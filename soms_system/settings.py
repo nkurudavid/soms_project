@@ -37,10 +37,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # third parties
+    'phonenumber_field',
+
     # local apps
-    'authentication',
-    'organization',
-    'recruitment',
+    'account',
+    # 'organization',
+    # 'recruitment',
+    'main',
 ]
 
 MIDDLEWARE = [
@@ -120,7 +125,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 #statc file directory
-STATIC_URL = '/static/'
+STATIC_URL = '/assets/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'assets'),
 )
@@ -138,4 +143,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # user model
-AUTH_USER_MODEL = "authentication.User"
+AUTH_USER_MODEL = "account.User"
+swappable = 'AUTH_USER_MODEL'

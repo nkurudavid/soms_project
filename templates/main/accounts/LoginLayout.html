@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  {% load static %}
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {% if title %}
+    <title>SOMS - {{ title }}</title>
+    {% else %}
+    <title>SOMS Login</title>
+    {% endif%}
+
+    <link rel="stylesheet" href="{% static 'main.css' %}" />
+
+    <meta
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+      name="viewport"
+    />
+    <!-- Bootstrap 3.3.7 -->
+    <link
+      rel="stylesheet"
+      href="{% static 'bower_components/bootstrap/dist/css/bootstrap.min.css' %}"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="{% static 'bower_components/font-awesome/css/font-awesome.min.css' %}"
+    />
+    <!-- Ionicons -->
+    <link
+      rel="stylesheet"
+      href="{% static 'bower_components/Ionicons/css/ionicons.min.css' %}"
+    />
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{% static 'dist/css/AdminLTE.min.css' %}" />
+    <!-- iCheck -->
+    <link
+      rel="stylesheet"
+      href="{% static 'plugins/iCheck/square/blue.css' %}"
+    />
+
+    <!-- Google Font -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic"
+    />
+  </head>
+
+  <body class="hold-transition login-page">
+    <!-- Body -->
+
+    {% block login_content%} {% endblock %}
+    <!-- ./Body -->
+
+    {% if messages %} {% for message in messages %}
+    <script>
+      //<!--contents message displayed-->
+      alert("{{ message }}");
+      //<!-- / .contents message displayed-->
+    </script>
+    {% endfor %} {% endif %}
+
+    <!-- jQuery 3 -->
+    <script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
+    <!-- Bootstrap 3.3.7 -->
+    <script src="{% static 'bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    <!-- iCheck -->
+    <script src="{% static 'plugins/iCheck/icheck.min.js' %}"></script>
+    <script>
+      $(function () {
+        $("input").iCheck({
+          checkboxClass: "icheckbox_square-blue",
+          radioClass: "iradio_square-blue",
+          increaseArea: "20%", // optional
+        });
+      });
+    </script>
+  </body>
+</html>
