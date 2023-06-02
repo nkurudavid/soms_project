@@ -12,4 +12,6 @@ urlpatterns = [
     path('staff/manager/dashboard/our_team/<int:pk>/details', ManagerDashboard_teamEdit, name='manager_trainerEdit'),
     path('staff/manager/dashboard/stacks', ManagerDashboard_stacks, name='manager_stacks'),
     path('staff/manager/dashboard/stacks/<int:pk>/details', ManagerDashboard_stackEdit, name='manager_stackEdit'),
+    path('staff/manager/dashboard/cohorts', ManagerDashboard_cohorts, name='manager_cohorts'),
+    path('staff/manager/dashboard/cohorts/<int:pk>/details', ManagerDashboard_cohortEdit, name='manager_cohortEdit'),
 ]
