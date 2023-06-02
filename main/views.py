@@ -241,30 +241,32 @@ def ManagerDashboard_stackEdit(request, pk):
 def ManagerDashboard_cohorts(request):
     if request.user.is_authenticated and request.user.is_manager==True:
         if request.method == 'POST':
-            stack_name = request.POST.get("stack_name")
-            description = request.POST.get("description")
+            cohort_name = request.POST.get("cohort_name")
+            starting_date = request.POST.get("starting_date")
+            ending_date = request.POST.get("ending_date")
 
-            if stack_name:
+            if cohort_name and starting_date and ending_date:
                 # stack_name=stack_name.upper()
-                found_data = Stack.objects.filter(name=stack_name)
+                found_data = Cohort.objects.filter(cohort_name=cohort_name)
                 if found_data:
-                    messages.warning(request, "Stack "+stack_name+", Already exist.")
+                    messages.warning(request, "Cohort "+cohort_name+", Already exist.")
                     return redirect(ManagerDashboard_cohorts)
                 else:
-                    # INSERT DATA IN STACK MODEL
-                    add_stack = Stack(
-                        name=stack_name, 
-                        description=description
+                    # Create new Cohort
+                    add_cohort = Cohort(
+                        cohort_name=cohort_name,
+                        starting_date=starting_date,
+                        ending_date=ending_date
                     )
-                    add_stack.save()
+                    add_cohort.save()
 
-                    messages.success(request, "New Stack created successfully.")
+                    messages.success(request, "New Cohort created successfully.")
                     return redirect(ManagerDashboard_cohorts)
             else:
-                messages.error(request, "Error , Stack name is required!")
+                messages.error(request, "Error , All fields are required!")
                 return redirect(ManagerDashboard_cohorts)
         else:
-            # getting stacks
+            # getting cohort
             CohortData = Cohort.objects.filter()
             context = {
                 'title': 'Manager - Cohorts',
