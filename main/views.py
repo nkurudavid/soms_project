@@ -137,16 +137,7 @@ def ManagerDashboard_team(request):
                         )
                         trainerProfile.save()
                         messages.success(request, "Trainer "+first_name+", created successfully.")
-
-                        # getting team
-                        teamData = Trainer.objects.filter()
-                        context = {
-                            'title': 'Manager - Team',
-                            'team': teamData,
-                            'team_total': teamData.count,
-                            'team_active': 'active',
-                        }
-                        return render(request, 'main/accounts/manager/team.html', context)
+                        return redirect(ManagerDashboard_team)
                     else:
                         messages.error(request, ('Process Failed.'))
                         return redirect(ManagerDashboard_team)
