@@ -49,15 +49,15 @@ def ManagerLogout(request):
 def ManagerDashboard(request):
     if request.user.is_authenticated and request.user.is_manager==True:
         # getting stacks
-        Stacks = Stack.objects.filter()
+        StacksData = Stack.objects.filter()
         # getting trainers
-        Trainers = Trainer.objects.filter()
+        TrainersData = Trainer.objects.filter()
 
         context = {
             'title': 'Manager Dashboard', 
             'dash_active': 'active',
-            'stack_total': Stacks.count(),
-            'trainer_total': Trainers.count(),
+            'stack_total': StacksData.count(),
+            'trainer_total': TrainersData.count(),
         }
         return render(request, 'main/accounts/manager/dashboard.html', context)
     else:
@@ -129,11 +129,11 @@ def ManagerDashboard_team(request):
                         messages.success(request, "Trainer "+first_name+", created successfully.")
 
                         # getting team
-                        team = Trainer.objects.filter()
+                        teamData = Trainer.objects.filter()
                         context = {
                             'title': 'Manager - Team',
-                            'team': team,
-                            'team_total': team.count,
+                            'team': teamData,
+                            'team_total': teamData.count,
                             'team_active': 'active',
                         }
                         return render(request, 'main/accounts/manager/team.html', context)
@@ -145,11 +145,11 @@ def ManagerDashboard_team(request):
                 return redirect(ManagerDashboard_team)
         else:
             # getting team
-            team = Trainer.objects.filter()
+            teamData = Trainer.objects.filter()
             context = {
                 'title': 'Manager - Team',
-                'team': team,
-                'team_total': team.count,
+                'team': teamData,
+                'team_total': teamData.count,
                 'team_active': 'active',
             }
             return render(request, 'main/accounts/manager/team.html', context)
@@ -163,12 +163,12 @@ def ManagerDashboard_teamEdit(request, pk):
     if request.user.is_authenticated and request.user.is_manager==True:
         stack_id = pk
         # getting stacks
-        Stack = Stack.objects.filter(id=stack_id)
+        StackData = Stack.objects.filter(id=stack_id)
 
         context = {
             'title': 'Manager - Stacks',
             'stacks_active': 'active', 
-            'stack': Stack,
+            'stack': StackData,
         }
         return render(request, 'main/accounts/manager/stacksEdit.html', context)
     else:
@@ -205,12 +205,12 @@ def ManagerDashboard_stacks(request):
                 return redirect(ManagerDashboard_stacks)
         else:
             # getting stacks
-            Stacks = Stack.objects.filter()
+            StackData = Stack.objects.filter()
             context = {
                 'title': 'Manager - Stacks',
                 'stacks_active': 'active', 
-                'stacks': Stacks,
-                'stack_total': Stacks.count(),
+                'stacks': StackData,
+                'stack_total': StackData.count(),
             }
             return render(request, 'main/accounts/manager/stacks.html', context)
     else:
@@ -223,14 +223,74 @@ def ManagerDashboard_stackEdit(request, pk):
     if request.user.is_authenticated and request.user.is_manager==True:
         stack_id = pk
         # getting stacks
-        Stack = Stack.objects.filter(id=stack_id)
+        StackData = Stack.objects.filter(id=stack_id)
 
         context = {
             'title': 'Manager - Stacks',
             'stacks_active': 'active', 
-            'stack': Stack,
+            'stack': StackData,
         }
         return render(request, 'main/accounts/manager/stacksEdit.html', context)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(ManagerLogin)
+
+
+
+@login_required(login_url='manager_login')
+def ManagerDashboard_cohorts(request):
+    if request.user.is_authenticated and request.user.is_manager==True:
+        if request.method == 'POST':
+            stack_name = request.POST.get("stack_name")
+            description = request.POST.get("description")
+
+            if stack_name:
+                # stack_name=stack_name.upper()
+                found_data = Stack.objects.filter(name=stack_name)
+                if found_data:
+                    messages.warning(request, "Stack "+stack_name+", Already exist.")
+                    return redirect(ManagerDashboard_cohorts)
+                else:
+                    # INSERT DATA IN STACK MODEL
+                    add_stack = Stack(
+                        name=stack_name, 
+                        description=description
+                    )
+                    add_stack.save()
+
+                    messages.success(request, "New Stack created successfully.")
+                    return redirect(ManagerDashboard_cohorts)
+            else:
+                messages.error(request, "Error , Stack name is required!")
+                return redirect(ManagerDashboard_cohorts)
+        else:
+            # getting stacks
+            CohortData = Cohort.objects.filter()
+            context = {
+                'title': 'Manager - Cohorts',
+                'cohort_active': 'active', 
+                'cohorts': CohortData,
+                'cohort_total': CohortData.count(),
+            }
+            return render(request, 'main/accounts/manager/cohorts.html', context)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(ManagerLogin)
+
+
+@login_required(login_url='manager_login')
+def ManagerDashboard_cohortEdit(request, pk):
+    if request.user.is_authenticated and request.user.is_manager==True:
+        stack_id = pk
+        # getting stacks
+        CohortData = Cohort.objects.filter(id=stack_id)
+
+        context = {
+            'title': 'Manager - Cohorts',
+            'cohorts_active': 'active', 
+            'cohort': CohortData,
+        }
+        return render(request, 'main/accounts/manager/cohortEdit.html', context)
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(ManagerLogin)

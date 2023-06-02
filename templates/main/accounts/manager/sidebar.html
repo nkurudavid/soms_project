@@ -26,20 +26,20 @@
           <span class="pull-right-container"> </span>
         </a>
       </li>
-      <li>
+      <li class="{{team_active}}">
         <a href="{% url 'manager_team' %}">
           <i class="fa fa-group"></i>
           <span>Our Team</span>
           <span class="pull-right-container"> </span>
         </a>
       </li>
-      <li>
+      <li class="{{stacks_active}}">
         <a href="{% url 'manager_stacks' %}">
           <i class="fa fa-sitemap"></i>
           <span>Stacks</span>
         </a>
       </li>
-      <li class="treeview">
+      <li class="treeview {{dash_active}}">
         <a href="#">
           <i class="fa fa-group"></i>
           <span>Talents</span>
@@ -48,10 +48,10 @@
           </span>
         </a>
         <ul class="treeview-menu">
-          <li>
+          <li class="{{dash_active}}">
             <a href="#"><i class="fa fa-circle-o text-aqua"></i> Outsourced</a>
           </li>
-          <li>
+          <li class="{{dash_active}}">
             <a href="#"
               ><i class="fa fa-circle-o text-aqua"></i> Reserved Talents</a
             >
@@ -59,15 +59,15 @@
         </ul>
       </li>
       <li class="header">TRAINING</li>
-      <li>
-        <a href="#">
+      <li class="{{cohort_active}}">
+        <a href="{% url 'manager_cohorts' %}">
           <i class="fa fa-list"></i>
           <span>Cohorts</span>
         </a>
       </li>
 
       <li class="treeview">
-        <a href="#">
+        <a href="#" class="{{dash_active}}">
           <i class="fa fa-files-o"></i>
           <span>Applicants</span>
           <span class="pull-right-container">
