@@ -52,10 +52,13 @@ def ManagerDashboard(request):
         StacksData = Stack.objects.filter()
         # getting trainers
         TrainersData = Trainer.objects.filter()
+        # getting cohort
+        CohortData = Cohort.objects.filter()
 
         context = {
             'title': 'Manager Dashboard', 
-            'dash_active': 'active',
+            'dash_active': 'active', 
+            'cohorts': CohortData,
             'stack_total': StacksData.count(),
             'trainer_total': TrainersData.count(),
         }
@@ -68,7 +71,14 @@ def ManagerDashboard(request):
 @login_required(login_url='manager_login')
 def ManagerDashboard_profile(request):
     if request.user.is_authenticated and request.user.is_manager==True:
-        context = {'title': 'Manager - My Profile', 'profile_active': 'active', }
+        # getting cohort
+        CohortData = Cohort.objects.filter()
+
+        context = {
+            'title': 'Manager - My Profile',
+            'profile_active': 'active',
+            'cohorts': CohortData,
+        }
         return render(request, 'main/accounts/manager/profile.html', context)
     else:
         messages.warning(request, ('You have to login to view the page!'))
@@ -146,11 +156,15 @@ def ManagerDashboard_team(request):
         else:
             # getting team
             teamData = Trainer.objects.filter()
+            # getting cohort
+            CohortData = Cohort.objects.filter()
+
             context = {
                 'title': 'Manager - Team',
                 'team': teamData,
                 'team_total': teamData.count,
                 'team_active': 'active',
+                'cohorts': CohortData,
             }
             return render(request, 'main/accounts/manager/team.html', context)
     else:
@@ -164,11 +178,14 @@ def ManagerDashboard_teamEdit(request, pk):
         stack_id = pk
         # getting stacks
         StackData = Stack.objects.filter(id=stack_id)
+        # getting cohort
+        CohortData = Cohort.objects.filter()
 
         context = {
             'title': 'Manager - Stacks',
             'stacks_active': 'active', 
-            'stack': StackData,
+            'stack': StackData, 
+            'cohorts': CohortData,
         }
         return render(request, 'main/accounts/manager/stacksEdit.html', context)
     else:
@@ -206,10 +223,14 @@ def ManagerDashboard_stacks(request):
         else:
             # getting stacks
             StackData = Stack.objects.filter()
+            # getting cohort
+            CohortData = Cohort.objects.filter()
+
             context = {
                 'title': 'Manager - Stacks',
                 'stacks_active': 'active', 
-                'stacks': StackData,
+                'stacks': StackData, 
+                'cohorts': CohortData,
                 'stack_total': StackData.count(),
             }
             return render(request, 'main/accounts/manager/stacks.html', context)
@@ -224,11 +245,14 @@ def ManagerDashboard_stackEdit(request, pk):
         stack_id = pk
         # getting stacks
         StackData = Stack.objects.filter(id=stack_id)
+        # getting cohort
+        CohortData = Cohort.objects.filter()
 
         context = {
             'title': 'Manager - Stacks',
             'stacks_active': 'active', 
             'stack': StackData,
+            'cohorts': CohortData,
         }
         return render(request, 'main/accounts/manager/stacksEdit.html', context)
     else:
@@ -268,9 +292,10 @@ def ManagerDashboard_cohorts(request):
         else:
             # getting cohort
             CohortData = Cohort.objects.filter()
+
             context = {
                 'title': 'Manager - Cohorts',
-                'cohort_active': 'active', 
+                'cohort_active': 'active',
                 'cohorts': CohortData,
                 'cohort_total': CohortData.count(),
             }
@@ -286,6 +311,8 @@ def ManagerDashboard_cohortEdit(request, pk):
         stack_id = pk
         # getting stacks
         CohortData = Cohort.objects.filter(id=stack_id)
+        # getting cohort
+        CohortData = Cohort.objects.filter()
 
         context = {
             'title': 'Manager - Cohorts',

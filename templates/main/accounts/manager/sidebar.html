@@ -75,24 +75,14 @@
           </span>
         </a>
         <ul class="treeview-menu">
+          {% if cohorts %} {% for cohort in cohorts %}
           <li>
-            <a href="#">
+            <a href="{% url 'manager_cohortEdit' cohort.id %}">
               <i class="fa fa-circle-o text-aqua"></i>
-              Cohort 1
+              {{cohort.cohort_name}}
             </a>
           </li>
-          <li>
-            <a href="#">
-              <i class="fa fa-circle-o text-aqua"></i>
-              Cohort 2
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              <i class="fa fa-circle-o text-aqua"></i>
-              Cohort 3
-            </a>
-          </li>
+          {% endfor %} {% endif %}
         </ul>
       </li>
       <li class="treeview">
@@ -103,24 +93,14 @@
           </span>
         </a>
         <ul class="treeview-menu">
+          {% if cohorts %} {% for cohort in cohorts %}
           <li>
-            <a href="#">
+            <a href="{% url 'manager_cohortEdit' cohort.id %}">
               <i class="fa fa-circle-o text-aqua"></i>
-              Cohort 1
+              {{cohort.cohort_name}}
             </a>
           </li>
-          <li>
-            <a href="#">
-              <i class="fa fa-circle-o text-aqua"></i>
-              Cohort 2
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              <i class="fa fa-circle-o text-aqua"></i>
-              Cohort 3
-            </a>
-          </li>
+          {% endfor %} {% endif %}
         </ul>
       </li>
     </ul>
