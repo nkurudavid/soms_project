@@ -9,7 +9,7 @@ urlpatterns = [
     path('staff/manager/dashboard', ManagerDashboard, name='manager_dashboard'),
     path('staff/manager/dashboard/my_profile', ManagerDashboard_profile, name='manager_profile'),
     path('staff/manager/dashboard/our_team', ManagerDashboard_team, name='manager_team'),
+    path('staff/manager/dashboard/our_team/<int:pk>/details', ManagerDashboard_teamEdit, name='manager_trainerEdit'),
     path('staff/manager/dashboard/stacks', ManagerDashboard_stacks, name='manager_stacks'),
-    path('staff/manager/dashboard/stacks/<int:pk>/details', ManagerDashboard_stacksEdit, name='manager_stacksEdit'),
-    
+    path('staff/manager/dashboard/stacks/<int:pk>/details', ManagerDashboard_stackEdit, name='manager_stackEdit'),
 ]

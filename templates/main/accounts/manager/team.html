@@ -40,10 +40,10 @@
             <div class="col-xs-12">
               <div class="box">
                 <div class="box-header">
-                  <h3 class="box-title">All Trainers</h3>
+                  <h3 class="box-title">All Trainers ({{team_total}})</h3>
                   <button
                     type="button"
-                    class="btn btn-primary pull-right"
+                    class="btn btn-flat btn-primary pull-right"
                     data-toggle="modal"
                     data-target="#modal-default"
                   >
@@ -59,50 +59,45 @@
                   >
                     <thead>
                       <tr>
-                        <th>Rendering engine</th>
-                        <th>Browser</th>
-                        <th>Platform(s)</th>
-                        <th>Engine version</th>
-                        <th>CSS grade</th>
+                        <th>No.</th>
+                        <th>FULL NAMES</th>
+                        <th>SSN</th>
+                        <th>CONTACT</th>
+                        <th>SPECIALIZATION</th>
+                        <th>IMAGE</th>
+                        <th></th>
                       </tr>
                     </thead>
                     <tbody>
+                      {% if team %} {% for trainer in team %}
                       <tr>
-                        <td>Trident</td>
-                        <td>Internet Explorer 4.0</td>
-                        <td>Win 95+</td>
-                        <td>4</td>
-                        <td>X</td>
+                        <td>{{ forloop.counter }}.</td>
+                        <td>{{trainer.user}}</td>
+                        <td>{{trainer.ssn}}</td>
+                        <td>
+                          Email: {{trainer.user.email}}<br />
+                          Phome: {{trainer.phone1}}, {{trainer.phone2}}<br />
+                        </td>
+                        <td>{{trainer.specialization}}</td>
+                        <td>
+                          <img
+                            class=""
+                            src="{{trainer.profilePicture.url}}"
+                            width="120px"
+                            alt="{{trainer.user.first_name}} image"
+                          />
+                        </td>
+                        <td>
+                          <div class="pull-right">
+                            <a
+                              href="{% url 'manager_trainerEdit' trainer.id %}"
+                              class="btn btn-flat btn-info"
+                              ><i class="fa fa-eye"></i> View</a
+                            >
+                          </div>
+                        </td>
                       </tr>
-
-                      <tr>
-                        <td>Misc</td>
-                        <td>Lynx</td>
-                        <td>Text only</td>
-                        <td>-</td>
-                        <td>X</td>
-                      </tr>
-                      <tr>
-                        <td>Misc</td>
-                        <td>IE Mobile</td>
-                        <td>Windows Mobile 6</td>
-                        <td>-</td>
-                        <td>C</td>
-                      </tr>
-                      <tr>
-                        <td>Misc</td>
-                        <td>PSP browser</td>
-                        <td>PSP</td>
-                        <td>-</td>
-                        <td>C</td>
-                      </tr>
-                      <tr>
-                        <td>Other browsers</td>
-                        <td>All others</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>U</td>
-                      </tr>
+                      {% endfor %} {% endif %}
                     </tbody>
                   </table>
                 </div>
@@ -125,23 +120,136 @@
                   >
                     <span aria-hidden="true">&times;</span>
                   </button>
-                  <h4 class="modal-title">Default Modal</h4>
+                  <h4 class="modal-title">
+                    <i class="fa fa-user-plus"></i> REGISTER NEW STACK
+                  </h4>
                 </div>
-                <div class="modal-body">
-                  <p>One fine body&hellip;</p>
-                </div>
-                <div class="modal-footer">
-                  <button
-                    type="button"
-                    class="btn btn-default pull-left"
-                    data-dismiss="modal"
-                  >
-                    Close
-                  </button>
-                  <button type="button" class="btn btn-primary">
-                    Save changes
-                  </button>
-                </div>
+                <form method="post" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <div class="modal-body">
+                    <fieldset>
+                      <legend>Personal Info</legend>
+                      <div class="form-group mb-0">
+                        <label class="col-form-label">First Name</label>
+                        <input
+                          type="text"
+                          class="form-control col-6"
+                          name="first_name"
+                          placeholder="Enter first name"
+                          required
+                        />
+                      </div>
+                      <div class="form-group mb-0">
+                        <label class="col-form-label">Last Name</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          name="last_name"
+                          placeholder="Enter last name"
+                          required
+                        />
+                      </div>
+                      <div class="form-group mb-0">
+                        <label class="col-form-label">Email</label>
+                        <input
+                          type="email"
+                          class="form-control"
+                          name="email"
+                          placeholder="Enter email"
+                          required
+                        />
+                      </div>
+                      <div class="form-group mb-0">
+                        <label class="col-form-label">Gender</label>
+                        <select class="form-control" name="gender" required>
+                          <option value="">Select Gender</option>
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                        </select>
+                      </div>
+                      <div class="form-group mb-0">
+                        <label class="col-form-label">Phone 1</label>
+                        <input
+                          type="tel"
+                          class="form-control"
+                          name="phone1"
+                          placeholder="Enter phone 1"
+                          required
+                        />
+                      </div>
+                      <div class="form-group mb-0">
+                        <label class="col-form-label">Phone 2</label>
+                        <input
+                          type="tel"
+                          class="form-control"
+                          name="phone2"
+                          placeholder="Enter phone 2"
+                        />
+                      </div>
+                      <br />
+                    </fieldset>
+                    <fieldset>
+                      <legend>Other Info</legend>
+                      <div class="form-group mb-0">
+                        <label class="col-form-label">Specialization</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          name="specialization"
+                          placeholder="Specialized in ..."
+                          required
+                        />
+                      </div>
+                      <div class="form-group mb-0">
+                        <label class="col-form-label">SSN</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          name="ssn"
+                          placeholder="Enter SSN"
+                          required
+                        />
+                      </div>
+                      <div class="form-group mb-0">
+                        <label class="col-form-label">Location Address</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          name="locationAddress"
+                          placeholder="Location in ..."
+                          required
+                        />
+                      </div>
+                      <div class="form-group mb-0">
+                        <label class="col-form-label">Profile Picture</label>
+                        <input
+                          type="file"
+                          class="form-control"
+                          name="profilePicture"
+                          accept=".png, .jpg, .jpeg"
+                          required
+                        />
+                      </div>
+                    </fieldset>
+                  </div>
+                  <div class="modal-footer">
+                    <button
+                      type="button"
+                      class="btn btn-flat btn-default pull-left"
+                      data-dismiss="modal"
+                    >
+                      Close
+                    </button>
+                    <button
+                      type="submit"
+                      name="new_stack"
+                      class="btn btn-flat btn-primary"
+                    >
+                      <i class="fa fa-save"></i>
+                      Submit
+                    </button>
+                  </div>
+                </form>
               </div>
               <!-- /.modal-content -->
             </div>

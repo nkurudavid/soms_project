@@ -1,3 +1,5 @@
+
+from datetime import date
 from django.shortcuts import redirect, render
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -5,7 +7,7 @@ from django.contrib.auth import get_user_model, authenticate, login, logout, upd
 
 from account.models import Trainer, Trainee, ProgramManager, Company
 from .models import Stack, Cohort
-
+from .forms import UserForm, TrainerForm
 
 # Create your views here.
 def HomePage(request):
@@ -76,11 +78,103 @@ def ManagerDashboard_profile(request):
 @login_required(login_url='manager_login')
 def ManagerDashboard_team(request):
     if request.user.is_authenticated and request.user.is_manager==True:
-        context = {'title': 'Manager - Team', 'team_active': 'active', }
-        return render(request, 'main/accounts/manager/team.html', context)
+        if request.method == 'POST':
+            # Retrieve the form data from the request
+            first_name = request.POST.get('first_name')
+            last_name = request.POST.get('last_name')
+            email = request.POST.get('email')
+            gender = request.POST.get('gender')
+            phone1 = request.POST.get('phone1')
+            phone2 = request.POST.get('phone2')
+            specialization = request.POST.get('specialization')
+            ssn = request.POST.get('ssn')
+            locationAddress = request.POST.get('locationAddress')
+            profilePicture = request.FILES.get('profilePicture')
+
+            if first_name and last_name and email and gender and phone1 and phone2 and specialization and ssn and locationAddress and profilePicture:
+                if get_user_model().objects.filter(email=email):
+                    messages.warning(request, "Email already exist.")
+                    return redirect(ManagerDashboard_team)
+                elif Trainer.objects.filter(ssn=ssn):
+                    messages.warning(request, "SSN already exist.")
+                    return redirect(ManagerDashboard_team)
+                elif Trainer.objects.filter(phone1=phone1):
+                    messages.warning(request, "Phone 1 already exist.")
+                    return redirect(ManagerDashboard_team)
+                else:
+                    current_year = date.today().year
+                    trainerPassword = "trainer"+str(current_year)
+                    # Create new User as Trainer
+                    user =  get_user_model().objects.create_user(
+                        first_name=first_name,
+                        last_name=last_name,
+                        email=email,
+                        gender=gender,
+                        is_trainer=True,
+                        password=trainerPassword
+                    )
+                    if user:
+                        trainerUser = get_user_model().objects.get(email=email)
+                        # Create trainer profile
+                        trainerProfile = Trainer(
+                            user=trainerUser,
+                            ssn=ssn,
+                            profilePicture=profilePicture,
+                            phone1=phone1,
+                            phone2=phone2,
+                            specialization=specialization,
+                            locationAddress=locationAddress,
+                        )
+                        trainerProfile.save()
+                        messages.success(request, "Trainer "+first_name+", created successfully.")
+
+                        # getting team
+                        team = Trainer.objects.filter()
+                        context = {
+                            'title': 'Manager - Team',
+                            'team': team,
+                            'team_total': team.count,
+                            'team_active': 'active',
+                        }
+                        return render(request, 'main/accounts/manager/team.html', context)
+                    else:
+                        messages.error(request, ('Process Failed.'))
+                        return redirect(ManagerDashboard_team)
+            else:
+                messages.error(request, ('All fields are required.'))
+                return redirect(ManagerDashboard_team)
+        else:
+            # getting team
+            team = Trainer.objects.filter()
+            context = {
+                'title': 'Manager - Team',
+                'team': team,
+                'team_total': team.count,
+                'team_active': 'active',
+            }
+            return render(request, 'main/accounts/manager/team.html', context)
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(ManagerLogin)
+
+
+@login_required(login_url='manager_login')
+def ManagerDashboard_teamEdit(request, pk):
+    if request.user.is_authenticated and request.user.is_manager==True:
+        stack_id = pk
+        # getting stacks
+        Stack = Stack.objects.filter(id=stack_id)
+
+        context = {
+            'title': 'Manager - Stacks',
+            'stacks_active': 'active', 
+            'stack': Stack,
+        }
+        return render(request, 'main/accounts/manager/stacksEdit.html', context)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(ManagerLogin)
+
 
 
 @login_required(login_url='manager_login')
@@ -125,7 +219,7 @@ def ManagerDashboard_stacks(request):
 
 
 @login_required(login_url='manager_login')
-def ManagerDashboard_stacksEdit(request, pk):
+def ManagerDashboard_stackEdit(request, pk):
     if request.user.is_authenticated and request.user.is_manager==True:
         stack_id = pk
         # getting stacks

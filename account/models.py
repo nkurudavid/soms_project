@@ -51,8 +51,6 @@ class Trainer(models.Model):
     phone1 = PhoneNumberField(verbose_name="Phone 1", blank=True)
     phone2 = PhoneNumberField(verbose_name="Phone 2", blank=True)
     specialization = models.CharField(verbose_name="Specializations", max_length=100, blank=True, null=True)
-    bio = models.TextField(verbose_name="Bio", blank=True)
-    dob = models.DateField(verbose_name="Birthdate")
     locationAddress = models.CharField(verbose_name="Address", max_length=200)
     def __str__(self):
         return "{} {}".format(self.user.first_name, self.user.last_name)
@@ -78,8 +76,6 @@ class Trainee(models.Model):
     phone2 = PhoneNumberField(verbose_name="Phone 2", blank=True)
     cohort = models.OneToOneField(Cohort, verbose_name="Cohort belonging", related_name="cohorts", on_delete=models.CASCADE)
     stack = models.OneToOneField(Stack, verbose_name="Stack belonging", related_name="stacks", on_delete=models.CASCADE)
-    bio = models.TextField(verbose_name="Bio", blank=True)
-    dob = models.DateField(verbose_name="Birthdate")
     locationAddress = models.CharField(verbose_name="Address", max_length=200)
     status = models.CharField(verbose_name="Status", choices=Status.choices, default=Status.SELECT, max_length=10)
     def __str__(self):
@@ -98,8 +94,6 @@ class ProgramManager(models.Model):
     )
     phone1 = PhoneNumberField(verbose_name="Phone 1", blank=True)
     phone2 = PhoneNumberField(verbose_name="Phone 2", blank=True)
-    bio = models.TextField(verbose_name="Bio", blank=True)
-    dob = models.DateField(verbose_name="Birthdate")
     locationAddress = models.CharField(verbose_name="Address", max_length=200)
     def __str__(self):
         return "{} {}".format(self.user.first_name, self.user.last_name)
