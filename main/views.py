@@ -7,7 +7,6 @@ from django.contrib.auth import get_user_model, authenticate, login, logout, upd
 
 from account.models import Trainer, Trainee, ProgramManager, Company
 from .models import Stack, Cohort
-from .forms import UserForm, TrainerForm
 
 # Create your views here.
 def HomePage(request):
@@ -54,7 +53,6 @@ def ManagerDashboard(request):
         TrainersData = Trainer.objects.filter()
         # getting cohort
         CohortData = Cohort.objects.filter()
-
         context = {
             'title': 'Manager Dashboard', 
             'dash_active': 'active', 
@@ -73,7 +71,6 @@ def ManagerDashboard_profile(request):
     if request.user.is_authenticated and request.user.is_manager==True:
         # getting cohort
         CohortData = Cohort.objects.filter()
-
         context = {
             'title': 'Manager - My Profile',
             'profile_active': 'active',
@@ -253,7 +250,6 @@ def ManagerDashboard_teamEdit(request, pk):
             else:
                 # getting cohort
                 CohortData = Cohort.objects.filter()
-
                 context = {
                     'title': 'Manager - Trainer Info',
                     'team_active': 'active',
@@ -284,7 +280,7 @@ def ManagerDashboard_stacks(request):
                     messages.warning(request, "Stack "+stack_name+", Already exist.")
                     return redirect(ManagerDashboard_stacks)
                 else:
-                    # INSERT DATA IN STACK MODEL
+                    # add new stack
                     add_stack = Stack(
                         name=stack_name, 
                         description=description
@@ -301,7 +297,6 @@ def ManagerDashboard_stacks(request):
             StackData = Stack.objects.filter()
             # getting cohort
             CohortData = Cohort.objects.filter()
-
             context = {
                 'title': 'Manager - Stacks',
                 'stacks_active': 'active', 
@@ -334,7 +329,7 @@ def ManagerDashboard_stackEdit(request, pk):
                         messages.warning(request, "Stack name already exist.")
                         return redirect(ManagerDashboard_stacks)
                     else:
-                        # Update Trainer account
+                        # Update Stack
                         stack_updated =  Stack.objects.filter(id=stack_id).update(
                             name=stack_name,
                             description=description
@@ -359,7 +354,6 @@ def ManagerDashboard_stackEdit(request, pk):
             else:
                 # getting cohort
                 CohortData = Cohort.objects.filter()
-
                 context = {
                     'title': 'Manager - Stack Info',
                     'stacks_active': 'active',
@@ -368,7 +362,7 @@ def ManagerDashboard_stackEdit(request, pk):
                 }
                 return render(request, 'main/accounts/manager/stackEdit.html', context)
         else:
-            messages.error(request, ('Trainer not found'))
+            messages.error(request, ('Stack not found'))
             return redirect(ManagerDashboard_stacks)
     else:
         messages.warning(request, ('You have to login to view the page!'))
@@ -407,7 +401,6 @@ def ManagerDashboard_cohorts(request):
         else:
             # getting cohort
             CohortData = Cohort.objects.filter()
-
             context = {
                 'title': 'Manager - Cohorts',
                 'cohort_active': 'active',
@@ -423,18 +416,59 @@ def ManagerDashboard_cohorts(request):
 @login_required(login_url='manager_login')
 def ManagerDashboard_cohortEdit(request, pk):
     if request.user.is_authenticated and request.user.is_manager==True:
-        stack_id = pk
-        # getting stacks
-        CohortData = Cohort.objects.filter(id=stack_id)
+        cohort_id = pk
         # getting cohort
-        CohortData = Cohort.objects.filter()
+        if Cohort.objects.filter(id=cohort_id).exists():
+            # if exists
+            foundData = Cohort.objects.get(id=cohort_id)
 
-        context = {
-            'title': 'Manager - Cohorts',
-            'cohorts_active': 'active', 
-            'cohort': CohortData,
-        }
-        return render(request, 'main/accounts/manager/cohortEdit.html', context)
+            if 'submit' in request.POST:
+                # Retrieve the form data from the request
+                cohort_name = request.POST.get("cohort_name")
+                starting_date = request.POST.get("starting_date")
+                ending_date = request.POST.get("ending_date")
+
+                if cohort_name and starting_date and ending_date:
+                    if Cohort.objects.filter(cohort_name=cohort_name).exclude(id=cohort_id):
+                        messages.warning(request, "Cohort name already exist.")
+                        return redirect(ManagerDashboard_cohorts)
+                    else:
+                        # Update Cohort
+                        updated_cohort =  Cohort.objects.filter(id=cohort_id).update(
+                            cohort_name=cohort_name,
+                            starting_date=starting_date,
+                            ending_date=ending_date
+                        )
+                        if updated_cohort:
+                            messages.success(request, "Cohort "+cohort_name+", Updated successfully.")
+                            return redirect(ManagerDashboard_cohorts)
+                        else:
+                            messages.error(request, ('Process Failed.'))
+                            return redirect(ManagerDashboard_cohorts)
+                else:
+                    messages.error(request, ('All fields are required.'))
+                    return redirect(ManagerDashboard_cohorts)
+
+            elif 'delete' in request.POST:
+                # Delete Cohort
+                delete_cohort = Cohort.objects.get(id=cohort_id)
+                delete_cohort.delete()
+                messages.success(request, "Cohort info deleted successfully.")
+                return redirect(ManagerDashboard_cohorts)
+
+            else:
+                # getting cohort
+                CohortData = Cohort.objects.filter()
+                context = {
+                    'title': 'Manager - Cohort Info',
+                    'cohorts_active': 'active',
+                    'cohort': foundData,
+                    'cohorts': CohortData,
+                }
+                return render(request, 'main/accounts/manager/cohortEdit.html', context)
+        else:
+            messages.error(request, ('Cohort not found'))
+            return redirect(ManagerDashboard_cohorts)
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(ManagerLogin)
