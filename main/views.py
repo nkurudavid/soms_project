@@ -319,18 +319,57 @@ def ManagerDashboard_stacks(request):
 def ManagerDashboard_stackEdit(request, pk):
     if request.user.is_authenticated and request.user.is_manager==True:
         stack_id = pk
-        # getting stacks
-        StackData = Stack.objects.filter(id=stack_id)
-        # getting cohort
-        CohortData = Cohort.objects.filter()
+        # getting stack
+        if Stack.objects.filter(id=stack_id).exists():
+            # if exists
+            foundData = Stack.objects.get(id=stack_id)
 
-        context = {
-            'title': 'Manager - Stacks',
-            'stacks_active': 'active', 
-            'stack': StackData,
-            'cohorts': CohortData,
-        }
-        return render(request, 'main/accounts/manager/stacksEdit.html', context)
+            if 'submit' in request.POST:
+                # Retrieve the form data from the request
+                stack_name = request.POST.get('stack_name')
+                description = request.POST.get('description')
+
+                if stack_name :
+                    if Stack.objects.filter(name=stack_name).exclude(id=stack_id):
+                        messages.warning(request, "Stack name already exist.")
+                        return redirect(ManagerDashboard_stacks)
+                    else:
+                        # Update Trainer account
+                        stack_updated =  Stack.objects.filter(id=stack_id).update(
+                            name=stack_name,
+                            description=description
+                        )
+                        if stack_updated:
+                            messages.success(request, "Stack "+stack_name+", Updated successfully.")
+                            return redirect(ManagerDashboard_stacks)
+                        else:
+                            messages.error(request, ('Process Failed.'))
+                            return redirect(ManagerDashboard_stacks)
+                else:
+                    messages.error(request, ('Stack name is required.'))
+                    return redirect(ManagerDashboard_stacks)
+
+            elif 'delete' in request.POST:
+                # Delete Stack
+                delete_stack = Stack.objects.get(id=stack_id)
+                delete_stack.delete()
+                messages.success(request, "Stack info deleted successfully.")
+                return redirect(ManagerDashboard_stacks)
+
+            else:
+                # getting cohort
+                CohortData = Cohort.objects.filter()
+
+                context = {
+                    'title': 'Manager - Stack Info',
+                    'stacks_active': 'active',
+                    'stack': foundData,
+                    'cohorts': CohortData,
+                }
+                return render(request, 'main/accounts/manager/stackEdit.html', context)
+        else:
+            messages.error(request, ('Trainer not found'))
+            return redirect(ManagerDashboard_stacks)
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(ManagerLogin)
