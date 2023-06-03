@@ -109,6 +109,72 @@
             <!-- ./col -->
           </div>
           <!-- /.row -->
+          {% if team %}
+          <div class="row">
+            <div class="col-md-12">
+              <div class="box box-info">
+                <div class="box-header with-border">
+                  <h3 class="box-title">
+                    <i class="fa fa-group"></i> OUR TEAM
+                  </h3>
+                  <div class="box-tools pull-right">
+                    <button
+                      type="button"
+                      class="btn btn-box-tool"
+                      data-widget="collapse"
+                    >
+                      <i class="fa fa-minus"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-box-tool"
+                      data-widget="remove"
+                    >
+                      <i class="fa fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body no-padding">
+                  <ul class="users-list clearfix">
+                    {% for trainer in team %}
+                    <li>
+                      <img
+                        class=""
+                        src="{{trainer.profilePicture.url}}"
+                        style="
+                          height: 100px !important;
+                          width: 100px !important;
+                        "
+                        alt="{{trainer.user.first_name}} image"
+                      />
+                      <a
+                        class="users-list-name"
+                        href="{% url 'manager_trainerEdit' trainer.id %}"
+                      >
+                        {{trainer.user}}
+                      </a>
+                      <span class="users-list-date"
+                        >{{trainer.specialization}}</span
+                      >
+                    </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+                <!-- /.box-body -->
+                <div class="box-footer text-center">
+                  <a href="{% url 'manager_team' %}" class="uppercase">
+                    View More info
+                  </a>
+                </div>
+                <!-- /.box-footer -->
+              </div>
+              <!--/.box -->
+            </div>
+            <!-- /.col -->
+          </div>
+          {% endif %}
+
           <!-- Main row -->
           <div class="row"></div>
           <!-- /.row (main row) -->

@@ -59,6 +59,7 @@ def ManagerDashboard(request):
             'cohorts': CohortData,
             'stack_total': StacksData.count(),
             'trainer_total': TrainersData.count(),
+            'team': TrainersData,
         }
         return render(request, 'main/accounts/manager/dashboard.html', context)
     else:
