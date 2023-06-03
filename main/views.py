@@ -88,7 +88,7 @@ def ManagerDashboard_profile(request):
 @login_required(login_url='manager_login')
 def ManagerDashboard_team(request):
     if request.user.is_authenticated and request.user.is_manager==True:
-        if request.method == 'POST':
+        if 'submit' in request.POST:
             # Retrieve the form data from the request
             first_name = request.POST.get('first_name')
             last_name = request.POST.get('last_name')
@@ -166,19 +166,104 @@ def ManagerDashboard_team(request):
 @login_required(login_url='manager_login')
 def ManagerDashboard_teamEdit(request, pk):
     if request.user.is_authenticated and request.user.is_manager==True:
-        stack_id = pk
-        # getting stacks
-        StackData = Stack.objects.filter(id=stack_id)
-        # getting cohort
-        CohortData = Cohort.objects.filter()
+        trainer_id = pk
+        # getting trainer
+        if Trainer.objects.filter(id=trainer_id).exists():
+            # getting coh
+            foundData = Trainer.objects.get(id=trainer_id)
+            if foundData:
+                trainerData=get_user_model().objects.get(id=foundData.user.id)
 
-        context = {
-            'title': 'Manager - Stacks',
-            'stacks_active': 'active', 
-            'stack': StackData, 
-            'cohorts': CohortData,
-        }
-        return render(request, 'main/accounts/manager/stacksEdit.html', context)
+            if 'submit' in request.POST:
+                # Retrieve the form data from the request
+                first_name = request.POST.get('first_name')
+                last_name = request.POST.get('last_name')
+                email = request.POST.get('email')
+                gender = request.POST.get('gender')
+                phone1 = request.POST.get('phone1')
+                phone2 = request.POST.get('phone2')
+                specialization = request.POST.get('specialization')
+                ssn = request.POST.get('ssn')
+                locationAddress = request.POST.get('locationAddress')
+                profilePicture = request.FILES.get('profilePicture')
+
+                if first_name and last_name and email and gender and phone1 and phone2 and specialization and ssn and locationAddress:
+                    if get_user_model().objects.filter(email=email).exclude(id=foundData.user.id):
+                        messages.warning(request, "Email already exist.")
+                        return redirect(ManagerDashboard_team)
+                    elif Trainer.objects.filter(ssn=ssn).exclude(id=trainer_id):
+                        messages.warning(request, "SSN already exist.")
+                        return redirect(ManagerDashboard_team)
+                    elif Trainer.objects.filter(phone1=phone1).exclude(id=trainer_id):
+                        messages.warning(request, "Phone 1 already exist.")
+                        return redirect(ManagerDashboard_team)
+                    else:
+                        # Update Trainer account
+                        user =  get_user_model().objects.filter(id=foundData.user.id).update(
+                            first_name=first_name,
+                            last_name=last_name,
+                            email=email,
+                            gender=gender,
+                        )
+                        if user:
+                            if len(profilePicture) > 0:
+                                data = Trainer.objects.get(id=trainer_id)
+                                if len(data.profilePicture) > 0:
+                                    data.profilePicture.delete()
+
+                                # Update trainer profile
+                                data.ssn = ssn
+                                data.profilePicture = profilePicture
+                                data.phone1 = phone1
+                                data.phone2 = phone2
+                                data.specialization = specialization
+                                data.locationAddress = locationAddress
+                                data.save()
+                                updateTrainer = data
+                            else:
+                                # Update trainer profile
+                                updateTrainer = Trainer.objects.filter(id=trainer_id).update(
+                                    ssn=ssn,
+                                    phone1=phone1,
+                                    phone2=phone2,
+                                    specialization=specialization,
+                                    locationAddress=locationAddress,
+                                )
+
+                            if updateTrainer:
+                                messages.success(request, "Trainer "+first_name+", Updated successfully.")
+                                return redirect(ManagerDashboard_team)
+                            else:
+                                messages.error(request, ('Process Failed.'))
+                                return redirect(ManagerDashboard_team)
+                        else:
+                            messages.error(request, ('Process Failed.'))
+                            return redirect(ManagerDashboard_team)
+                else:
+                    messages.error(request, ('All fields are required.'))
+                    return redirect(ManagerDashboard_teamEdit)
+
+            elif 'delete' in request.POST:
+                # Delete Trainer
+                delete_trainer = get_user_model().objects.get(id=foundData.user.id)
+                delete_trainer.delete()
+                messages.success(request, "Trainer info deleted successfully.")
+                return redirect(ManagerDashboard_team)
+
+            else:
+                # getting cohort
+                CohortData = Cohort.objects.filter()
+
+                context = {
+                    'title': 'Manager - Trainer Info',
+                    'team_active': 'active',
+                    'profile_data': trainerData,
+                    'cohorts': CohortData,
+                }
+                return render(request, 'main/accounts/manager/trainerEdit.html', context)
+        else:
+            messages.error(request, ('Trainer not found'))
+            return redirect(ManagerDashboard_team)
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(ManagerLogin)

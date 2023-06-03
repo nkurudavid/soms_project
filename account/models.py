@@ -1,3 +1,4 @@
+from django.utils.safestring import mark_safe
 from django.core.validators import FileExtensionValidator
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth.models import AbstractUser
@@ -52,6 +53,12 @@ class Trainer(models.Model):
     phone2 = PhoneNumberField(verbose_name="Phone 2", blank=True)
     specialization = models.CharField(verbose_name="Specializations", max_length=100, blank=True, null=True)
     locationAddress = models.CharField(verbose_name="Address", max_length=200)
+    
+    def image(self):
+        return mark_safe('<img src="/../../media/%s" width="70" />' % (self.profilePicture))
+    
+    image.allow_tags = True 
+
     def __str__(self):
         return "{} {}".format(self.user.first_name, self.user.last_name)
 
@@ -78,6 +85,12 @@ class Trainee(models.Model):
     stack = models.OneToOneField(Stack, verbose_name="Stack belonging", related_name="stacks", on_delete=models.CASCADE)
     locationAddress = models.CharField(verbose_name="Address", max_length=200)
     status = models.CharField(verbose_name="Status", choices=Status.choices, default=Status.SELECT, max_length=10)
+    
+    def image(self):
+        return mark_safe('<img src="/../../media/%s" width="70" />' % (self.profilePicture))
+    
+    image.allow_tags = True 
+
     def __str__(self):
         return "{} {}".format(self.user.first_name, self.user.last_name)
 
@@ -95,6 +108,12 @@ class ProgramManager(models.Model):
     phone1 = PhoneNumberField(verbose_name="Phone 1", blank=True)
     phone2 = PhoneNumberField(verbose_name="Phone 2", blank=True)
     locationAddress = models.CharField(verbose_name="Address", max_length=200)
+    
+    def image(self):
+        return mark_safe('<img src="/../../media/%s" width="70" />' % (self.profilePicture))
+    
+    image.allow_tags = True 
+
     def __str__(self):
         return "{} {}".format(self.user.first_name, self.user.last_name)
 
@@ -112,5 +131,11 @@ class Company(models.Model):
         validators=[FileExtensionValidator(['png','jpg','jpeg'])],
         blank=True, null=True
     )
+    
+    def logo(self):
+        return mark_safe('<img src="/../../media/%s" width="70" />' % (self.logoFile))
+    
+    logo.allow_tags = True 
+
     def __str__(self):
         return self.name
