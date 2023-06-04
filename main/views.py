@@ -10,7 +10,15 @@ from .models import Stack, Cohort
 
 # Create your views here.
 def HomePage(request):
-    return render(request, 'main/index.html')
+    # getting stacks
+    StacksData = Stack.objects.filter()
+    TrainersData = Trainer.objects.filter()
+    context = {
+        'title': 'Welcome to SOMS',
+        'courses': StacksData,
+        'instructors': TrainersData,
+    }
+    return render(request, 'index.html', context)
 
 
 

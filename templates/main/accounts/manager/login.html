@@ -15,7 +15,10 @@
 
     <div class="login-box">
       <div class="login-logo">
-        <a href="{% url 'index' %}"><b>SOMS</b></a>
+        <a href="{% url 'home_page' %}">
+          <img src="{% static 'dist/img/logo.jpg' %}" width="90px" alt="logo" />
+          <b class="text-primary">SOMS</b>
+        </a>
       </div>
       <!-- /.login-logo -->
       <div class="login-box-body">
