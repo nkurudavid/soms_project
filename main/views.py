@@ -517,17 +517,16 @@ def TrainerLogout(request):
 @login_required(login_url='trainer_login')
 def TrainerDashboard(request):
     if request.user.is_authenticated and request.user.is_trainer==True:
-        # getting stacks
-        StacksData = Stack.objects.filter()
-        # getting trainers
-        TrainersData = Trainer.objects.filter()
+        # getting current cohort
+        currCohort = Cohort.objects.all().order_by('-starting_date').first()
+        # getting trainees
+        TrainersData = Trainee.objects.filter(cohort=currCohort)
         # getting cohort
         CohortData = Cohort.objects.filter()
         context = {
             'title': 'Trainer Dashboard', 
             'dash_active': 'active', 
             'cohorts': CohortData,
-            'stack_total': StacksData.count(),
             'trainer_total': TrainersData.count(),
             'team': TrainersData,
         }
@@ -552,3 +551,172 @@ def Trainer_profile(request):
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(TrainerLogin)
 
+
+
+@login_required(login_url='trainer_login')
+def TrainerDashboard_course(request):
+    if request.user.is_authenticated and request.user.is_trainer==True:
+        if request.method == 'POST':
+            course_name = request.POST.get("course_name")
+            description = request.POST.get("description")
+
+            if course_name:
+                # course_name=course_name.upper()
+                found_data = Stack.objects.filter(name=course_name)
+                if found_data:
+                    messages.warning(request, "Stack "+course_name+", Already exist.")
+                    return redirect(TrainerDashboard_course)
+                else:
+                    # add new stack
+                    add_stack = Stack(
+                        name=course_name, 
+                        description=description
+                    )
+                    add_stack.save()
+
+                    messages.success(request, "New Stack created successfully.")
+                    return redirect(TrainerDashboard_course)
+            else:
+                messages.error(request, "Error , Stack name is required!")
+                return redirect(TrainerDashboard_course)
+        else:
+            # getting stacks
+            StackData = Stack.objects.filter()
+            # getting cohort
+            CohortData = Cohort.objects.filter()
+            context = {
+                'title': 'Trainer - Courses',
+                'course_active': 'active', 
+                'cohorts': CohortData,
+                'courses': StackData,
+                'course_total': StackData.count(),
+            }
+            return render(request, 'main/trainer/course.html', context)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(TrainerLogin)
+
+
+
+
+@login_required(login_url='trainer_login')
+def TrainerDashboard_traineeList(request, pk):
+    if request.user.is_authenticated and request.user.is_trainer==True:
+        if request.method == 'POST':
+            course_name = request.POST.get("course_name")
+            description = request.POST.get("description")
+
+            if course_name:
+                # course_name=course_name.upper()
+                found_data = Stack.objects.filter(name=course_name)
+                if found_data:
+                    messages.warning(request, "Stack "+course_name+", Already exist.")
+                    return redirect(TrainerDashboard_course)
+                else:
+                    # add new stack
+                    add_stack = Stack(
+                        name=course_name, 
+                        description=description
+                    )
+                    add_stack.save()
+
+                    messages.success(request, "New Stack created successfully.")
+                    return redirect(TrainerDashboard_course)
+            else:
+                messages.error(request, "Error , Stack name is required!")
+                return redirect(TrainerDashboard_course)
+        else:
+            # getting stacks
+            StackData = Stack.objects.filter()
+            # getting cohort
+            CohortData = Cohort.objects.filter()
+            context = {
+                'title': 'Trainer - Courses',
+                'course_active': 'active', 
+                'cohorts': CohortData,
+                'courses': StackData,
+                'course_total': StackData.count(),
+            }
+            return render(request, 'main/trainer/trainee_list.html', context)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(TrainerLogin)
+
+
+
+@login_required(login_url='trainer_login')
+def TrainerDashboard_assignmentList(request, pk):
+    if request.user.is_authenticated and request.user.is_manager==True:
+        if 'submit' in request.POST:
+            # Retrieve the form data from the request
+            first_name = request.POST.get('first_name')
+            last_name = request.POST.get('last_name')
+            email = request.POST.get('email')
+            gender = request.POST.get('gender')
+            phone1 = request.POST.get('phone1')
+            phone2 = request.POST.get('phone2')
+            specialization = request.POST.get('specialization')
+            ssn = request.POST.get('ssn')
+            locationAddress = request.POST.get('locationAddress')
+            profilePicture = request.FILES.get('profilePicture')
+
+            if first_name and last_name and email and gender and phone1 and phone2 and specialization and ssn and locationAddress and profilePicture:
+                if get_user_model().objects.filter(email=email):
+                    messages.warning(request, "Email already exist.")
+                    return redirect(ManagerDashboard_team)
+                elif Trainer.objects.filter(ssn=ssn):
+                    messages.warning(request, "SSN already exist.")
+                    return redirect(ManagerDashboard_team)
+                elif Trainer.objects.filter(phone1=phone1):
+                    messages.warning(request, "Phone 1 already exist.")
+                    return redirect(ManagerDashboard_team)
+                else:
+                    current_year = date.today().year
+                    trainerPassword = "trainer"+str(current_year)
+                    # Create new User as Trainer
+                    user =  get_user_model().objects.create_user(
+                        first_name=first_name,
+                        last_name=last_name,
+                        email=email,
+                        gender=gender,
+                        is_trainer=True,
+                        password=trainerPassword
+                    )
+                    if user:
+                        trainerUser = get_user_model().objects.get(email=email)
+                        # Create trainer profile
+                        trainerProfile = Trainer(
+                            user=trainerUser,
+                            ssn=ssn,
+                            profilePicture=profilePicture,
+                            phone1=phone1,
+                            phone2=phone2,
+                            specialization=specialization,
+                            locationAddress=locationAddress,
+                        )
+                        trainerProfile.save()
+                        messages.success(request, "Trainer "+first_name+", created successfully.")
+                        return redirect(TrainerDashboard_assignmentList)
+                    else:
+                        messages.error(request, ('Process Failed.'))
+                        return redirect(TrainerDashboard_assignmentList)
+            else:
+                messages.error(request, ('All fields are required.'))
+                return redirect(TrainerDashboard_assignmentList)
+        else:
+            # getting team
+            teamData = Trainer.objects.filter()
+            # getting cohort
+            CohortData = Cohort.objects.filter()
+
+            context = {
+                'title': 'Manager - Team',
+                'team': teamData,
+                'team_total': teamData.count,
+                'team_active': 'active',
+                'cohorts': CohortData,
+            }
+            return render(request, 'main/trainer/assignmentList.html', context)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(TrainerLogin)
