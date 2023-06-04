@@ -20,7 +20,7 @@ urlpatterns = [
     path('staff/trainer/logout', TrainerLogout, name='trainer_logout'),
     path('staff/trainer/dashboard', TrainerDashboard, name='trainer_dashboard'),
     path('staff/trainer/dashboard/my_profile', Trainer_profile, name='trainer_profile'),
-    path('staff/trainer/dashboard/courses', TrainerDashboard_course, name='trainer_courses'),
+    path('staff/trainer/dashboard/modules', TrainerDashboard_module, name='trainer_modules'),
     path('staff/trainer/dashboard/cohort/<int:pk>/trainees', TrainerDashboard_traineeList, name='trainer_traineeList'),
     path('staff/trainer/dashboard/cohort/<int:pk>/assignments', TrainerDashboard_assignmentList, name='trainer_assignmentList'),
     

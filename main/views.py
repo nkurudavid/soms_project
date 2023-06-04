@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model, authenticate, login, logout, update_session_auth_hash
 
 from account.models import Trainer, Trainee, ProgramManager, Company
-from .models import Stack, Cohort
+from .models import Stack, Cohort, Module
 
 # Create your views here.
 def HomePage(request):
@@ -520,15 +520,17 @@ def TrainerDashboard(request):
         # getting current cohort
         currCohort = Cohort.objects.all().order_by('-starting_date').first()
         # getting trainees
-        TrainersData = Trainee.objects.filter(cohort=currCohort)
+        TraineesData = Trainee.objects.filter(cohort=currCohort)
+        # getting Modules
+        ModulesData = Module.objects.filter()
         # getting cohort
         CohortData = Cohort.objects.filter()
         context = {
             'title': 'Trainer Dashboard', 
             'dash_active': 'active', 
             'cohorts': CohortData,
-            'trainer_total': TrainersData.count(),
-            'team': TrainersData,
+            'module_total': ModulesData.count(),
+            'trainee_total': TraineesData.count(),
         }
         return render(request, 'main/trainer/dashboard.html', context)
     else:
@@ -554,44 +556,44 @@ def Trainer_profile(request):
 
 
 @login_required(login_url='trainer_login')
-def TrainerDashboard_course(request):
+def TrainerDashboard_module(request):
     if request.user.is_authenticated and request.user.is_trainer==True:
         if request.method == 'POST':
-            course_name = request.POST.get("course_name")
+            module_name = request.POST.get("module_name")
             description = request.POST.get("description")
 
-            if course_name:
-                # course_name=course_name.upper()
-                found_data = Stack.objects.filter(name=course_name)
+            if module_name:
+                # module_name=module_name.upper()
+                found_data = Module.objects.filter(name=module_name)
                 if found_data:
-                    messages.warning(request, "Stack "+course_name+", Already exist.")
-                    return redirect(TrainerDashboard_course)
+                    messages.warning(request, "Module "+module_name+", Already exist.")
+                    return redirect(TrainerDashboard_module)
                 else:
                     # add new stack
-                    add_stack = Stack(
-                        name=course_name, 
+                    add_stack = Module(
+                        name=module_name, 
                         description=description
                     )
                     add_stack.save()
 
-                    messages.success(request, "New Stack created successfully.")
-                    return redirect(TrainerDashboard_course)
+                    messages.success(request, "New Module created successfully.")
+                    return redirect(TrainerDashboard_module)
             else:
-                messages.error(request, "Error , Stack name is required!")
-                return redirect(TrainerDashboard_course)
+                messages.error(request, "Error , Module name is required!")
+                return redirect(TrainerDashboard_module)
         else:
-            # getting stacks
-            StackData = Stack.objects.filter()
+            # getting sodules
+            ModuleData = Module.objects.filter()
             # getting cohort
             CohortData = Cohort.objects.filter()
             context = {
-                'title': 'Trainer - Courses',
-                'course_active': 'active', 
+                'title': 'Trainer - Modules',
+                'module_active': 'active', 
                 'cohorts': CohortData,
-                'courses': StackData,
-                'course_total': StackData.count(),
+                'modules': ModuleData,
+                'module_total': ModuleData.count(),
             }
-            return render(request, 'main/trainer/course.html', context)
+            return render(request, 'main/trainer/modules.html', context)
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(TrainerLogin)
@@ -603,28 +605,28 @@ def TrainerDashboard_course(request):
 def TrainerDashboard_traineeList(request, pk):
     if request.user.is_authenticated and request.user.is_trainer==True:
         if request.method == 'POST':
-            course_name = request.POST.get("course_name")
+            module_name = request.POST.get("module_name")
             description = request.POST.get("description")
 
-            if course_name:
-                # course_name=course_name.upper()
-                found_data = Stack.objects.filter(name=course_name)
+            if module_name:
+                # module_name=module_name.upper()
+                found_data = Stack.objects.filter(name=module_name)
                 if found_data:
-                    messages.warning(request, "Stack "+course_name+", Already exist.")
-                    return redirect(TrainerDashboard_course)
+                    messages.warning(request, "Stack "+module_name+", Already exist.")
+                    return redirect(TrainerDashboard_module)
                 else:
                     # add new stack
                     add_stack = Stack(
-                        name=course_name, 
+                        name=module_name, 
                         description=description
                     )
                     add_stack.save()
 
                     messages.success(request, "New Stack created successfully.")
-                    return redirect(TrainerDashboard_course)
+                    return redirect(TrainerDashboard_module)
             else:
                 messages.error(request, "Error , Stack name is required!")
-                return redirect(TrainerDashboard_course)
+                return redirect(TrainerDashboard_module)
         else:
             # getting stacks
             StackData = Stack.objects.filter()
