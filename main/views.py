@@ -18,7 +18,7 @@ def HomePage(request):
         'courses': StacksData,
         'instructors': TrainersData,
     }
-    return render(request, 'index.html', context)
+    return render(request, 'home.html', context)
 
 
 
