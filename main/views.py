@@ -40,7 +40,7 @@ def ManagerLogin(request):
                 return redirect(ManagerLogin)
         else:
             context = {'title': 'Manager Login',}
-            return render(request, 'main/accounts/manager/login.html', context)
+            return render(request, 'main/manager/login.html', context)
     else:
         return redirect(ManagerDashboard)
 
@@ -69,7 +69,7 @@ def ManagerDashboard(request):
             'trainer_total': TrainersData.count(),
             'team': TrainersData,
         }
-        return render(request, 'main/accounts/manager/dashboard.html', context)
+        return render(request, 'main/manager/dashboard.html', context)
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(ManagerLogin)
@@ -85,7 +85,7 @@ def ManagerDashboard_profile(request):
             'profile_active': 'active',
             'cohorts': CohortData,
         }
-        return render(request, 'main/accounts/manager/profile.html', context)
+        return render(request, 'main/manager/profile.html', context)
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(ManagerLogin)
@@ -163,7 +163,7 @@ def ManagerDashboard_team(request):
                 'team_active': 'active',
                 'cohorts': CohortData,
             }
-            return render(request, 'main/accounts/manager/team.html', context)
+            return render(request, 'main/manager/team.html', context)
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(ManagerLogin)
@@ -265,7 +265,7 @@ def ManagerDashboard_teamEdit(request, pk):
                     'profile_data': trainerData,
                     'cohorts': CohortData,
                 }
-                return render(request, 'main/accounts/manager/trainerEdit.html', context)
+                return render(request, 'main/manager/trainerEdit.html', context)
         else:
             messages.error(request, ('Trainer not found'))
             return redirect(ManagerDashboard_team)
@@ -313,7 +313,7 @@ def ManagerDashboard_stacks(request):
                 'cohorts': CohortData,
                 'stack_total': StackData.count(),
             }
-            return render(request, 'main/accounts/manager/stacks.html', context)
+            return render(request, 'main/manager/stacks.html', context)
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(ManagerLogin)
@@ -369,7 +369,7 @@ def ManagerDashboard_stackEdit(request, pk):
                     'stack': foundData,
                     'cohorts': CohortData,
                 }
-                return render(request, 'main/accounts/manager/stackEdit.html', context)
+                return render(request, 'main/manager/stackEdit.html', context)
         else:
             messages.error(request, ('Stack not found'))
             return redirect(ManagerDashboard_stacks)
@@ -416,7 +416,7 @@ def ManagerDashboard_cohorts(request):
                 'cohorts': CohortData,
                 'cohort_total': CohortData.count(),
             }
-            return render(request, 'main/accounts/manager/cohorts.html', context)
+            return render(request, 'main/manager/cohorts.html', context)
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(ManagerLogin)
@@ -474,7 +474,7 @@ def ManagerDashboard_cohortEdit(request, pk):
                     'cohort': foundData,
                     'cohorts': CohortData,
                 }
-                return render(request, 'main/accounts/manager/cohortEdit.html', context)
+                return render(request, 'main/manager/cohortEdit.html', context)
         else:
             messages.error(request, ('Cohort not found'))
             return redirect(ManagerDashboard_cohorts)

@@ -1,4 +1,4 @@
-{% extends "main/accounts/dash_main_layout.html" %}
+{% extends "main/dash_main_layout.html" %}
 <!DOCTYPE html>
 <html lang="en">
   {% load static %}
@@ -14,9 +14,9 @@
     {% block account_content%}
 
     <div class="wrapper">
-      {% include 'main/accounts/manager/navbar.html' %}
+      {% include 'main/manager/navbar.html' %}
       <!-- Left side column. contains the logo and sidebar -->
-      {% include 'main/accounts/manager/sidebar.html' %}
+      {% include 'main/manager/sidebar.html' %}
 
       <!-- Content Wrapper. Contains page content -->
       <div class="content-wrapper">
@@ -124,7 +124,7 @@
                     <i class="fa fa-user-plus"></i> REGISTER NEW TRAINER
                   </h4>
                 </div>
-                {% include 'main/accounts/manager/trainer_model_form.html' %}
+                {% include 'main/manager/trainer_model_form.html' %}
               </div>
             </div>
           </div>
@@ -134,7 +134,7 @@
       </div>
       <!-- /.content-wrapper -->
 
-      {% include 'main/accounts/manager/footer.html' %}
+      {% include 'main/manager/footer.html' %}
     </div>
     {% endblock %}
   </body>
