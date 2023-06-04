@@ -76,7 +76,7 @@ def ManagerDashboard(request):
 
 
 @login_required(login_url='manager_login')
-def ManagerDashboard_profile(request):
+def Manager_profile(request):
     if request.user.is_authenticated and request.user.is_manager==True:
         # getting cohort
         CohortData = Cohort.objects.filter()
@@ -481,4 +481,74 @@ def ManagerDashboard_cohortEdit(request, pk):
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(ManagerLogin)
+
+
+
+# trainer views
+def TrainerLogin(request):
+    if not request.user.is_authenticated or request.user.is_trainer!=True:
+        if request.method == "POST":
+            email = request.POST.get('email')
+            password = request.POST.get('password')
+
+            user = authenticate(request, email=email, password=password)
+
+            if user is not None and user.is_trainer==True:
+                login(request, user)
+                messages.success(request, ('Hi '+user.first_name+', Welcome back to the dashboard!'))
+                return redirect(ManagerDashboard)
+            else:
+                messages.error(request, ('User Email or Password is not correct! Try agin...'))
+                return redirect(TrainerLogin)
+        else:
+            context = {'title': 'Trainer Login',}
+            return render(request, 'main/trainer/login.html', context)
+    else:
+        return redirect(ManagerDashboard)
+
+
+@login_required(login_url='trainer_login')
+def TrainerLogout(request):
+    logout(request)
+    messages.info(request, ('You are now Logged out.'))
+    return redirect(TrainerLogin)
+
+
+@login_required(login_url='trainer_login')
+def TrainerDashboard(request):
+    if request.user.is_authenticated and request.user.is_trainer==True:
+        # getting stacks
+        StacksData = Stack.objects.filter()
+        # getting trainers
+        TrainersData = Trainer.objects.filter()
+        # getting cohort
+        CohortData = Cohort.objects.filter()
+        context = {
+            'title': 'Trainer Dashboard', 
+            'dash_active': 'active', 
+            'cohorts': CohortData,
+            'stack_total': StacksData.count(),
+            'trainer_total': TrainersData.count(),
+            'team': TrainersData,
+        }
+        return render(request, 'main/trainer/dashboard.html', context)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(TrainerLogin)
+
+
+@login_required(login_url='trainer_login')
+def Trainer_profile(request):
+    if request.user.is_authenticated and request.user.is_trainer==True:
+        # getting cohort
+        CohortData = Cohort.objects.filter()
+        context = {
+            'title': 'Trainer - My Profile',
+            'profile_active': 'active',
+            'cohorts': CohortData,
+        }
+        return render(request, 'main/trainer/profile.html', context)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(TrainerLogin)
 
