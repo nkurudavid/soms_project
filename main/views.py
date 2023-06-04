@@ -496,7 +496,7 @@ def TrainerLogin(request):
             if user is not None and user.is_trainer==True:
                 login(request, user)
                 messages.success(request, ('Hi '+user.first_name+', Welcome back to the dashboard!'))
-                return redirect(ManagerDashboard)
+                return redirect(TrainerDashboard)
             else:
                 messages.error(request, ('User Email or Password is not correct! Try agin...'))
                 return redirect(TrainerLogin)
@@ -504,7 +504,7 @@ def TrainerLogin(request):
             context = {'title': 'Trainer Login',}
             return render(request, 'main/trainer/login.html', context)
     else:
-        return redirect(ManagerDashboard)
+        return redirect(TrainerDashboard)
 
 
 @login_required(login_url='trainer_login')
