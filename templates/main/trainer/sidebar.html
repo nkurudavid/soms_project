@@ -1,0 +1,75 @@
+{% load static %}
+
+<aside class="main-sidebar">
+  <!-- sidebar: style can be found in sidebar.less -->
+  <section class="sidebar">
+    <!-- Sidebar user panel -->
+    <div class="user-panel">
+      <div class="pull-left image">
+        <img
+          src="{{user.trainers.profilePicture.url}}"
+          class="img-circle"
+          alt="User Image"
+        />
+      </div>
+      <div class="pull-left info">
+        <p>{{user.first_name}} {{user.last_name}}</p>
+        <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+      </div>
+    </div>
+    <!-- sidebar menu -->
+    <ul class="sidebar-menu" data-widget="tree">
+      <li class="header">MAIN NAVIGATION</li>
+      <li class="{{dash_active}}">
+        <a href="{% url 'trainer_dashboard' %}">
+          <i class="fa fa-dashboard"></i> <span>Dashboard</span>
+          <span class="pull-right-container"> </span>
+        </a>
+      </li>
+      <li class="{{course_active}}">
+        <a href="{% url 'trainer_courses' %}">
+          <i class="fa fa-sitemap"></i>
+          <span>Courses</span>
+        </a>
+      </li>
+      <li class="header">TRAINING</li>
+      <li class="treeview">
+        <a href="#">
+          <i class="fa fa-group"></i> <span>Trainees</span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu">
+          {% if cohorts %} {% for cohort in cohorts %}
+          <li>
+            <a href="{% url 'trainer_traineeList' cohort.id %}">
+              <i class="fa fa-circle-o text-aqua"></i>
+              {{cohort.cohort_name}}
+            </a>
+          </li>
+          {% endfor %} {% endif %}
+        </ul>
+      </li>
+      <li class="treeview">
+        <a href="#">
+          <i class="fa fa-group"></i> <span>Assignments</span>
+          <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu">
+          {% if cohorts %} {% for cohort in cohorts %}
+          <li>
+            <a href="{% url 'trainer_assignmentList' cohort.id %}">
+              <i class="fa fa-circle-o text-aqua"></i>
+              {{cohort.cohort_name}}
+            </a>
+          </li>
+          {% endfor %} {% endif %}
+        </ul>
+      </li>
+    </ul>
+  </section>
+  <!-- /.sidebar -->
+</aside>

@@ -1,0 +1,76 @@
+{% load static %}
+
+<header class="main-header">
+  <!-- Logo -->
+  <a href="" class="logo" style="padding: 0">
+    <img
+      class=""
+      src="{% static 'dist/img/logo.jpg' %}"
+      width="45px"
+      alt="Logo"
+    />
+    Trainer
+  </a>
+  <!-- Header Navbar: style can be found in header.less -->
+  <nav class="navbar navbar-static-top">
+    <!-- Sidebar toggle button-->
+    <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+      <span class="sr-only">Toggle navigation</span>
+    </a>
+
+    <div class="navbar-custom-menu">
+      <ul class="nav navbar-nav">
+        <!-- Tasks: style can be found in dropdown.less -->
+        <li class="tasks-menu">
+          <a href="#">
+            <h4 style="margin: 0; padding: 0">SOMS</h4>
+          </a>
+        </li>
+        <!-- User Account: style can be found in dropdown.less -->
+        <li class="dropdown user user-menu">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <img
+              src="{{user.trainers.profilePicture.url}}"
+              class="user-image"
+              alt="User Image"
+            />
+            <span class="hidden-xs"
+              >{{user.first_name}} {{user.last_name}}</span
+            >
+          </a>
+          <ul class="dropdown-menu">
+            <!-- User image -->
+            <li class="user-header">
+              <img
+                src="{{user.trainers.profilePicture.url}}"
+                class="img-circle"
+                alt="User Image"
+              />
+
+              <p>
+                {{user.first_name}} {{user.last_name}}
+                <small>Trainer</small>
+              </p>
+            </li>
+            <li class="user-footer">
+              <div class="pull-left">
+                <a
+                  href="{% url 'trainer_profile' %}"
+                  class="btn btn-default btn-flat"
+                  ><i class="fa fa-user"></i> Profile</a
+                >
+              </div>
+              <div class="pull-right">
+                <a
+                  href="{% url 'trainer_logout' %}"
+                  class="btn btn-default btn-flat"
+                  ><i class="fa fa-sign-out"></i> Sign out</a
+                >
+              </div>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
