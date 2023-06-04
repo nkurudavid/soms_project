@@ -1,0 +1,106 @@
+{% extends "main/dash_main_layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
+  {% load static %}
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+  </head>
+
+  <body>
+    {% block account_content%}
+
+    <div class="wrapper">
+      {% include 'main/trainer/navbar.html' %}
+      <!-- Left side column. contains the logo and sidebar -->
+      {% include 'main/trainer/sidebar.html' %}
+
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            <i class="fa fa-group"></i>
+            Trainees
+          </h1>
+          <ol class="breadcrumb">
+            <li>
+              <a href="#"><i class="fa fa-dashboard"></i> Home</a>
+            </li>
+            <li class="active">Trainees</li>
+          </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+          <div class="row">
+            <div class="col-xs-12">
+              <div class="box box-info">
+                <div class="box-header">
+                  <h3 class="box-title">All Trainees ({{trainee_total}})</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  <table
+                    id="example1"
+                    class="table table-bordered table-striped"
+                  >
+                    <thead>
+                      <tr>
+                        <th>No.</th>
+                        <th>FULL NAMES</th>
+                        <th>CONTACT</th>
+                        <th>IMAGE</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% if trainees %} {% for trainee in trainees %}
+                      <tr>
+                        <td>{{ forloop.counter }}.</td>
+                        <td>{{trainee.user}}</td>
+                        <td>
+                          Email: {{trainee.user.email}}<br />
+                          Phome: {{trainee.phone1}}, {{trainee.phone2}}<br />
+                        </td>
+                        <td>
+                          <img
+                            class=""
+                            src="{{trainee.profilePicture.url}}"
+                            width="120px"
+                            alt="{{trainee.user.first_name}} image"
+                          />
+                        </td>
+                        <td>
+                          <div class="pull-right">
+                            <a
+                              href="{% url 'trainer_traineeList' trainee.id %}"
+                              class="btn btn-flat btn-info"
+                              ><i class="fa fa-eye"></i> View</a
+                            >
+                          </div>
+                        </td>
+                      </tr>
+                      {% endfor %} {% endif %}
+                    </tbody>
+                  </table>
+                </div>
+                <!-- /.box-body -->
+              </div>
+              <!-- /.box -->
+            </div>
+            <!-- /.col -->
+          </div>
+        </section>
+        <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+
+      {% include 'main/trainer/footer.html' %}
+    </div>
+    {% endblock %}
+  </body>
+</html>
