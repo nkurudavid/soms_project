@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model, authenticate, login, logout, upd
 
 from account.models import Trainer, Trainee, ProgramManager, Company
 from .models import Stack, Cohort, Module
+from recruitment.models import Application
 
 # Create your views here.
 def HomePage(request):
@@ -20,6 +21,64 @@ def HomePage(request):
     }
     return render(request, 'home.html', context)
 
+
+
+def ApplicationPage(request):
+    if request.method == 'POST' :
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        gender = request.POST.get('gender')
+        phone1 = request.POST.get('phone1')
+        locationAddress = request.POST.get('locationAddress')
+        stack = request.POST.get('stack')
+        git_link = request.POST.get('git_link')
+        more = request.POST.get('more')
+        education_level = request.POST.get('education_level')
+        cv = request.FILES['cv']
+        if not (
+            first_name and last_name and email and gender and phone1 and locationAddress and stack and git_link and education_level and cv
+        ) : 
+            messages.warning(request, "Error , All fields are required.")
+            return redirect(ApplicationPage) 
+        else :
+            #CHECK FOR EXISTING APPLICANT
+            if Application.objects.filter(email=email):
+                messages.warning(request, "Your application already received.")
+                return redirect(ApplicationPage)
+            else:
+                # GETTING CURRENT STACK
+                selectedStack = Stack.objects.get(id=stack)
+                # GETTING CURRENT COHORT
+                current_cohort = Cohort.objects.latest('starting_date')
+                # SUBMITTING APPLICATION
+                applicationForm = Application(
+                    cohort = current_cohort,
+                    stack = selectedStack,
+                    first_name = first_name,
+                    last_name = last_name,
+                    email = email,
+                    gender = gender,
+                    phone1 = phone1,
+                    locationAddress = locationAddress,
+                    githubLink = git_link,
+                    cv_file = cv,
+                    educationLevel = education_level,
+                    more = more,
+                    status = "Pending"
+                )
+                applicationForm.save()
+
+                messages.success(request, "Your Application form has been submitted successfully.")
+                return redirect(ApplicationPage)
+    else:
+        # getting stacks
+        StacksData = Stack.objects.filter()
+        context = {
+            'title': 'Join the BootCamp',
+            'courses': StacksData,
+        }
+        return render(request, 'application.html', context)
 
 
 # manager views

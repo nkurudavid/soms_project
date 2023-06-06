@@ -3,6 +3,7 @@ from .views import *
 
 urlpatterns = [
     path('', HomePage, name='home_page'),
+    path('join_us/apply', ApplicationPage, name='join_page'),
     # manager urls
     path('staff/manager/login', ManagerLogin, name='manager_login'),
     path('staff/manager/logout', ManagerLogout, name='manager_logout'),

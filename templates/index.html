@@ -18,7 +18,12 @@
       href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900"
       rel="stylesheet"
     />
-
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
+    />
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
     <!-- Font Awesome CSS -->
@@ -80,28 +85,18 @@
                         </a>
                       </li>
                       <li>
-                        <a href="#"> <i class="fa fa-clone"></i> About Us </a>
-                        <ul class="dropdown">
-                          <li>
-                            <a href="{% url 'home_page' %}#courses">
-                              <i class="fa fa-clone"></i>Courses
-                            </a>
-                          </li>
-                          <li>
-                            <a href="{% url 'home_page' %}#instructors">
-                              <i class="fa fa-group"></i>Instructors
-                            </a>
-                          </li>
-                        </ul>
+                        <a href="{% url 'home_page' %}#courses">
+                          <i class="fa fa-clone"></i>Courses
+                        </a>
+                      </li>
+                      <li>
+                        <a href="{% url 'home_page' %}#instructors">
+                          <i class="fa fa-group"></i>Instructors
+                        </a>
                       </li>
                       <li>
                         <a href="{% url 'home_page' %}#contact_us">
                           <i class="fa fa-address-book"></i>Contact
-                        </a>
-                      </li>
-                      <li>
-                        <a href="{% url 'home_page' %}#join_us">
-                          <i class="fa fa-user-plus"></i>Join Us
                         </a>
                       </li>
                       <li class="active">
@@ -194,7 +189,7 @@
                   </li>
                   <li>
                     <i class="fa fa-angle-right"></i>
-                    <a href="{% url 'home_page' %}#join_us">Join Us </a>
+                    <a href="{% url 'join_page' %}">Join Us </a>
                   </li>
                 </ul>
               </div>

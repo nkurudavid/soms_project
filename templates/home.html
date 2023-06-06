@@ -45,10 +45,7 @@
                     <a href="{% url 'home_page' %}#courses" class="btn white">
                       <i class="fa fa-clone"></i> Our Courses
                     </a>
-                    <a
-                      href="{% url 'home_page' %}#join_us"
-                      class="btn white primary"
-                    >
+                    <a href="{% url 'join_page' %}" class="btn white primary">
                       <i class="fa fa-user-plus"></i> Join Us
                     </a>
                   </div>
@@ -126,7 +123,7 @@
                 </p>
                 <!-- CTA Button -->
                 <div class="button">
-                  <a class="btn white" href="contact.html">Join Now</a>
+                  <a class="btn white" href="{% url 'join_page' %}">Join Now</a>
                 </div>
                 <!--/ End CTA Button -->
               </div>
@@ -291,7 +288,7 @@
                       />
                     </div>
                   </div>
-                  <div class="col-lg-6 col-md-6 col-12">
+                  <div class="col-lg-12">
                     <div class="form-group">
                       <i class="fa fa-envelope"></i>
                       <input
@@ -299,12 +296,6 @@
                         type="email"
                         placeholder="Email address"
                       />
-                    </div>
-                  </div>
-                  <div class="col-lg-6 col-md-6 col-12">
-                    <div class="form-group">
-                      <i class="fa fa-envelope"></i>
-                      <input name="url" type="url" placeholder="Website url" />
                     </div>
                   </div>
                   <div class="col-12">

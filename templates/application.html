@@ -1,0 +1,295 @@
+{% extends "index.html" %}
+<!DOCTYPE html>
+<html lang="en">
+  {% load static %}
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SOMS</title>
+  </head>
+  <body>
+    {% block index_content%}
+    <!-- Breadcrumb -->
+    <div
+      class="breadcrumbs overlay"
+      style="background-image: url('{% static 'images/bg-pattern1.png' %}')"
+    >
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-6 col-md-6 col-12">
+            <h2>Join Us</h2>
+          </div>
+          <div class="col-lg-6 col-md-6 col-12">
+            <ul class="bread-list">
+              <li>
+                <a href="{% url 'home_page' %}"
+                  >Home<i class="fa fa-angle-right"></i
+                ></a>
+              </li>
+              <li class="active"><a href="#">Join Us</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--/ End Breadcrumb -->
+
+    <!-- Events -->
+    <section class="events archive section">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-10 m-auto">
+            <div class="section-title bg">
+              <h2>Welcome Future Coders!</h2>
+              <div class="icon"><i class="fa fa-paper-plane"></i></div>
+            </div>
+            <p class="mb-3">
+              Are you ready to take your coding skills to the next level? Join
+              our intensive coding bootcamp and accelerate your journey to
+              becoming a skilled software developer. Our upcoming cohort is
+              starting soon, and we invite you to be a part of it!
+            </p>
+            <p class="mb-3">
+              Don't miss out on this incredible opportunity to jumpstart your
+              coding journey! Our bootcamp cohorts fill up quickly, so secure
+              your spot today.
+            </p>
+            <p class="mb-3">
+              To apply for our coding bootcamp and join the upcoming cohort,
+              click on the "Apply Now" button below. We can't wait to see you
+              become a part of our vibrant community of aspiring coders.
+            </p>
+          </div>
+
+          <div class="col-lg-10 m-auto">
+            <!-- Single Event -->
+            <div class="single-event py-5">
+              <div class="section-title">
+                <h3>Application Form</h3>
+                <br />
+              </div>
+              <div class="containe">
+                <div class="row">
+                  <div class="col-lg-12">
+                    <div class="form-head">
+                      <!-- Contact Form -->
+                      <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row">
+                          <div class="col-lg-6 col-md-6 col-12 mb-4">
+                            <div class="input-group">
+                              <span class="input-group-text">
+                                <i class="fa fa-user"></i>
+                              </span>
+
+                              <input
+                                class="form-control form-control-lg"
+                                name="first_name"
+                                type="text"
+                                placeholder="First name"
+                                required
+                              />
+                            </div>
+                          </div>
+                          <div class="col-lg-6 col-md-6 col-12 mb-4">
+                            <div class="input-group">
+                              <span class="input-group-text">
+                                <i class="fa fa-user"></i>
+                              </span>
+
+                              <input
+                                class="form-control form-control-lg"
+                                name="last_name"
+                                type="text"
+                                placeholder="Last name"
+                                required
+                              />
+                            </div>
+                          </div>
+                          <div class="col-lg-6 col-md-6 col-12 mb-4">
+                            <div class="input-group">
+                              <span class="input-group-text">
+                                <i class="fa fa-envelope"></i>
+                              </span>
+
+                              <input
+                                class="form-control form-control-lg"
+                                name="email"
+                                type="email"
+                                placeholder="Email address"
+                                required
+                              />
+                            </div>
+                          </div>
+                          <div class="col-lg-6 col-md-6 col-12 mb-4">
+                            <div class="input-group">
+                              <span class="input-group-text">
+                                <i class="fa fa-male"></i> /
+                                <i class="fa fa-female"></i>
+                              </span>
+
+                              <select
+                                class="form-control form-control-lg"
+                                name="gender"
+                                required
+                              >
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 col-md-6 col-12 mb-4">
+                            <div class="input-group">
+                              <span class="input-group-text">
+                                <i class="fa fa-phone"></i>
+                              </span>
+
+                              <input
+                                class="form-control form-control-lg"
+                                name="phone1"
+                                type="text"
+                                placeholder="Phone1"
+                                required
+                              />
+                            </div>
+                          </div>
+                          <div class="col-lg-6 col-md-6 col-12 mb-4">
+                            <div class="input-group">
+                              <span class="input-group-text">
+                                <i class="fa fa-map"></i>
+                              </span>
+
+                              <input
+                                class="form-control form-control-lg"
+                                name="locationAddress"
+                                type="text"
+                                placeholder="Location Address"
+                                required
+                              />
+                            </div>
+                          </div>
+                          <div class="col-lg-6 col-md-6 col-12 mb-4">
+                            <div class="input-group">
+                              <span class="input-group-text">
+                                <i class="fa fa-sitemap"></i>
+                              </span>
+                              <select
+                                class="form-control form-control-lg"
+                                name="stack"
+                                required
+                              >
+                                <option value="">
+                                  Select Stack you are applying for
+                                </option>
+                                {% if courses %}{% for course in courses %}
+                                <option value="{{course.id}}">
+                                  {{course.name}}
+                                </option>
+                                {% endfor%} {% endif %}
+                              </select>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 col-md-6 col-12 mb-4">
+                            <div class="input-group">
+                              <span class="input-group-text">
+                                <i class="fa fa-github"></i>
+                              </span>
+
+                              <input
+                                class="form-control form-control-lg"
+                                name="git_link"
+                                type="url"
+                                placeholder="Website url"
+                                required
+                              />
+                            </div>
+                          </div>
+                          <div class="col-lg-6 col-md-6 col-12 mb-4">
+                            <div class="input-group">
+                              <span class="input-group-text">
+                                <i class="fa fa-file"></i>
+                              </span>
+
+                              <input
+                                class="form-control form-control-lg"
+                                name="cv"
+                                type="file"
+                                placeholder="CV Document"
+                                accept=".pdf, .doc, .docx"
+                                required
+                              />
+                            </div>
+                          </div>
+                          <div class="col-lg-6 col-md-6 col-12 mb-4">
+                            <div class="input-group">
+                              <span class="input-group-text">
+                                <i class="fa fa-graduation-cap"></i>
+                              </span>
+                              <select
+                                class="form-control form-control-lg"
+                                name="education_level"
+                                required
+                              >
+                                <option value="">Select Education Level</option>
+                                <option value="Bachelors">
+                                  Bachelors Degree
+                                </option>
+                                <option value="Advanced diploma">
+                                  Advanced diploma
+                                </option>
+                                <option value="High School">High School</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="col-12 mb-4">
+                            <div class="input-group">
+                              <textarea
+                                class="form-control form-control-lg"
+                                name="more"
+                                placeholder="More information..."
+                                rows="5"
+                              ></textarea>
+                            </div>
+                          </div>
+                          <div class="col-12">
+                            <div class="form-group">
+                              <div class="button">
+                                <button
+                                  type="submit"
+                                  name="submit"
+                                  class="btn primary"
+                                >
+                                  Apply
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                      <!--/ End Contact Form -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- End Single Event -->
+          </div>
+        </div>
+      </div>
+    </section>
+    <!--/ End Events -->
+
+    {% if messages %} {% for message in messages %}
+    <script>
+      //<!--contents message displayed-->
+      alert("{{ message }}");
+      //<!-- / .contents message displayed-->
+    </script>
+    {% endfor %} {% endif %}
+    <br />
+
+    {% endblock %}
+  </body>
+</html>

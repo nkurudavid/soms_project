@@ -73,7 +73,7 @@ class Trainee(models.Model):
     user = models.OneToOneField(User, verbose_name="User", related_name="trainees", on_delete=models.CASCADE)
     cohort = models.OneToOneField(Cohort, verbose_name="Cohort belonging", related_name="trainees", on_delete=models.CASCADE)
     stack = models.OneToOneField(Stack, verbose_name="Stack belonging", related_name="trainees", on_delete=models.CASCADE)
-    git_account = models.CharField(verbose_name="Git Account Link", max_length=1000, unique=True)
+    git_account = models.URLField(verbose_name="Git Account Link", max_length=1000, unique=True)
     profilePicture = models.ImageField(
         verbose_name="Image", 
         upload_to="images/profile/", 
