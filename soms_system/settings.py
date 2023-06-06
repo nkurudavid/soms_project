@@ -43,8 +43,7 @@ INSTALLED_APPS = [
 
     # local apps
     'account',
-    # 'organization',
-    # 'recruitment',
+    'recruitment',
     'main',
 ]
 

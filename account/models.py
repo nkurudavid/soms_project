@@ -71,7 +71,8 @@ class Trainee(models.Model):
         AWARDED = "Awarded", "Awarded"
 
     user = models.OneToOneField(User, verbose_name="User", related_name="trainees", on_delete=models.CASCADE)
-    nid = models.CharField(verbose_name="National ID OR Passport", max_length=20, unique=True)
+    cohort = models.OneToOneField(Cohort, verbose_name="Cohort belonging", related_name="trainees", on_delete=models.CASCADE)
+    stack = models.OneToOneField(Stack, verbose_name="Stack belonging", related_name="trainees", on_delete=models.CASCADE)
     git_account = models.CharField(verbose_name="Git Account Link", max_length=1000, unique=True)
     profilePicture = models.ImageField(
         verbose_name="Image", 
@@ -81,8 +82,6 @@ class Trainee(models.Model):
     )
     phone1 = PhoneNumberField(verbose_name="Phone 1", blank=True)
     phone2 = PhoneNumberField(verbose_name="Phone 2", blank=True)
-    cohort = models.OneToOneField(Cohort, verbose_name="Cohort belonging", related_name="cohorts", on_delete=models.CASCADE)
-    stack = models.OneToOneField(Stack, verbose_name="Stack belonging", related_name="stacks", on_delete=models.CASCADE)
     locationAddress = models.CharField(verbose_name="Address", max_length=200)
     status = models.CharField(verbose_name="Status", choices=Status.choices, default=Status.SELECT, max_length=10)
     
