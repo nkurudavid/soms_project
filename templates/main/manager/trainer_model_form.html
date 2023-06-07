@@ -83,6 +83,17 @@
         />
       </div>
       <div class="form-group mb-0">
+        <label class="col-form-label">Stack to Instruct</label>
+        <select class="form-control" name="stack" required>
+          <option value="">Select Stack</option>
+          {% for stack in stacks %}
+          {% with profile_data.trainers.stack as selected_stack %}
+          <option value="{{stack.id}}" {% if selected_stack == stack %} selected {% endif %}>{{stack.name}}</option>
+          {% endwith %}
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group mb-0">
         <label class="col-form-label">SSN</label>
         <input
           type="text"

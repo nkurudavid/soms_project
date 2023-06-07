@@ -165,10 +165,11 @@ def ManagerDashboard_team(request):
             phone2 = request.POST.get('phone2')
             specialization = request.POST.get('specialization')
             ssn = request.POST.get('ssn')
+            stack = request.POST.get('stack')
             locationAddress = request.POST.get('locationAddress')
             profilePicture = request.FILES.get('profilePicture')
 
-            if first_name and last_name and email and gender and phone1 and phone2 and specialization and ssn and locationAddress and profilePicture:
+            if first_name and last_name and email and gender and phone1 and phone2 and specialization and ssn and stack and locationAddress and profilePicture:
                 if get_user_model().objects.filter(email=email):
                     messages.warning(request, "Email already exist.")
                     return redirect(ManagerDashboard_team)
@@ -178,7 +179,13 @@ def ManagerDashboard_team(request):
                 elif Trainer.objects.filter(phone1=phone1):
                     messages.warning(request, "Phone 1 already exist.")
                     return redirect(ManagerDashboard_team)
+                elif Trainer.objects.filter(stack=stack):
+                    messages.warning(request, "Stack already assigned.")
+                    return redirect(ManagerDashboard_team)
                 else:
+                    # get stack
+                    selectedStack = Stack.objects.get(id=stack)
+
                     current_year = date.today().year
                     trainerPassword = "trainer"+str(current_year)
                     # Create new User as Trainer
@@ -195,6 +202,7 @@ def ManagerDashboard_team(request):
                         # Create trainer profile
                         trainerProfile = Trainer(
                             user=trainerUser,
+                            stack=selectedStack,
                             ssn=ssn,
                             profilePicture=profilePicture,
                             phone1=phone1,
@@ -214,8 +222,10 @@ def ManagerDashboard_team(request):
         else:
             # getting team
             teamData = Trainer.objects.filter()
-            # getting cohort
+            # getting cohorts
             CohortData = Cohort.objects.filter()
+            # getting stacks
+            StackData = Stack.objects.filter()
 
             context = {
                 'title': 'Manager - Team',
@@ -223,6 +233,7 @@ def ManagerDashboard_team(request):
                 'team_total': teamData.count,
                 'team_active': 'active',
                 'cohorts': CohortData,
+                'stacks': StackData,
             }
             return render(request, 'main/manager/team.html', context)
     else:
@@ -250,11 +261,12 @@ def ManagerDashboard_teamEdit(request, pk):
                 phone1 = request.POST.get('phone1')
                 phone2 = request.POST.get('phone2')
                 specialization = request.POST.get('specialization')
+                stack = request.POST.get('stack')
                 ssn = request.POST.get('ssn')
                 locationAddress = request.POST.get('locationAddress')
                 profilePicture = request.FILES.get('profilePicture')
 
-                if first_name and last_name and email and gender and phone1 and phone2 and specialization and ssn and locationAddress:
+                if first_name and last_name and email and gender and phone1 and phone2 and specialization and ssn and stack and locationAddress:
                     if get_user_model().objects.filter(email=email).exclude(id=foundData.user.id):
                         messages.warning(request, "Email already exist.")
                         return redirect(ManagerDashboard_team)
@@ -264,7 +276,13 @@ def ManagerDashboard_teamEdit(request, pk):
                     elif Trainer.objects.filter(phone1=phone1).exclude(id=trainer_id):
                         messages.warning(request, "Phone 1 already exist.")
                         return redirect(ManagerDashboard_team)
+                    elif Trainer.objects.filter(stack=stack).exclude(id=trainer_id):
+                        messages.warning(request, "Stack already assigned.")
+                        return redirect(ManagerDashboard_team)
                     else:
+                        # get stack
+                        selectedStack = Stack.objects.get(id=stack)
+
                         # Update Trainer account
                         user =  get_user_model().objects.filter(id=foundData.user.id).update(
                             first_name=first_name,
@@ -273,13 +291,15 @@ def ManagerDashboard_teamEdit(request, pk):
                             gender=gender,
                         )
                         if user:
-                            if len(profilePicture) > 0:
-                                data = Trainer.objects.get(id=trainer_id)
-                                if len(data.profilePicture) > 0:
-                                    data.profilePicture.delete()
+                            if profilePicture:
+                                if len(profilePicture) > 0:
+                                    data = Trainer.objects.get(id=trainer_id)
+                                    if len(data.profilePicture) > 0:
+                                        data.profilePicture.delete()
 
                                 # Update trainer profile
                                 data.ssn = ssn
+                                data.stack=selectedStack
                                 data.profilePicture = profilePicture
                                 data.phone1 = phone1
                                 data.phone2 = phone2
@@ -291,6 +311,7 @@ def ManagerDashboard_teamEdit(request, pk):
                                 # Update trainer profile
                                 updateTrainer = Trainer.objects.filter(id=trainer_id).update(
                                     ssn=ssn,
+                                    stack=selectedStack,
                                     phone1=phone1,
                                     phone2=phone2,
                                     specialization=specialization,
@@ -299,16 +320,16 @@ def ManagerDashboard_teamEdit(request, pk):
 
                             if updateTrainer:
                                 messages.success(request, "Trainer "+first_name+", Updated successfully.")
-                                return redirect(ManagerDashboard_team)
+                                return redirect(ManagerDashboard_teamEdit, pk)
                             else:
                                 messages.error(request, ('Process Failed.'))
-                                return redirect(ManagerDashboard_team)
+                                return redirect(ManagerDashboard_teamEdit, pk)
                         else:
                             messages.error(request, ('Process Failed.'))
-                            return redirect(ManagerDashboard_team)
+                            return redirect(ManagerDashboard_teamEdit, pk)
                 else:
                     messages.error(request, ('All fields are required.'))
-                    return redirect(ManagerDashboard_teamEdit)
+                    return redirect(ManagerDashboard_teamEdit, pk)
 
             elif 'delete' in request.POST:
                 # Delete Trainer
@@ -318,13 +339,16 @@ def ManagerDashboard_teamEdit(request, pk):
                 return redirect(ManagerDashboard_team)
 
             else:
-                # getting cohort
+                # getting cohorts
                 CohortData = Cohort.objects.filter()
+                # getting stacks
+                StackData = Stack.objects.filter()
                 context = {
                     'title': 'Manager - Trainer Info',
                     'team_active': 'active',
                     'profile_data': trainerData,
                     'cohorts': CohortData,
+                    'stacks': StackData,
                 }
                 return render(request, 'main/manager/trainerEdit.html', context)
         else:

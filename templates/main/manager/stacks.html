@@ -62,6 +62,7 @@
                         <th>No.</th>
                         <th>STACK NAME</th>
                         <th>DESCRIPTION</th>
+                        <th>INSTRUCTOR</th>
                         <th></th>
                       </tr>
                     </thead>
@@ -71,6 +72,7 @@
                         <td>{{ forloop.counter }}.</td>
                         <td>{{stack.name}}</td>
                         <td>{{stack.description}}</td>
+                        <td>{{stack.trainers.user}}</td>
                         <td>
                           <div class="pull-right">
                             <a
