@@ -22,6 +22,7 @@ class Cohort_schedule(models.Model):
     class Schedule(models.TextChoices):
         SELECT = "", "Select Schedule"
         APPLICATION = "Application", "Application"
+        INTERVIEW = "Interview", "Interview"
         GRADUATION = "Graduation", "Graduation"
 
     cohort = models.ForeignKey(Cohort, verbose_name="Cohort Scheduled", related_name="schedules", on_delete=models.PROTECT)
