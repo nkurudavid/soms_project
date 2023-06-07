@@ -27,7 +27,8 @@ urlpatterns = [
     path('staff/trainer/dashboard', TrainerDashboard, name='trainer_dashboard'),
     path('staff/trainer/dashboard/my_profile', Trainer_profile, name='trainer_profile'),
     path('staff/trainer/dashboard/modules', TrainerDashboard_module, name='trainer_modules'),
-    path('staff/trainer/dashboard/cohort/<int:pk>/trainees', TrainerDashboard_traineeList, name='trainer_traineeList'),
-    path('staff/trainer/dashboard/cohort/<int:pk>/assignments', TrainerDashboard_assignmentList, name='trainer_assignmentList'),
+    path('staff/trainer/dashboard/cohorts/<int:pk>/trainees', TrainerDashboard_traineeList, name='trainer_traineeList'),
+    path('staff/trainer/dashboard/cohorts/<int:pk>/trainees_list/<int:n>/trainee_profile', TrainerDashboard_traineeProfile, name='trainer_traineeProfile'),
+    path('staff/trainer/dashboard/cohorts/<int:pk>/assignments', TrainerDashboard_assignmentList, name='trainer_assignmentList'),
 
 ]

@@ -24,7 +24,8 @@
         <section class="content-header">
           <h1>
             <i class="fa fa-group"></i>
-            Trainees
+            Trainees for
+            <span class="text-blue">{{current_cohort.cohort_name}}</span>
           </h1>
           <ol class="breadcrumb">
             <li>
@@ -40,7 +41,7 @@
             <div class="col-xs-12">
               <div class="box box-info">
                 <div class="box-header">
-                  <h3 class="box-title">All Trainees ({{trainee_total}})</h3>
+                  <h3 class="box-title">All Trainees ({{trainees_total}})</h3>
                 </div>
                 <!-- /.box-header -->
                 <div class="box-body">
@@ -51,9 +52,10 @@
                     <thead>
                       <tr>
                         <th>No.</th>
-                        <th>FULL NAMES</th>
-                        <th>CONTACT</th>
                         <th>IMAGE</th>
+                        <th>FULL NAMES</th>
+                        <th>STACK</th>
+                        <th>CONTACT</th>
                         <th></th>
                       </tr>
                     </thead>
@@ -61,23 +63,35 @@
                       {% if trainees %} {% for trainee in trainees %}
                       <tr>
                         <td>{{ forloop.counter }}.</td>
-                        <td>{{trainee.user}}</td>
                         <td>
-                          Email: {{trainee.user.email}}<br />
-                          Phome: {{trainee.phone1}}, {{trainee.phone2}}<br />
-                        </td>
-                        <td>
+                          {% if trainee.profilePicture %}
                           <img
-                            class=""
+                            class="profile-user-img img-responsive img-circle"
                             src="{{trainee.profilePicture.url}}"
                             width="120px"
                             alt="{{trainee.user.first_name}} image"
                           />
+                          {% else %}
+                          <img
+                            class="profile-user-img img-responsive img-circle"
+                            src="{% static 'images/anonymous.png' %}"
+                            width="90px"
+                            alt="{{trainee.user.first_name}} image"
+                          />
+                          {% endif %}
+                        </td>
+                        <td>
+                          {{trainee.user.first_name}} {{trainee.user.last_name}}
+                        </td>
+                        <td>{{trainee.stack.name}}</td>
+                        <td>
+                          Email: {{trainee.user.email}}<br />
+                          Phome: {{trainee.phone1}}
                         </td>
                         <td>
                           <div class="pull-right">
                             <a
-                              href="{% url 'trainer_traineeList' trainee.id %}"
+                              href="{% url 'trainer_traineeProfile' current_cohort.id trainee.id %}"
                               class="btn btn-flat btn-info"
                               ><i class="fa fa-eye"></i> View</a
                             >

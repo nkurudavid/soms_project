@@ -792,7 +792,7 @@ def TrainerDashboard(request):
         # getting current cohort
         currCohort = Cohort.objects.all().order_by('-starting_date').first()
         # getting trainees
-        TraineesData = Trainee.objects.filter(cohort=currCohort)
+        TraineesData = Trainee.objects.filter(cohort=currCohort, stack=request.user.trainers.stack)
         # getting Modules
         ModulesData = Module.objects.filter()
         # getting cohort
@@ -876,42 +876,61 @@ def TrainerDashboard_module(request):
 @login_required(login_url='trainer_login')
 def TrainerDashboard_traineeList(request, pk):
     if request.user.is_authenticated and request.user.is_trainer==True:
-        if request.method == 'POST':
-            module_name = request.POST.get("module_name")
-            description = request.POST.get("description")
-
-            if module_name:
-                # module_name=module_name.upper()
-                found_data = Stack.objects.filter(name=module_name)
-                if found_data:
-                    messages.warning(request, "Stack "+module_name+", Already exist.")
-                    return redirect(TrainerDashboard_module)
-                else:
-                    # add new stack
-                    add_stack = Stack(
-                        name=module_name, 
-                        description=description
-                    )
-                    add_stack.save()
-
-                    messages.success(request, "New Stack created successfully.")
-                    return redirect(TrainerDashboard_module)
-            else:
-                messages.error(request, "Error , Stack name is required!")
-                return redirect(TrainerDashboard_module)
-        else:
-            # getting stacks
-            StackData = Stack.objects.filter()
+        cohort_id = pk
+        # getting cohort
+        if Cohort.objects.filter(id=cohort_id).exists():
+            # if exists
+            current_cohort = Cohort.objects.get(id=cohort_id)
+            # getting all trainees from cohort
+            traineesData=Trainee.objects.filter(cohort=pk, stack=request.user.trainers.stack)
             # getting cohort
             CohortData = Cohort.objects.filter()
             context = {
-                'title': 'Trainer - Courses',
-                'course_active': 'active', 
+                'title': 'Trainer - Trainees List',
+                'trainees_active': 'active',
+                'current_cohort': current_cohort,
                 'cohorts': CohortData,
-                'courses': StackData,
-                'course_total': StackData.count(),
+                'trainees': traineesData,
+                'trainees_total': traineesData.count
             }
-            return render(request, 'main/trainer/trainee_list.html', context)
+            return render(request, 'main/trainer/trainees_list.html', context)
+        else:
+            messages.error(request, ('Cohort not found'))
+            return redirect(TrainerDashboard)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(TrainerLogin)
+
+
+
+@login_required(login_url='manager_login')
+def TrainerDashboard_traineeProfile(request, pk, n):
+    if request.user.is_authenticated and request.user.is_trainer==True:
+        cohort_id = pk
+        trainee_id = n
+        # getting cohort
+        if Cohort.objects.filter(id=cohort_id).exists():
+            # if exists
+            current_cohort = Cohort.objects.get(id=cohort_id)
+            if Trainee.objects.filter(id=trainee_id, stack=request.user.trainers.stack).exists():
+                # get trainee
+                trainee = Trainee.objects.get(id=trainee_id)
+                # getting cohort
+                CohortData = Cohort.objects.filter()
+                context = {
+                    'title': 'Trainer - Trainee Profile',
+                    'trainees_active': 'active',
+                    'current_cohort': current_cohort,
+                    'cohorts': CohortData,
+                    'trainee': trainee,
+                }
+                return render(request, 'main/trainer/trainees_profile.html', context)
+            else:
+                messages.error(request, ('Trainee Profile not found'))
+                return redirect(TrainerDashboard_traineeList, pk)
+        else:
+            messages.error(request, ('Cohort not found'))
+            return redirect(TrainerDashboard)
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(TrainerLogin)
