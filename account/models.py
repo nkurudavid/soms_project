@@ -42,6 +42,7 @@ class User(AbstractUser):
 
 class Trainer(models.Model):
     user = models.OneToOneField(User, verbose_name="User", related_name="trainers", on_delete=models.CASCADE)
+    stack = models.OneToOneField(Stack, verbose_name="Stack belonging", related_name="trainers", on_delete=models.SET_DEFAULT, default=None, blank=True, null=True)
     ssn = models.CharField(verbose_name="SSN", max_length=100, blank=True, null=True)
     profilePicture = models.ImageField(
         verbose_name="Image", 
@@ -53,10 +54,10 @@ class Trainer(models.Model):
     phone2 = PhoneNumberField(verbose_name="Phone 2", blank=True)
     specialization = models.CharField(verbose_name="Specializations", max_length=100, blank=True, null=True)
     locationAddress = models.CharField(verbose_name="Address", max_length=200)
-    
+
     def image(self):
         return mark_safe('<img src="/../../media/%s" width="70" />' % (self.profilePicture))
-    
+
     image.allow_tags = True 
 
     def __str__(self):

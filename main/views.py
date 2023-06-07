@@ -116,6 +116,9 @@ def ManagerDashboard(request):
         StacksData = Stack.objects.filter()
         # getting trainers
         TrainersData = Trainer.objects.filter()
+        # getting new applicants
+        current_cohort = Cohort.objects.latest('starting_date')
+        NewApplicantsData = Application.objects.filter(cohort=current_cohort.id, status=False)
         # getting cohort
         CohortData = Cohort.objects.filter()
         context = {
@@ -124,6 +127,7 @@ def ManagerDashboard(request):
             'cohorts': CohortData,
             'stack_total': StacksData.count(),
             'trainer_total': TrainersData.count(),
+            'applicant_total': NewApplicantsData.count(),
             'team': TrainersData,
         }
         return render(request, 'main/manager/dashboard.html', context)
