@@ -18,6 +18,21 @@ class Cohort(models.Model):
         return self.cohort_name
 
 
+class Cohort_schedule(models.Model):
+    class Schedule(models.TextChoices):
+        SELECT = "", "Select Schedule"
+        APPLICATION = "Application", "Application"
+        GRADUATION = "Graduation", "Graduation"
+
+    cohort = models.ForeignKey(Cohort, verbose_name="Cohort Scheduled", related_name="schedules", on_delete=models.PROTECT)
+    schedule_name = models.CharField(verbose_name="Status", choices=Schedule.choices, default=Schedule.SELECT, max_length=12)
+    start_period = models.DateTimeField()
+    end_period = models.DateTimeField()
+
+    def __str__(self):
+       return self.schedule_name
+
+
 class Stack(models.Model):
     name = models.CharField(verbose_name="Stack Name", max_length=100, unique=True)
     description = models.TextField(verbose_name="Description", blank=True)
