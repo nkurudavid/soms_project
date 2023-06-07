@@ -25,7 +25,7 @@ class Application(models.Model):
     phone1 = PhoneNumberField(verbose_name="Phone 1", blank=True)
     phone2 = PhoneNumberField(verbose_name="Phone 2", blank=True)
     locationAddress = models.CharField(verbose_name="Address", max_length=200)
-    githubLink = models.URLField(max_length=255, blank=False, null=False)
+    githubLink = models.URLField(verbose_name="Git Account Link", blank=False, null=False)
     educationLevel = models.CharField(verbose_name="Education Level", choices=Education.choices, default=Education.SELECT, max_length=30)
     cv_file = models.FileField(
         verbose_name="CV Document",

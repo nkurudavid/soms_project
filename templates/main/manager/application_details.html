@@ -47,10 +47,12 @@
                 <ul class="nav nav-tabs">
                   <li class="active">
                     <a href="#profile" class="text-uppercase" data-toggle="tab"
-                      >APPLICANT FOR {{applicant.cohort.cohort_name}}</a
-                    >
+                      >APPLICANT FOR
+                      <strong> {{applicant.cohort.cohort_name}} </strong>
+                    </a>
                   </li>
                   <li class="pull-right">
+                    {% if applicant.status == False %}
                     <button
                       type="button"
                       class="btn btn-flat btn-primary pull-right"
@@ -59,6 +61,7 @@
                     >
                       <i class="fa fa-cogs"></i> Action
                     </button>
+                    {% endif %}
                   </li>
                 </ul>
                 <div class="tab-content">
@@ -265,7 +268,7 @@
                   </button>
                   <button
                     type="submit"
-                    name="delete"
+                    name="rejected"
                     class="btn btn-flat btn-danger"
                   >
                     Yes, Delete

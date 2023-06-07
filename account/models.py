@@ -71,9 +71,9 @@ class Trainee(models.Model):
         AWARDED = "Awarded", "Awarded"
 
     user = models.OneToOneField(User, verbose_name="User", related_name="trainees", on_delete=models.CASCADE)
-    cohort = models.OneToOneField(Cohort, verbose_name="Cohort belonging", related_name="trainees", on_delete=models.CASCADE)
-    stack = models.OneToOneField(Stack, verbose_name="Stack belonging", related_name="trainees", on_delete=models.CASCADE)
-    git_account = models.URLField(verbose_name="Git Account Link", max_length=1000, unique=True)
+    cohort = models.ForeignKey(Cohort, verbose_name="Cohort belonging", related_name="trainees", on_delete=models.CASCADE)
+    stack = models.ForeignKey(Stack, verbose_name="Stack belonging", related_name="trainees", on_delete=models.CASCADE)
+    git_account = models.URLField(verbose_name="Git Account Link", blank=False, null=False)
     profilePicture = models.ImageField(
         verbose_name="Image", 
         upload_to="images/profile/", 
