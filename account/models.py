@@ -82,6 +82,12 @@ class Trainee(models.Model):
     )
     phone1 = PhoneNumberField(verbose_name="Phone 1", blank=True)
     phone2 = PhoneNumberField(verbose_name="Phone 2", blank=True)
+    cv_document = models.FileField(
+        verbose_name="CV Document",
+        upload_to="document/trainees/cv/",
+        validators=[FileExtensionValidator(['pdf','doc'])],
+        blank=True, null=True
+    )
     locationAddress = models.CharField(verbose_name="Address", max_length=200)
     status = models.CharField(verbose_name="Status", choices=Status.choices, default=Status.SELECT, max_length=10)
     

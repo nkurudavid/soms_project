@@ -24,13 +24,14 @@
         <section class="content-header">
           <h1>
             <i class="fa fa-group"></i>
-            Our Team
+            Trainees for
+            <span class="text-blue">{{current_cohort.cohort_name}}</span>
           </h1>
           <ol class="breadcrumb">
             <li>
               <a href="#"><i class="fa fa-dashboard"></i> Home</a>
             </li>
-            <li class="active">Team</li>
+            <li class="active">Trainees</li>
           </ol>
         </section>
 
@@ -40,16 +41,7 @@
             <div class="col-xs-12">
               <div class="box box-info">
                 <div class="box-header">
-                  <h3 class="box-title">All Trainers ({{team_total}})</h3>
-                  <button
-                    type="button"
-                    class="btn btn-flat btn-primary pull-right"
-                    data-toggle="modal"
-                    data-target="#modal-default"
-                  >
-                    <i class="fa fa-plus"></i>
-                    New Trainer
-                  </button>
+                  <h3 class="box-title">All Trainees ({{trainees_total}})</h3>
                 </div>
                 <!-- /.box-header -->
                 <div class="box-body">
@@ -60,37 +52,46 @@
                     <thead>
                       <tr>
                         <th>No.</th>
-                        <th>FULL NAMES</th>
-                        <th>SSN</th>
-                        <th>CONTACT</th>
-                        <th>SPECIALIZATION</th>
                         <th>IMAGE</th>
+                        <th>FULL NAMES</th>
+                        <th>STACK</th>
+                        <th>CONTACT</th>
                         <th></th>
                       </tr>
                     </thead>
                     <tbody>
-                      {% if team %} {% for trainer in team %}
+                      {% if trainees %} {% for trainee in trainees %}
                       <tr>
                         <td>{{ forloop.counter }}.</td>
                         <td>
+                          {% if trainee.profilePicture %}
                           <img
                             class="profile-user-img img-responsive img-circle"
-                            src="{{trainer.profilePicture.url}}"
+                            src="{{trainee.profilePicture.url}}"
                             width="120px"
-                            alt="{{trainer.user.first_name}} image"
+                            alt="{{trainee.user.first_name}} image"
                           />
+                          {% else %}
+                          <img
+                            class="profile-user-img img-responsive img-circle"
+                            src="{% static 'images/anonymous.png' %}"
+                            width="90px"
+                            alt="{{trainee.user.first_name}} image"
+                          />
+                          {% endif %}
                         </td>
-                        <td>{{trainer.user}}</td>
-                        <td>{{trainer.ssn}}</td>
                         <td>
-                          Email: {{trainer.user.email}}<br />
-                          Phome: {{trainer.phone1}}, {{trainer.phone2}}<br />
+                          {{trainee.user.first_name}} {{trainee.user.last_name}}
                         </td>
-                        <td>{{trainer.specialization}}</td>
+                        <td>{{trainee.stack.name}}</td>
+                        <td>
+                          Email: {{trainee.user.email}}<br />
+                          Phome: {{trainee.phone1}}
+                        </td>
                         <td>
                           <div class="pull-right">
                             <a
-                              href="{% url 'manager_trainerEdit' trainer.id %}"
+                              href="{% url 'manager_traineesProfile' current_cohort.id trainee.id %}"
                               class="btn btn-flat btn-info"
                               ><i class="fa fa-eye"></i> View</a
                             >
@@ -107,28 +108,6 @@
             </div>
             <!-- /.col -->
           </div>
-
-          <div class="modal fade" id="modal-default">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <button
-                    type="button"
-                    class="close"
-                    data-dismiss="modal"
-                    aria-label="Close"
-                  >
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                  <h4 class="modal-title">
-                    <i class="fa fa-user-plus"></i> REGISTER NEW TRAINER
-                  </h4>
-                </div>
-                {% include 'main/manager/trainer_model_form.html' %}
-              </div>
-            </div>
-          </div>
-          <!-- /.modal -->
         </section>
         <!-- /.content -->
       </div>

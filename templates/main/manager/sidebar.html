@@ -85,7 +85,7 @@
           {% endfor %} {% endif %}
         </ul>
       </li>
-      <li class="treeview">
+      <li class="treeview {{trainees_active}}">
         <a href="#">
           <i class="fa fa-group"></i> <span>Trainees</span>
           <span class="pull-right-container">
@@ -95,7 +95,7 @@
         <ul class="treeview-menu">
           {% if cohorts %} {% for cohort in cohorts %}
           <li>
-            <a href="{% url 'manager_cohortEdit' cohort.id %}">
+            <a href="{% url 'manager_traineesList' cohort.id %}">
               <i class="fa fa-circle-o text-aqua"></i>
               {{cohort.cohort_name}}
             </a>

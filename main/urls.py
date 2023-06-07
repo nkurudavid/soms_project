@@ -4,6 +4,7 @@ from .views import *
 urlpatterns = [
     path('', HomePage, name='home_page'),
     path('join_us/apply', ApplicationPage, name='join_page'),
+
     # manager urls
     path('staff/manager/login', ManagerLogin, name='manager_login'),
     path('staff/manager/logout', ManagerLogout, name='manager_logout'),
@@ -17,8 +18,9 @@ urlpatterns = [
     path('staff/manager/dashboard/cohorts/<int:pk>/cohort_info', ManagerDashboard_cohortEdit, name='manager_cohortEdit'),
     path('staff/manager/dashboard/cohorts/<int:pk>/application_list', ManagerDashboard_applicationList, name='manager_applicantsList'),
     path('staff/manager/dashboard/cohorts/<int:pk>/application_list/<int:n>/application_details', ManagerDashboard_applicationDetails, name='manager_applicationDetails'),
-    
-    
+    path('staff/manager/dashboard/cohorts/<int:pk>/trainees_list', ManagerDashboard_traineesList, name='manager_traineesList'),
+    path('staff/manager/dashboard/cohorts/<int:pk>/trainees_list/<int:n>/trainee_profile', ManagerDashboard_traineeProfile, name='manager_traineesProfile'),
+
     # Trainer urls
     path('staff/trainer/login', TrainerLogin, name='trainer_login'),
     path('staff/trainer/logout', TrainerLogout, name='trainer_logout'),
@@ -27,5 +29,5 @@ urlpatterns = [
     path('staff/trainer/dashboard/modules', TrainerDashboard_module, name='trainer_modules'),
     path('staff/trainer/dashboard/cohort/<int:pk>/trainees', TrainerDashboard_traineeList, name='trainer_traineeList'),
     path('staff/trainer/dashboard/cohort/<int:pk>/assignments', TrainerDashboard_assignmentList, name='trainer_assignmentList'),
-    
+
 ]

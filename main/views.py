@@ -606,6 +606,7 @@ def ManagerDashboard_applicationDetails(request, pk, n):
                             git_account=applicant.githubLink,
                             phone1=applicant.phone1,
                             locationAddress=applicant.locationAddress,
+                            cv_document=applicant.cv_file.url,
                             status='Pending',
                         )
                         traineeProfile.save()
@@ -651,56 +652,79 @@ def ManagerDashboard_applicationDetails(request, pk, n):
 
 
 
-# @login_required(login_url='manager_login')
-# def candidates_deanOfStudents(request, pk):
-#     if request.user.is_authenticated and request.user.is_manager==True:
-#         cohort_id = pk
-#         # getting cohort
-#         if Cohort.objects.filter(id=cohort_id).exists():
-#             # GET CANDIDATES WITH MANDATE = pk
-#             candidates=Candidate.objects.filter(mandate=pk).order_by('position')
-#             # GET ALL DATA IN MANDATE MODEL
-#             data_mandate = Mandate.objects.all().order_by('-mandate_name')
-#             context = {
-#                 'title': 'Dean of students | Mandate - Candidates',
-#                 'candidates':candidates,
-#                 'mandate': mandate,
-#                 'mandates': data_mandate,
-#                 'candidate_active': 'active',
-#                 'candidate_trigger': 'pcoded-trigger'
-#                 }
-#             return render(request, 'vote/dashboard/dean/candidate_list.html', context)
-#         else:
-#             messages.error(request, ('Cohort not found'))
-#             return redirect(ManagerDashboard)
-#     else:
-#         messages.warning(request, ('You have to login to view the page!'))
-#         return redirect(ManagerLogin)
+@login_required(login_url='manager_login')
+def ManagerDashboard_traineesList(request, pk):
+    if request.user.is_authenticated and request.user.is_manager==True:
+        cohort_id = pk
+        # getting cohort
+        if Cohort.objects.filter(id=cohort_id).exists():
+            # if exists
+            current_cohort = Cohort.objects.get(id=cohort_id)
+            # getting all trainees from cohort
+            traineesData=Trainee.objects.filter(cohort=pk).order_by('stack')
+            # getting cohort
+            CohortData = Cohort.objects.filter()
+            context = {
+                'title': 'Manager - Trainees',
+                'trainees_active': 'active',
+                'current_cohort': current_cohort,
+                'cohorts': CohortData,
+                'trainees': traineesData,
+                'trainees_total': traineesData.count
+            }
+            return render(request, 'main/manager/trainees_list.html', context)
+        else:
+            messages.error(request, ('Cohort not found'))
+            return redirect(ManagerDashboard)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(ManagerLogin)
 
 
-# @login_required(login_url='manager_login')
-# def candidateDetails_deanOfStudents(request, pk, n):
-#     if request.user.is_authenticated and request.user.is_manager==True:
-#         cohort_id = pk
-#         # getting cohort
-#         if Cohort.objects.filter(id=cohort_id).exists():
-#             candidate = Candidate.objects.get(id=n)
-#             # GET ALL DATA IN MANDATE MODEL
-#             data_mandate = Mandate.objects.all().order_by('-mandate_name')
-#             context = {
-#                 'title': 'Dean of students | Candidate - Details',
-#                 'candidate':candidate,
-#                 'mandate': mandate,
-#                 'mandates': data_mandate,
-#                 'candidate_trigger': 'pcoded-trigger'
-#                 }
-#             return render(request, 'vote/dashboard/dean/candidate_details.html', context)
-#         else:
-#             messages.error(request, ('Cohort not found'))
-#             return redirect(ManagerDashboard)
-#     else:
-#         messages.warning(request, ('You have to login to view the page!'))
-#         return redirect(ManagerLogin)
+
+@login_required(login_url='manager_login')
+def ManagerDashboard_traineeProfile(request, pk, n):
+    if request.user.is_authenticated and request.user.is_manager==True:
+        cohort_id = pk
+        trainee_id = n
+        # getting cohort
+        if Cohort.objects.filter(id=cohort_id).exists():
+            # if exists
+            current_cohort = Cohort.objects.get(id=cohort_id)
+            if Trainee.objects.filter(id=trainee_id).exists():
+                # get trainee
+                trainee = Trainee.objects.get(id=trainee_id)
+                if 'dismiss' in request.POST:
+                    if trainee.cv_document:
+                        if len(trainee.cv_document )  > 0:
+                            trainee.cv_document.delete()
+                    # Delete Trainee
+                    get_user_model().objects.filter(id=trainee.user.id).delete()
+                    Application.objects.filter(email=trainee.user.email).delete()
+                    messages.success(request, "Trainee dismissed successfully.")
+                    return redirect(ManagerDashboard_traineesList, pk)
+                else:
+                    # getting cohort
+                    CohortData = Cohort.objects.filter()
+                    context = {
+                        'title': 'Manager - Trainee Profile',
+                        'trainees_active': 'active',
+                        'current_cohort': current_cohort,
+                        'cohorts': CohortData,
+                        'trainee': trainee,
+                    }
+                    return render(request, 'main/manager/trainees_profile.html', context)
+            else:
+                messages.error(request, ('Trainee Profile not found'))
+                return redirect(ManagerDashboard_traineesList, pk)
+        else:
+            messages.error(request, ('Cohort not found'))
+            return redirect(ManagerDashboard)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(ManagerLogin)
+
+
 
 
 
