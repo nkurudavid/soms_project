@@ -42,8 +42,8 @@ class Stack(models.Model):
 
 
 class Module(models.Model):
-    stack = models.OneToOneField(Stack, verbose_name="Stack belonging", related_name="courses", on_delete=models.CASCADE)
-    name = models.CharField(verbose_name="Course Name", max_length=100, unique=True)
+    stack = models.ForeignKey(Stack, verbose_name="Stack belonging", related_name="modules", on_delete=models.CASCADE)
+    name = models.CharField(verbose_name="Module Name", max_length=100, unique=True)
     description = models.TextField(verbose_name="Description", blank=True)
     documentFiles = models.FileField(
         verbose_name="Document", 
@@ -79,17 +79,3 @@ class Module(models.Model):
 # - description
 # - documentFile (upload [.png, .jpg, .pdf, .doc, .ppt])
 # - createdDate(datetime)
-
-# #RecruitmentAnnouncement
-# - cohort (oneToOne)
-# - title
-# - description
-# - start_date (date)
-# - end_date (date)
-# - createDated (date)
-
-# #Requitment
-# - user (foreignKey -> company)
-# - talent (foreignKey -> trainee[awarded])
-# - status ( #confirmed: hided)
-# - dateCreated

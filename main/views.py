@@ -794,7 +794,7 @@ def TrainerDashboard(request):
         # getting trainees
         TraineesData = Trainee.objects.filter(cohort=currCohort, stack=request.user.trainers.stack)
         # getting Modules
-        ModulesData = Module.objects.filter()
+        ModulesData = Module.objects.filter(stack=request.user.trainers.stack)
         # getting cohort
         CohortData = Cohort.objects.filter()
         context = {
@@ -830,37 +830,39 @@ def Trainer_profile(request):
 @login_required(login_url='trainer_login')
 def TrainerDashboard_module(request):
     if request.user.is_authenticated and request.user.is_trainer==True:
-        if request.method == 'POST':
+        if 'new_module' in request.POST:
             module_name = request.POST.get("module_name")
             description = request.POST.get("description")
+            notes_document = request.FILES['notes_document']
 
             if module_name:
-                # module_name=module_name.upper()
-                found_data = Module.objects.filter(name=module_name)
-                if found_data:
+                # check existing module
+                if Module.objects.filter(name=module_name, stack=request.user.trainers.stack):
                     messages.warning(request, "Module "+module_name+", Already exist.")
                     return redirect(TrainerDashboard_module)
                 else:
                     # add new stack
-                    add_stack = Module(
+                    new_module = Module(
+                        stack=request.user.trainers.stack,
                         name=module_name, 
-                        description=description
+                        description=description,
+                        documentFiles=notes_document
                     )
-                    add_stack.save()
+                    new_module.save()
 
-                    messages.success(request, "New Module created successfully.")
+                    messages.success(request, "New Module registered successfully.")
                     return redirect(TrainerDashboard_module)
             else:
-                messages.error(request, "Error , Module name is required!")
+                messages.error(request, "Error , Module required!")
                 return redirect(TrainerDashboard_module)
         else:
-            # getting sodules
-            ModuleData = Module.objects.filter()
+            # getting modules
+            ModuleData = Module.objects.filter(stack=request.user.trainers.stack)
             # getting cohort
             CohortData = Cohort.objects.filter()
             context = {
                 'title': 'Trainer - Modules',
-                'module_active': 'active', 
+                'modules_active': 'active', 
                 'cohorts': CohortData,
                 'modules': ModuleData,
                 'module_total': ModuleData.count(),

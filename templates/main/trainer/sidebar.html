@@ -26,14 +26,14 @@
           <span class="pull-right-container"> </span>
         </a>
       </li>
-      <li class="{{course_active}}">
+      <li class="{{modules_active}}">
         <a href="{% url 'trainer_modules' %}">
           <i class="fa fa-book"></i>
           <span>Modules</span>
         </a>
       </li>
       <li class="header">TRAINING</li>
-      <li class="treeview">
+      <li class="treeview {{trainees_active}}">
         <a href="#">
           <i class="fa fa-group"></i> <span>Trainees</span>
           <span class="pull-right-container">
@@ -51,7 +51,7 @@
           {% endfor %} {% endif %}
         </ul>
       </li>
-      <li class="treeview">
+      <li class="treeview {{assignment_active}}">
         <a href="#">
           <i class="fa fa-group"></i> <span>Assignments</span>
           <span class="pull-right-container">
