@@ -10,12 +10,6 @@ class Application(models.Model):
         MALE = "Male", "Male"
         FEMALE = "Female", "Female"
 
-    class Status(models.TextChoices):
-        SELECT = "", "Select Status"
-        PENDING = "Pending", "Pending"
-        AWARDED = "Awarded", "Awarded"
-        REJECTED = "Rejected", "Rejected"
-
     class Education(models.TextChoices):
         SELECT = "", "Select Education Level"
         BACHELORS= "Bachelors Degree", "Bachelors Degree"
@@ -40,7 +34,7 @@ class Application(models.Model):
         blank=True, null=True
     )
     more = models.TextField(verbose_name="More Information", blank=True)
-    status = models.CharField(verbose_name="Status", choices=Status.choices, default=Status.SELECT, max_length=10)
+    status = models.BooleanField(verbose_name="Is Application Confirmed ?", default=False)
     createdDate = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

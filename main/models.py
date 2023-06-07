@@ -88,18 +88,6 @@ class Module(models.Model):
 # - end_date (date)
 # - createDated (date)
 
-# #TrainingApplication
-# - cohort (foreignKey)
-# - stack = models.OneToOneField(Stack, verbose_name="Stack belonging", related_name="stacks", on_delete=models.CASCADE)
-# - first_name
-# - last_name
-# - email
-# - gender
-# - phone
-# - location address
-# - cv ( #upload_document)
-# - createdDate (date)
-
 # #Requitment
 # - user (foreignKey -> company)
 # - talent (foreignKey -> trainee[awarded])

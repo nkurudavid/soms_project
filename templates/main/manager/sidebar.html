@@ -66,8 +66,8 @@
         </a>
       </li>
 
-      <li class="treeview">
-        <a href="#" class="{{dash_active}}">
+      <li class="treeview {{application_active}}">
+        <a href="#">
           <i class="fa fa-files-o"></i>
           <span>Applicants</span>
           <span class="pull-right-container">
@@ -77,7 +77,7 @@
         <ul class="treeview-menu">
           {% if cohorts %} {% for cohort in cohorts %}
           <li>
-            <a href="{% url 'manager_cohortEdit' cohort.id %}">
+            <a href="{% url 'manager_applicantsList' cohort.id %}">
               <i class="fa fa-circle-o text-aqua"></i>
               {{cohort.cohort_name}}
             </a>

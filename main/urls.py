@@ -15,6 +15,9 @@ urlpatterns = [
     path('staff/manager/dashboard/stacks/<int:pk>/stack_info', ManagerDashboard_stackEdit, name='manager_stackEdit'),
     path('staff/manager/dashboard/cohorts', ManagerDashboard_cohorts, name='manager_cohorts'),
     path('staff/manager/dashboard/cohorts/<int:pk>/cohort_info', ManagerDashboard_cohortEdit, name='manager_cohortEdit'),
+    path('staff/manager/dashboard/cohorts/<int:pk>/application_list', ManagerDashboard_applicationList, name='manager_applicantsList'),
+    path('staff/manager/dashboard/cohorts/<int:pk>/application_list/<int:n>/application_details', ManagerDashboard_applicationDetails, name='manager_applicationDetails'),
+    
     
     # Trainer urls
     path('staff/trainer/login', TrainerLogin, name='trainer_login'),

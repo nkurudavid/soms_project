@@ -1,0 +1,116 @@
+{% extends "main/dash_main_layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
+  {% load static %}
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+  </head>
+
+  <body>
+    {% block account_content%}
+
+    <div class="wrapper">
+      {% include 'main/manager/navbar.html' %}
+      <!-- Left side column. contains the logo and sidebar -->
+      {% include 'main/manager/sidebar.html' %}
+
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            <i class="fa fa-copy"></i>
+            Applications for
+            <span class="text-blue">{{current_cohort.cohort_name}}</span>
+          </h1>
+          <ol class="breadcrumb">
+            <li>
+              <a href="#"><i class="fa fa-dashboard"></i> Home</a>
+            </li>
+            <li class="active">Applicant</li>
+          </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+          <div class="row">
+            <div class="col-xs-12">
+              <div class="box box-info">
+                <div class="box-header">
+                  <h3 class="box-title">
+                    All Applicants ({{applicant_total}})
+                  </h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  <table
+                    id="example1"
+                    class="table table-bordered table-striped"
+                  >
+                    <thead>
+                      <tr>
+                        <th>No.</th>
+                        <th>FULL NAMES</th>
+                        <th>STACK</th>
+                        <th>CONTACT</th>
+                        <th>ATTACHED CV</th>
+                        <th>STATUS</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% if applicants %} {% for applicant in applicants %}
+                      <tr>
+                        <td>{{ forloop.counter }}.</td>
+                        <td>
+                          {{applicant.first_name}} {{applicant.last_name}}
+                        </td>
+                        <td>{{applicant.stack.name}}</td>
+                        <td>
+                          Email: {{applicant.email}}<br />
+                          Phome: {{applicant.phone1}}
+                        </td>
+                        <td>
+                          <i class="fa fa-file"></i> {{applicant.cv_file}}
+                        </td>
+                        <td>
+                          {% if applicant.status == False %}
+                          <span class="badge bg-yellow">Pending</span>
+                          {% else %}
+                          <span class="badge bg-green">Approved</span>
+                          {% endif %}
+                        </td>
+                        <td>
+                          <div class="pull-right">
+                            <a
+                              href="{% url 'manager_applicationDetails' current_cohort.id applicant.id %}"
+                              class="btn btn-flat btn-info"
+                              ><i class="fa fa-eye"></i> View</a
+                            >
+                          </div>
+                        </td>
+                      </tr>
+                      {% endfor %} {% endif %}
+                    </tbody>
+                  </table>
+                </div>
+                <!-- /.box-body -->
+              </div>
+              <!-- /.box -->
+            </div>
+            <!-- /.col -->
+          </div>
+        </section>
+        <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+
+      {% include 'main/manager/footer.html' %}
+    </div>
+    {% endblock %}
+  </body>
+</html>

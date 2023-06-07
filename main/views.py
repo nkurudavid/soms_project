@@ -22,7 +22,6 @@ def HomePage(request):
     return render(request, 'home.html', context)
 
 
-
 def ApplicationPage(request):
     if request.method == 'POST' :
         first_name = request.POST.get('first_name')
@@ -64,8 +63,7 @@ def ApplicationPage(request):
                     githubLink = git_link,
                     cv_file = cv,
                     educationLevel = education_level,
-                    more = more,
-                    status = "Pending"
+                    more = more
                 )
                 applicationForm.save()
 
@@ -540,6 +538,240 @@ def ManagerDashboard_cohortEdit(request, pk):
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(ManagerLogin)
+
+
+
+@login_required(login_url='manager_login')
+def ManagerDashboard_applicationList(request, pk):
+    if request.user.is_authenticated and request.user.is_manager==True:
+        cohort_id = pk
+        # getting cohort
+        if Cohort.objects.filter(id=cohort_id).exists():
+            # if exists
+            current_cohort = Cohort.objects.get(id=cohort_id)
+            # Get Application with cohort.id = pk
+            applicantsData = Application.objects.filter(cohort=cohort_id).order_by('-status')
+            # getting cohort
+            CohortData = Cohort.objects.filter()
+            context = {
+                'title': 'Manager - Applicants',
+                'application_active': 'active',
+                'current_cohort': current_cohort,
+                'cohorts': CohortData,
+                'applicants': applicantsData,
+                'applicant_total': applicantsData.count
+            }
+            return render(request, 'main/manager/application_list.html', context)
+        else:
+            messages.error(request, ('Cohort not found'))
+            return redirect(ManagerDashboard)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(ManagerLogin)
+
+
+@login_required(login_url='manager_login')
+def ManagerDashboard_applicationDetails(request, pk, n):
+    if request.user.is_authenticated and request.user.is_manager==True:
+        cohort_id = pk
+        applicant_id = n
+        # getting cohort
+        if Cohort.objects.filter(id=cohort_id).exists():
+            # if exists
+            current_cohort = Cohort.objects.get(id=cohort_id)
+            if Application.objects.filter(id=applicant_id).exists():
+                # get applicant
+                applicant = Application.objects.get(id=applicant_id)
+                # getting cohort
+                CohortData = Cohort.objects.filter()
+                context = {
+                    'title': 'Manager - Applicant Details',
+                    'application_active': 'active',
+                    'current_cohort': current_cohort,
+                    'cohorts': CohortData,
+                    'applicant': applicant,
+                }
+                return render(request, 'main/manager/application_details.html', context)
+            else:
+                messages.error(request, ('Application not found'))
+                return redirect(ManagerDashboard_applicationList, pk)
+        else:
+            messages.error(request, ('Cohort not found'))
+            return redirect(ManagerDashboard)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(ManagerLogin)
+
+
+# @login_required(login_url='manager_login')
+# def approvedCandidate_deanOfStudents(request, pk, n):
+#     if request.user.is_authenticated and request.user.is_manager==True:
+#         cohort_id = pk
+#         # getting cohort
+#         if Cohort.objects.filter(id=cohort_id).exists():
+#             # GET CANDIDACY WITH ID = n
+#             candidacy = Candidacy.objects.get(id=n)
+
+#             update_candidacy = Candidacy.objects.filter(id=n).update(approved = True)
+#             if update_candidacy:
+#                 current_year = date.today().year
+#                 candidatePassword = "candidate"+str(current_year)
+#                 # CREATE USER CANDIDATE WHEN CANDIDACY APPROVED
+#                 user =  get_user_model().objects.create_user(
+#                     first_name=candidacy.student.first_name,
+#                     last_name=candidacy.student.last_name,
+#                     email=candidacy.student.email, 
+#                     type="candidate", 
+#                     password=candidatePassword
+#                 )
+#                 if user:
+#                     candidateUser =  get_user_model().objects.get(email=candidacy.student.email)
+                    
+#                     # GET LATEST CANDIDATE ID IN CANDIDATE MODEL
+#                     if Candidate.objects.exists():
+#                         last_id = Candidate.objects.latest('id').id
+#                         n = last_id + 1
+#                         candidate_code = "GCC/CA/"+str(current_year)+"/"+ str(n)
+#                     else:
+#                         candidate_code = "GCC/CA/"+str(current_year)+"/1"
+                        
+#                     # INSERT CANDIDATE DATA IN CANDIDATE MODEL
+#                     add_candidate = Candidate(
+#                         user = candidateUser,
+#                         student = candidacy.student,
+#                         mandate = mandate, 
+#                         position = candidacy.applied_position, 
+#                         candid_code = candidate_code,
+#                         approved = True, 
+#                         candid_image = candidacy.passport_image,
+#                     )
+#                     add_candidate.save()
+                    
+                    
+#                     login_url = "https://127.0.0.1:9000/candidate/login"
+#                     # SENDING NOTIFICATION TO APPLICANT THROUGH AN EMAIL
+#                     subject = 'Candidacy Approval'
+#                     message = 'Your candidacy has been verified and approved for '+mandate.mandate_name+', on candidate position: '+candidacy.applied_position.position_name+'. You can now login to your candidate account with '+login_url+'. Your login credential are email: '+candidacy.student.email+', password: '+candidatePassword
+#                     email_from = settings.EMAIL_HOST_USER
+#                     recipient_list =[candidacy.student.email,]
+#                     send_mail( subject, message, email_from, recipient_list )
+                    
+#                     messages.success(request, candidacy.student.first_name+"'s Candidacy approved successfully.")
+#                     context = {
+#                         'title': 'Dean of students | Canndidacy - Details',
+#                         'candidacy':candidacy,
+#                         'mandate': mandate,
+#                         }
+#                     return render(request, 'vote/dashboard/dean/candidacy_approved.html', context)
+#             else:
+#                 messages.error(request, "Error, unable to complete action.")
+#                 context = {
+#                     'title': 'Dean of students | Canndidacy - Details',
+#                     'candidacy':candidacy,
+#                     'mandate': mandate,
+#                     }
+#                 return render(request, 'vote/dashboard/dean/candidacy_details.html', context)
+#         else:
+#             messages.error(request, ('Cohort not found'))
+#             return redirect(ManagerDashboard)
+#     else:
+#         messages.warning(request, ('You have to login to view the page!'))
+#         return redirect(ManagerLogin)
+
+
+# @login_required(login_url='manager_login')
+# def rejectCandidacy_deanOfStudents(request, pk, n):
+#     if request.user.is_authenticated and request.user.is_manager==True:
+#         cohort_id = pk
+#         # getting cohort
+#         if Cohort.objects.filter(id=cohort_id).exists():
+            
+#             if request.method == 'POST':
+#                 # GET CANDIDACY WITH ID = n
+#                 candidacy = Candidacy.objects.get(id=n)
+#                 # GET CANDIDACIES WITH MANDATE = pk
+#                 candidacies = Candidacy.objects.filter(mandate=pk).order_by('-applied_date')
+#                 # GET ALL DATA IN MANDATE MODEL
+#                 data_mandate = Mandate.objects.all().order_by('-mandate_name')
+                
+#                 if len(candidacy.passport_image and candidacy.studentID_copy and candidacy.National_ID_copy and candidacy.transcript)  > 0:
+#                     candidacy.passport_image.delete()
+#                     candidacy.studentID_copy.delete()
+#                     candidacy.National_ID_copy.delete()
+#                     candidacy.transcript.delete()
+                
+#                 delete_candidacy = candidacy.delete()
+                    
+#                 if delete_candidacy:
+#                     context = {
+#                         'title': 'Dean of students | Submited Candidacy',
+#                         'candidacies': candidacies,
+#                         'mandate': mandate,
+#                         'mandates': data_mandate,
+#                         'candidacy_active': 'active',
+#                         'candidacy_trigger': 'pcoded-trigger',
+#                         }
+#                     messages.info(request, ('Candidacy Rejected Successfully'))
+#                     return render(request, 'vote/dashboard/dean/candidacy_list.html', context)
+#         else:
+#             messages.error(request, ('Cohort not found'))
+#             return redirect(ManagerDashboard)
+#     else:
+#         messages.warning(request, ('You have to login to view the page!'))
+#         return redirect(ManagerLogin)
+
+
+
+# @login_required(login_url='manager_login')
+# def candidates_deanOfStudents(request, pk):
+#     if request.user.is_authenticated and request.user.is_manager==True:
+#         cohort_id = pk
+#         # getting cohort
+#         if Cohort.objects.filter(id=cohort_id).exists():
+#             # GET CANDIDATES WITH MANDATE = pk
+#             candidates=Candidate.objects.filter(mandate=pk).order_by('position')
+#             # GET ALL DATA IN MANDATE MODEL
+#             data_mandate = Mandate.objects.all().order_by('-mandate_name')
+#             context = {
+#                 'title': 'Dean of students | Mandate - Candidates',
+#                 'candidates':candidates,
+#                 'mandate': mandate,
+#                 'mandates': data_mandate,
+#                 'candidate_active': 'active',
+#                 'candidate_trigger': 'pcoded-trigger'
+#                 }
+#             return render(request, 'vote/dashboard/dean/candidate_list.html', context)
+#         else:
+#             messages.error(request, ('Cohort not found'))
+#             return redirect(ManagerDashboard)
+#     else:
+#         messages.warning(request, ('You have to login to view the page!'))
+#         return redirect(ManagerLogin)
+
+
+# @login_required(login_url='manager_login')
+# def candidateDetails_deanOfStudents(request, pk, n):
+#     if request.user.is_authenticated and request.user.is_manager==True:
+#         cohort_id = pk
+#         # getting cohort
+#         if Cohort.objects.filter(id=cohort_id).exists():
+#             candidate = Candidate.objects.get(id=n)
+#             # GET ALL DATA IN MANDATE MODEL
+#             data_mandate = Mandate.objects.all().order_by('-mandate_name')
+#             context = {
+#                 'title': 'Dean of students | Candidate - Details',
+#                 'candidate':candidate,
+#                 'mandate': mandate,
+#                 'mandates': data_mandate,
+#                 'candidate_trigger': 'pcoded-trigger'
+#                 }
+#             return render(request, 'vote/dashboard/dean/candidate_details.html', context)
+#         else:
+#             messages.error(request, ('Cohort not found'))
+#             return redirect(ManagerDashboard)
+#     else:
+#         messages.warning(request, ('You have to login to view the page!'))
+#         return redirect(ManagerLogin)
 
 
 
