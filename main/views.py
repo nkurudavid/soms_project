@@ -826,55 +826,6 @@ def Trainer_profile(request):
         return redirect(TrainerLogin)
 
 
-
-@login_required(login_url='trainer_login')
-def TrainerDashboard_module(request):
-    if request.user.is_authenticated and request.user.is_trainer==True:
-        if 'new_module' in request.POST:
-            module_name = request.POST.get("module_name")
-            description = request.POST.get("description")
-            notes_document = request.FILES['notes_document']
-
-            if module_name:
-                # check existing module
-                if Module.objects.filter(name=module_name, stack=request.user.trainers.stack):
-                    messages.warning(request, "Module "+module_name+", Already exist.")
-                    return redirect(TrainerDashboard_module)
-                else:
-                    # add new stack
-                    new_module = Module(
-                        stack=request.user.trainers.stack,
-                        name=module_name, 
-                        description=description,
-                        documentFiles=notes_document
-                    )
-                    new_module.save()
-
-                    messages.success(request, "New Module registered successfully.")
-                    return redirect(TrainerDashboard_module)
-            else:
-                messages.error(request, "Error , Module required!")
-                return redirect(TrainerDashboard_module)
-        else:
-            # getting modules
-            ModuleData = Module.objects.filter(stack=request.user.trainers.stack)
-            # getting cohort
-            CohortData = Cohort.objects.filter()
-            context = {
-                'title': 'Trainer - Modules',
-                'modules_active': 'active', 
-                'cohorts': CohortData,
-                'modules': ModuleData,
-                'module_total': ModuleData.count(),
-            }
-            return render(request, 'main/trainer/modules.html', context)
-    else:
-        messages.warning(request, ('You have to login to view the page!'))
-        return redirect(TrainerLogin)
-
-
-
-
 @login_required(login_url='trainer_login')
 def TrainerDashboard_traineeList(request, pk):
     if request.user.is_authenticated and request.user.is_trainer==True:
@@ -940,8 +891,131 @@ def TrainerDashboard_traineeProfile(request, pk, n):
 
 
 @login_required(login_url='trainer_login')
+def TrainerDashboard_module(request):
+    if request.user.is_authenticated and request.user.is_trainer==True:
+        if 'new_module' in request.POST:
+            module_name = request.POST.get("module_name")
+            description = request.POST.get("description")
+            notes_document = request.FILES.get('notes_document')
+
+            if module_name:
+                # check existing module
+                if Module.objects.filter(name=module_name, stack=request.user.trainers.stack):
+                    messages.warning(request, "Module "+module_name+", Already exist.")
+                    return redirect(TrainerDashboard_module)
+                else:
+                    # add new stack
+                    new_module = Module(
+                        stack=request.user.trainers.stack,
+                        name=module_name, 
+                        description=description,
+                        documentFiles=notes_document
+                    )
+                    new_module.save()
+
+                    messages.success(request, "New Module registered successfully.")
+                    return redirect(TrainerDashboard_module)
+            else:
+                messages.error(request, "Error , Module required!")
+                return redirect(TrainerDashboard_module)
+        else:
+            # getting modules
+            ModuleData = Module.objects.filter(stack=request.user.trainers.stack)
+            # getting cohort
+            CohortData = Cohort.objects.filter()
+            context = {
+                'title': 'Trainer - Modules',
+                'modules_active': 'active', 
+                'cohorts': CohortData,
+                'modules': ModuleData,
+                'module_total': ModuleData.count(),
+            }
+            return render(request, 'main/trainer/modules.html', context)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(TrainerLogin)
+
+
+
+@login_required(login_url='trainer_login')
+def TrainerDashboard_moduleEdit(request, pk):
+    if request.user.is_authenticated and request.user.is_trainer==True:
+        module_id = pk
+        if Module.objects.filter(id=module_id, stack=request.user.trainers.stack).exists():
+            # getting module
+            moduleData = Module.objects.get(id=module_id, stack=request.user.trainers.stack)
+
+            if 'submit' in request.POST:
+                module_name = request.POST.get("module_name")
+                description = request.POST.get("description")
+                notes_document = request.FILES.get('notes_document')
+
+                if module_name:
+                    # check existing module
+                    if Module.objects.filter(name=module_name, stack=request.user.trainers.stack).exclude(id=module_id):
+                        messages.warning(request, "Module "+module_name+", Already exist.")
+                        return redirect(TrainerDashboard_moduleEdit, pk)
+                    else:
+                        if notes_document:
+                            if len(notes_document) > 0:
+                                # check if existing module have document
+                                if len(moduleData.documentFiles) > 0:
+                                    moduleData.documentFiles.delete()
+
+                            # Update module with document file
+                            moduleData.name=module_name, 
+                            moduleData.description=description,
+                            moduleData.documentFiles=notes_document
+                            # save changes
+                            moduleData.save()
+                            updateModule = moduleData
+                        else:
+                            # Update Module
+                            updateModule = Module.objects.filter(id=module_id, stack=request.user.trainers.stack).update(
+                                name=module_name, 
+                                description=description,
+                            )
+
+                        if updateModule:
+                            messages.success(request, "Module "+module_name+", Updated successfully.")
+                            return redirect(TrainerDashboard_moduleEdit, pk)
+                        else:
+                            messages.error(request, ('Process Failed.'))
+                            return redirect(TrainerDashboard_moduleEdit, pk)
+                else:
+                    messages.error(request, ('All fields are required.'))
+                    return redirect(TrainerDashboard_moduleEdit, pk)
+
+            elif 'delete' in request.POST:
+                # Delete Module and it's files
+                if len(moduleData.documentFiles) > 0:
+                    moduleData.documentFiles.delete()
+                moduleData.delete()
+                messages.success(request, "Module deleted successfully.")
+                return redirect(TrainerDashboard_module)
+
+            else:
+                # getting cohorts
+                CohortData = Cohort.objects.filter()
+                context = {
+                    'title': 'Trainer - Module Info',
+                    'modules_active': 'active',
+                    'cohorts': CohortData,
+                    'module': moduleData,
+                }
+                return render(request, 'main/trainer/moduleEdit.html', context)
+        else:
+            messages.error(request, ('Module not found'))
+            return redirect(TrainerDashboard_module)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(TrainerLogin)
+
+
+
+@login_required(login_url='trainer_login')
 def TrainerDashboard_assignmentList(request, pk):
-    if request.user.is_authenticated and request.user.is_manager==True:
+    if request.user.is_authenticated and request.user.is_trainer==True:
         if 'submit' in request.POST:
             # Retrieve the form data from the request
             first_name = request.POST.get('first_name')

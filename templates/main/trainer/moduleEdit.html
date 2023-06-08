@@ -23,16 +23,16 @@
         <!-- Content Header (Page header) -->
         <section class="content-header">
           <h1>
-            <i class="fa fa-edit"></i>
-            Edit Courses
+            <i class="fa fa-book"></i>
+            Module Info
           </h1>
           <ol class="breadcrumb">
             <li>
               <a href="#"><i class="fa fa-dashboard"></i> Home</a>
             </li>
             <li>
-              <a href="{% url 'manager_courses' %}">
-                <i class="fa fa-book"></i> Courses
+              <a href="{% url 'trainer_modules' %}">
+                <i class="fa fa-book"></i> modules
               </a>
             </li>
             <li class="active">Edit</li>
@@ -42,24 +42,87 @@
         <!-- Main content -->
         <section class="content">
           <div class="row">
-            <div class="col-xs-12">
-              <div class="box box-info">
+            <div class="col-lg-8">
+              <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                  <li class="active">
+                    <a
+                      href="#module_info"
+                      class="text-uppercase"
+                      data-toggle="tab"
+                    >
+                      {{module.name}} MODULE
+                    </a>
+                  </li>
+                </ul>
+                <div class="tab-content">
+                  <div class="active tab-pane" id="module_info">
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                      <div class="row mb-5">
+                        <div class="col-lg-12">
+                          <strong> <i class="fa fa-book"></i> Title: </strong>
+                          <p class="text-muted">{{module.name}}</p>
+                          <hr />
+
+                          <strong> Descriptions: </strong>
+                          <p class="text-muted">{{module.description}}</p>
+                          <hr />
+
+                          <strong>
+                            <i class="fa fa-file"></i> Document Notes:
+                          </strong>
+                          <p class="text-muted">
+                            {% if module.documentFiles %}
+                            {{module.documentFiles}}
+                            <br />
+                            <br />
+                            <a
+                              href="{{module.documentFiles.url}}"
+                              target="_blank"
+                              class="btn btn-primary btn-sm btn-flat"
+                            >
+                              <i class="fa fa-download"></i>
+                              Download
+                            </a>
+                            {% else %} No Document Files {% endif %}
+                          </p>
+                          <hr />
+                        </div>
+                      </div>
+                      <a
+                        href="{% url 'trainer_modules' %}"
+                        class="btn btn-default btn-flat pull-left"
+                        ><i class="fa fa-arrow-left"></i> Back
+                      </a>
+                    </div>
+                    <!-- /.box-body -->
+                  </div>
+                </div>
+                <!-- /.tab-content -->
+              </div>
+              <!-- /.nav-tabs-custom -->
+            </div>
+            <div class="col-lg-4">
+              <div class="box">
                 <div class="box-header">
-                  <h3 class="box-title">Course Info</h3>
+                  <h3 class="box-title">
+                    <i class="fa fa-edit"></i> Edit Module
+                  </h3>
                 </div>
                 <!-- /.box-header -->
                 <div class="box-body">
-                  <form action="" method="post">
+                  <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="modal-body">
                       <div class="form-group mb-0">
-                        <label class="col-form-label">Course name</label>
+                        <label class="col-form-label">Module name</label>
                         <input
                           type="text"
                           class="form-control form-control-uppercase"
-                          name="course_name"
-                          placeholder="Course Name"
-                          value="{{ course.name }}"
+                          name="module_name"
+                          placeholder="Module Name"
+                          value="{{ module.name }}"
                           required
                         />
                       </div>
@@ -71,8 +134,19 @@
                           placeholder="Description ..."
                           name="description"
                         >
-{{ course.description }}</textarea
+{{ module.description }}</textarea
                         >
+                      </div>
+                      <div class="form-group mb-0">
+                        <label class="col-form-label"
+                          >Upload Document Notes</label
+                        >
+                        <input
+                          class="form-control form-control-lg"
+                          name="notes_document"
+                          type="file"
+                          accept=".pdf, .doc, .docx"
+                        />
                       </div>
                     </div>
                     <div class="modal-footer">
@@ -91,11 +165,6 @@
                       >
                         <i class="fa fa-save"></i> Save Changes
                       </button>
-                      <a
-                        href="{% url 'trainer_courses' %}"
-                        class="btn btn-default btn-flat pull-left"
-                        ><i class="fa fa-arrow-left"></i> Back</a
-                      >
                     </div>
                   </form>
                 </div>
@@ -120,7 +189,7 @@
                     <span aria-hidden="true">&times;</span>
                   </button>
                   <h4 class="modal-title">
-                    <i class="fa fa-trash"></i> DELETE COURSE
+                    <i class="fa fa-trash"></i> DELETE MODULE
                   </h4>
                 </div>
                 <form action="" method="post">
@@ -128,7 +197,7 @@
                   <div class="modal-body">
                     <p class="text-center h4">
                       Are you sure want to delete <br />
-                      Course: "{{course.name}}" ?
+                      module: "{{module.name}}" ?
                     </p>
                   </div>
                   <div class="modal-footer">
