@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin
 from .models import User, Trainer, Trainee, ProgramManager, Company
 
@@ -35,3 +36,5 @@ admin.site.register(Trainer)
 admin.site.register(Trainee)
 admin.site.register(ProgramManager)
 admin.site.register(Company)
+
+admin.site.unregister(Group)
