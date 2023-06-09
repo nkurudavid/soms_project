@@ -5,7 +5,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 from . manager import UserManager
-from main.models import Stack, Cohort
+from main.models import Stack, Cohort, Group
 
 
 # Create your models here.
@@ -74,6 +74,7 @@ class Trainee(models.Model):
     user = models.OneToOneField(User, verbose_name="User", related_name="trainees", on_delete=models.CASCADE)
     cohort = models.ForeignKey(Cohort, verbose_name="Cohort belonging", related_name="trainees", on_delete=models.CASCADE)
     stack = models.ForeignKey(Stack, verbose_name="Stack belonging", related_name="trainees", on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, verbose_name="Group belonging", related_name="trainees", on_delete=models.SET_DEFAULT, default=None, blank=True, null=True)
     git_account = models.URLField(verbose_name="Git Account Link", blank=False, null=False)
     profilePicture = models.ImageField(
         verbose_name="Image", 

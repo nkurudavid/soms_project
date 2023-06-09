@@ -1,8 +1,6 @@
 from django.db import models
 from django.core.validators import FileExtensionValidator
 
-# from account.models import Trainer
-
 
 class Cohort(models.Model):
     class Status(models.TextChoices):
@@ -25,7 +23,7 @@ class Cohort_schedule(models.Model):
         INTERVIEW = "Interview", "Interview"
         GRADUATION = "Graduation", "Graduation"
 
-    cohort = models.ForeignKey(Cohort, verbose_name="Cohort Scheduled", related_name="schedules", on_delete=models.PROTECT)
+    cohort = models.ForeignKey(Cohort, verbose_name="Cohort Scheduled", related_name="schedules", on_delete=models.CASCADE)
     schedule_name = models.CharField(verbose_name="Status", choices=Schedule.choices, default=Schedule.SELECT, max_length=12)
     start_period = models.DateTimeField()
     end_period = models.DateTimeField()
@@ -54,28 +52,50 @@ class Module(models.Model):
     def __str__(self):
         return self.name
 
-# class Team(models.Model):
-# - lab = models.OneToOneField(Cohort, verbose_name="Cohort", related_name="labs", on_delete=models.CASCADE)
-# - trainee (foreignKey)
-# - name = models.CharField(verbose_name="Stack Name", max_length=100, unique=True)
 
-# class Assignment(models.Model):
-# - lab (foreignKey)
-# - title = models.CharField(verbose_name="Stack Name", max_length=100, unique=True)
-# - description
-# - documentFile (upload [.pdf, .doc, .ppt])
-# - submitionDate (datetime)
+class Group(models.Model):
+    cohort = models.ForeignKey(Cohort, verbose_name="Cohort belonging", related_name="groups", on_delete=models.CASCADE)
+    stack = models.ForeignKey(Stack, verbose_name="Stack belonging", related_name="groups", on_delete=models.CASCADE)
+    group_name = models.CharField(verbose_name="Group Name", max_length=100, unique=True)
+    def __str__(self):
+        return self.group_name
 
-# class Report(models.Model):
-# - assignment (foreignKey)
-# - team (foreignkey)
-# - description
-# - documentFile (upload [.pdf, .doc, .ppt])
-# - dateCreated (datetime)
-# - status (option: #unread, #read)
 
-# class Feedback(models.Model):
-# - assignment (oneToOne)
-# - description
-# - documentFile (upload [.png, .jpg, .pdf, .doc, .ppt])
-# - createdDate(datetime)
+class Assignment(models.Model):
+    cohort = models.ForeignKey(Cohort, verbose_name="Cohort belonging", related_name="assignments", on_delete=models.CASCADE)
+    stack = models.ForeignKey(Stack, verbose_name="Stack belonging", related_name="assignments", on_delete=models.CASCADE)
+    title = models.CharField(verbose_name="Assignment Title", max_length=100, unique=True)
+    description = models.TextField(verbose_name="Description", blank=True)
+    documentFiles = models.FileField(
+        verbose_name="Document", 
+        upload_to="document/course/assignment/", 
+        validators=[FileExtensionValidator(['pdf','doc','ppt'])],
+        blank=True, null=True
+    )
+    def __str__(self):
+        return self.title
+
+
+class AssignmentReport(models.Model):
+    group = models.ForeignKey(Group, verbose_name="Submitting Group", related_name="reports", on_delete=models.CASCADE)
+    assignment = models.ForeignKey(Assignment, verbose_name="Assignment", related_name="reports", on_delete=models.CASCADE)
+    description = models.TextField(verbose_name="Description", blank=True)
+    documentFiles = models.FileField(
+        verbose_name="Document", 
+        upload_to="document/course/assignment/", 
+        validators=[FileExtensionValidator(['pdf','doc','ppt'])],
+        blank=True, null=True
+    )
+    status = models.BooleanField(verbose_name="Is Received", default=False)
+    createdDate = models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return self.group.group_name
+
+
+class Feedback(models.Model):
+    assignment = models.ForeignKey(Assignment, verbose_name="Assignment", related_name="feedbacks", on_delete=models.CASCADE)
+    grade = models.CharField(verbose_name="Assignment Grade", max_length=100, unique=True)
+    comment = models.TextField(verbose_name="Comment", blank=True)
+    createdDate = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return self.comment
