@@ -6,11 +6,20 @@
     <!-- Sidebar user panel -->
     <div class="user-panel">
       <div class="pull-left image">
+        {% if user.trainees.profilePicture %}
         <img
           src="{{user.trainees.profilePicture.url}}"
-          class="img-circle"
-          alt="User Image"
+          class="user-image"
+          alt="{{trainee.user.first_name}} image"
         />
+        {% else %}
+        <img
+          class="user-image"
+          src="{% static 'images/anonymous.png' %}"
+          width="40px"
+          alt="{{trainee.user.first_name}} image"
+        />
+        {% endif %}
       </div>
       <div class="pull-left info">
         <p>{{user.first_name}} {{user.last_name}}</p>

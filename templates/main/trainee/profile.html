@@ -50,53 +50,109 @@
                 <div class="tab-content">
                   <div class="active tab-pane" id="activity">
                     <div class="box-body box-profile">
+                      {% if user.trainee.profilePicture %}
                       <img
                         class="profile-user-img img-responsive img-circle"
-                        src="{{user.trainees.profilePicture.url}}"
-                        alt="User profile picture"
+                        src="{{user.trainee.profilePicture.url}}"
+                        style="width: 200px !important"
+                        alt="{{user.first_name}} image"
                       />
+                      {% else %}
+                      <img
+                        class="profile-user-img img-responsive img-circle"
+                        src="{% static 'images/anonymous.png' %}"
+                        style="width: 200px !important"
+                        alt="{{user.first_name}} image"
+                      />
+                      {% endif %}
 
                       <h3 class="profile-username text-center">
                         {{user.first_name}} {{user.last_name}}
                       </h3>
 
-                      <p class="text-muted text-center">Trainee</p>
-                    </div>
-                    <div class="box-header with-border">
-                      <h3 class="box-title text-primary text-bold">About Me</h3>
+                      <h3 class="text-bold text-muted text-center">Trainee</h3>
+                      <p class="text-muted text-center">
+                        <sup><i class="fa fa-quote-left"></i></sup>
+                        <span class="h4 text-bold">
+                          {{user.trainees.stack.name}}
+                        </span>
+                        <sup><i class="fa fa-quote-right"></i></sup>
+                      </p>
                     </div>
                     <!-- /.box-header -->
                     <div class="box-body">
-                      <strong
-                        ><i class="fa fa-envelope margin-r-5"></i> Email</strong
-                      >
-                      <p class="text-muted">{{user.email}}</p>
-                      <hr />
+                      <div class="row">
+                        <div class="col-lg-6">
+                          <strong> <i class="fa fa-user"></i> Names: </strong>
+                          <p class="text-muted">
+                            {{user.first_name}}
+                            {{user.last_name}}
+                          </p>
+                          <hr />
 
-                      <strong
-                        ><i class="fa fa-user margin-r-5"></i> Gender</strong
-                      >
-                      <p class="text-muted">{{user.gender}}</p>
-                      <hr />
+                          <strong>
+                            <i class="fa fa-envelope"></i> Email:
+                          </strong>
+                          <p class="text-muted">{{user.email}}</p>
+                          <hr />
 
-                      <strong> <i class="fa fa-barcode"></i> SSN: </strong>
-                      <p class="text-muted">{{user.trainees.ssn}}</p>
-                      <hr />
+                          <strong>
+                            <i class="fa fa-phone"></i> Contact Phone:
+                          </strong>
+                          <p class="text-muted">{{user.trainees.phone1}}</p>
+                          <hr />
 
-                      <strong
-                        ><i class="fa fa-phone margin-r-5"></i> Contact
-                        Phone</strong
-                      >
-                      <p class="text-muted">{{user.trainees.phone1}}</p>
-                      <p class="text-muted">{{user.trainees.phone2}}</p>
+                          <strong>
+                            <i class="fa fa-male"></i> /
+                            <i class="fa fa-female"></i>
+                            Gender:
+                          </strong>
+                          <p class="text-muted">{{user.gender}}</p>
+                          <hr />
 
-                      <hr />
+                          <strong>
+                            <i class="fa fa-map-marker"></i> Location:
+                          </strong>
+                          <p class="text-muted">{{user.trainees.locationAddress}}</p>
+                          <hr />
+                        </div>
+                        <div class="col-lg-6">
+                          <strong>
+                            <i class="fa fa-sitemap"></i> Stack:
+                          </strong>
+                          <p class="text-muted">{{user.trainees.stack.name}}</p>
+                          <hr />
 
-                      <strong
-                        ><i class="fa fa-map-marker margin-r-5"></i> Location
-                        Address</strong
-                      >
-                      <p>{{user.trainees.locationAddress}}</p>
+                          <strong>
+                            <i class="fa fa-github"></i> Git Account Link:
+                          </strong>
+                          <p class="text-muted">
+                            <a href="{{user.trainees.git_account}}" target="_blank">
+                              {{user.trainees.git_account}}
+                            </a>
+                          </p>
+                          <hr />
+
+                          <strong>
+                            <i class="fa fa-file"></i> CV Document:
+                          </strong>
+                          <p class="text-muted">
+                            {% if user.trainees.cv_document %} {{user.trainees.cv_document}}
+                            <br />
+                            <br />
+                            <a
+                              href="{{user.trainees.cv_document.url}}"
+                              target="_blank"
+                              class="btn btn-primary btn-sm"
+                            >
+                              <i class="fa fa-download"></i>
+                              Download
+                            </a>
+                            {% else %} No CV {% endif %}
+                          </p>
+                        </div>
+                        <hr />
+                      </div>
                     </div>
                     <!-- /.box-body -->
                   </div>

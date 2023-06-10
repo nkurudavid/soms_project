@@ -1073,7 +1073,7 @@ def TrainerDashboard_assignmentList(request, pk):
                 # getting assignment reports
                 reportData = AssignmentReport.objects.filter(assignment=currentAssignment).order_by('-createdDate')
                 # getting modules
-                moduleData = Module.objects.filter()
+                moduleData = Module.objects.filter(stack=request.user.trainers.stack)
                 # getting cohorts
                 CohortData = Cohort.objects.filter()
 
@@ -1330,21 +1330,16 @@ def TraineeLogout(request):
 @login_required(login_url='trainee_login')
 def TraineeDashboard(request):
     if request.user.is_authenticated and request.user.is_trainee==True:
-        # getting current cohort
-        currCohort = Cohort.objects.all().order_by('-starting_date').first()
-        # getting trainees
-        TraineesData = Trainee.objects.filter(cohort=currCohort, stack=request.user.trainees.stack)
-        # getting Modules
-        ModulesData = Module.objects.filter(stack=request.user.trainees.stack)
-        # getting cohort
-        CohortData = Cohort.objects.filter()
+        # getting modules
+        modulesData = Module.objects.filter(stack=request.user.trainees.stack)
+        # getting assignments
+        assignmentData = Assignment.objects.filter(stack=request.user.trainees.stack).order_by('-createdDate')
         context = {
             'title': 'Trainee Dashboard', 
-            'dash_active': 'active', 
-            'cohorts': CohortData,
-            'current_cohort': currCohort,
-            'module_total': ModulesData.count(),
-            'trainee_total': TraineesData.count(),
+            'dash_active': 'active',
+            'modules': modulesData,
+            'assignment': assignmentData,
+            'module_total': modulesData.count(),
         }
         return render(request, 'main/trainee/dashboard.html', context)
     else:
@@ -1614,7 +1609,7 @@ def TraineeDashboard_assignmentList(request, pk):
                 # getting assignment reports
                 reportData = AssignmentReport.objects.filter(assignment=currentAssignment).order_by('-createdDate')
                 # getting modules
-                moduleData = Module.objects.filter()
+                moduleData = Module.objects.filter(stack=request.user.trainees.stack)
                 # getting cohorts
                 CohortData = Cohort.objects.filter()
 

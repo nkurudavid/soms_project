@@ -1,0 +1,162 @@
+{% extends "main/dash_main_layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
+  {% load static %}
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+  </head>
+
+  <body>
+    {% block account_content%}
+
+    <div class="wrapper">
+      {% include 'main/trainer/navbar.html' %}
+      <!-- Left side column. contains the logo and sidebar -->
+      {% include 'main/trainer/sidebar.html' %}
+
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            <i class="fa fa-user"></i>
+            Trainee Profile
+          </h1>
+          <ol class="breadcrumb">
+            <li>
+              <a href="#"><i class="fa fa-dashboard"></i> Home</a>
+            </li>
+            <li>
+              <a href="{% url 'trainer_traineeList' current_cohort.id %}"
+                ><i class="fa fa-group"></i> Trainees List</a
+              >
+            </li>
+            <li class="active">Trainee Profile</li>
+          </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                  <li class="active">
+                    <a href="#profile" class="text-uppercase" data-toggle="tab">
+                      {{trainee.user.first_name}} {{trainee.user.last_name}}
+                      PROFILE
+                    </a>
+                  </li>
+                </ul>
+                <div class="tab-content">
+                  <div class="active tab-pane" id="profile">
+                    <div class="box-body box-profile">
+                      {% if trainee.profilePicture %}
+                      <img
+                        class="profile-user-img img-responsive img-circle"
+                        src="{{trainee.profilePicture.url}}"
+                        style="width: 200px !important"
+                        alt="{{trainee.user.first_name}} image"
+                      />
+                      {% else %}
+                      <img
+                        class="profile-user-img img-responsive img-circle"
+                        src="{% static 'images/anonymous.png' %}"
+                        style="width: 200px !important"
+                        alt="{{trainee.user.first_name}} image"
+                      />
+                      {% endif %}
+
+                      <h3 class="profile-username text-center">
+                        {{trainee.user.first_name}} {{trainee.user.last_name}}
+                      </h3>
+
+                      <h3 class="text-bold text-muted text-center">Trainee</h3>
+                      <p class="text-muted text-center">
+                        <sup><i class="fa fa-quote-left"></i></sup>
+                        <span class="h4 text-bold">
+                          {{trainee.stack.name}}
+                        </span>
+                        <sup><i class="fa fa-quote-right"></i></sup>
+                      </p>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                      <div class="row">
+                        <div class="col-lg-6">
+                          <strong> <i class="fa fa-user"></i> Names: </strong>
+                          <p class="text-muted">
+                            {{trainee.user.first_name}}
+                            {{trainee.user.last_name}}
+                          </p>
+                          <hr />
+
+                          <strong>
+                            <i class="fa fa-envelope"></i> Email:
+                          </strong>
+                          <p class="text-muted">{{trainee.user.email}}</p>
+                          <hr />
+
+                          <strong>
+                            <i class="fa fa-phone"></i> Contact Phone:
+                          </strong>
+                          <p class="text-muted">{{trainee.phone1}}</p>
+                          <hr />
+
+                          <strong>
+                            <i class="fa fa-male"></i> /
+                            <i class="fa fa-female"></i>
+                            Gender:
+                          </strong>
+                          <p class="text-muted">{{trainee.user.gender}}</p>
+                          <hr />
+
+                          <strong>
+                            <i class="fa fa-map-marker"></i> Location:
+                          </strong>
+                          <p class="text-muted">{{trainee.locationAddress}}</p>
+                          <hr />
+                        </div>
+                        <div class="col-lg-6">
+                          <strong>
+                            <i class="fa fa-sitemap"></i> Stack:
+                          </strong>
+                          <p class="text-muted">{{trainee.stack.name}}</p>
+                          <hr />
+
+                          <strong>
+                            <i class="fa fa-github"></i> Git Account Link:
+                          </strong>
+                          <p class="text-muted">
+                            <a href="{{trainee.git_account}}" target="_blank">
+                              {{trainee.git_account}}
+                            </a>
+                          </p>
+                          <hr />
+                        </div>
+                        <hr />
+                      </div>
+                    </div>
+                    <!-- /.box-body -->
+                  </div>
+                </div>
+                <!-- /.tab-content -->
+              </div>
+              <!-- /.nav-tabs-custom -->
+            </div>
+            <!-- /.col -->
+          </div>
+        </section>
+        <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+
+      {% include 'main/trainer/footer.html' %}
+    </div>
+    {% endblock %}
+  </body>
+</html>

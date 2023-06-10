@@ -29,11 +29,19 @@
         <!-- User Account: style can be found in dropdown.less -->
         <li class="dropdown user user-menu">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            {% if user.trainees.profilePicture %}
             <img
               src="{{user.trainees.profilePicture.url}}"
               class="user-image"
-              alt="User Image"
+              alt="{{trainee.user.first_name}} image"
             />
+            {% else %}
+            <img
+              class="user-image"
+              src="{% static 'images/anonymous.png' %}"
+              alt="{{trainee.user.first_name}} image"
+            />
+            {% endif %}
             <span class="hidden-xs"
               >{{user.first_name}} {{user.last_name}}</span
             >
@@ -41,12 +49,19 @@
           <ul class="dropdown-menu">
             <!-- User image -->
             <li class="user-header">
+              {% if user.trainees.profilePicture %}
               <img
                 src="{{user.trainees.profilePicture.url}}"
-                class="img-circle"
-                alt="User Image"
+                class="user-image"
+                alt="{{trainee.user.first_name}} image"
               />
-
+              {% else %}
+              <img
+              class="img-circle"
+                src="{% static 'images/anonymous.png' %}"
+                alt="{{trainee.user.first_name}} image"
+              />
+              {% endif %}
               <p>
                 {{user.first_name}} {{user.last_name}}
                 <small>Trainee</small>

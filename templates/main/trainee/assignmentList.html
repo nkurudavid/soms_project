@@ -1,0 +1,292 @@
+{% extends "main/dash_main_layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
+  {% load static %}
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+  </head>
+
+  <body>
+    {% block account_content%}
+
+    <div class="wrapper">
+      {% include 'main/trainee/navbar.html' %}
+      <!-- Left side column. contains the logo and sidebar -->
+      {% include 'main/trainee/sidebar.html' %}
+
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            <i class="fa fa-tasks"></i>
+            Assigments for <strong>{{current_cohort.cohort_name}}</strong>
+          </h1>
+          <ol class="breadcrumb">
+            <li>
+              <a href="{% url 'trainee_dashboard' %}"><i class="fa fa-dashboard"></i> Home</a>
+            </li>
+            <li> <i class="fa fa-sitemap"></i> {{current_cohort.cohort_name}}</li>
+            <li class="active">Assignments</li>
+          </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+          <div class="row">
+            <div class="col-lg-8">
+              <div class="box box-info">
+                <div class="box-header">
+                  <h3 class="box-title">All Assignment ({{assignments_total}})</h3>
+                  {% if not current_cohort.status %}
+                  <button
+                    type="button"
+                    class="btn btn-flat btn-primary pull-right"
+                    data-toggle="modal"
+                    data-target="#modal-default"
+                  >
+                    <i class="fa fa-plus"></i>
+                    New Assignment
+                  </button>
+                  {% endif %}
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  {% if assignments %}
+                  <div class="list-group">
+                    <br/>
+                    {% for assignment in assignments %}
+                    <a
+                      href="{% url 'trainee_assignmentDetails' current_cohort.id assignment.id %}"
+                      class="list-group-item list-group-item-action {% if not assignment.status %}list-group-item-primary active{% endif %}"
+                    >
+                      <div class="d-flex w-100 justify-content-between">
+                        <h4 class="mb-1">
+                          Title: {{assignment.title}}
+                        </h4>
+                      </div>
+                      <p class="mb-1"><i class="fa fa-bullhorn"></i> {{assignment.description}}</p>
+                      {% if assignment.documentFiles %}
+                      <span class="text-md"> <i class="fa fa-file"></i> {{assignment.documentFiles}}</span>
+                      {% endif %}
+                      <span class="label {% if assignment.status %} label-default {% endif %}">From: {{assignment.startDate}}</span> - 
+                      <span class="label {% if assignment.status %} label-default {% endif %}">Due date: {{assignment.dueDate}}</span>
+                    </a>
+                    <br/>
+                    {% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="box box-info">
+                <div class="box-header">
+                  <h3 class="box-title">Modules</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  {% if modules %}
+                  <ul class="list-group">
+                    {% for module in modules %}
+                    <li class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between">
+                        <h4 class="text-primary">{{module.name}}</h4>
+                      </div>
+                      <p class="mb-1">{{module.description}}</p>
+                      <span class="text-md"> <i class="fa fa-file"></i> {{module.documentFiles}}</span>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-4">
+              <div class="box box-info">
+                <div class="box-header">
+                  <h3 class="box-title">Last Report</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  {% if reports %}
+                  <div class="list-group">
+                    {% for report in reports %}
+                    <a
+                      href="{% url 'trainee_assignmentReport' current_cohort.id report.assignment.id report.id  %}"
+                      class="list-group-item list-group-item-action {% if not report.status %}list-group-item-info{% endif %}"
+                    >
+                      <div class="d-flex w-100 justify-content-between">
+                        <h4 class="mb-1"> 
+                          {{report.group.group_name}} 
+                          {% if not report.status %}
+                          <span class="label label-warning pull-right">pending</span>
+                          {% else %}
+                          <span class="label label-default pull-right">Marked</span>
+                          {% endif %}
+                        </h4>
+                        <span>Submitted date: {{report.createdDate}}</span>
+                      </div>
+                    </a>
+                    {% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="box box-info">
+                <div class="box-header with-border">
+                  <h3 class="box-title">All Groups</h3>
+    
+                  <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"> <i class="fa fa-minus"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  {% if groups %}
+                  <ul class="list-group list-group-flush">
+                    {% for group in groups %}
+                    <li class="list-group-item">
+                      <div class="card-header">
+                        <h5 class="mb-2">
+                          <a class="collapsed text-bold" data-toggle="collapse" data-target="#data{{group.id}}" aria-expanded="true">
+                            {{group.group_name}}
+                            <span class="badge bg-blue pull-right badge-pill"> Members {{group.trainee_count}}</span>
+                          </a>
+                        </h5>
+                      </div>
+                      <div id="data{{group.id}}" class="collapse">
+                        <ul class="list-group list-group-flush">
+                          {% for member in group.trainees.all %}
+                          <li class="list-group-item d-flex justify-content-between align-items-center">
+                              {% if member.profilePicture %}
+                              <img src="{{member.profilePicture}}" width="30px" alt="{{member.user.first_name}}" />
+                              {% else %}
+                              <img src="{% static 'images/anonymous.png' %}" width="30px" alt="{{member.user.first_name}}" />
+                              {% endif %}
+                              <a href="{% url 'trainee_traineeProfile' current_cohort.id member.id %}" class="product-titles">
+                                {{member.user}}
+                              </a>
+                          </li>
+                          {% endfor%}
+                        </ul>
+                      </div>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+                </div>
+                <!-- /.box-body -->
+              </div>
+              <!-- /.box -->
+            </div>
+
+          </div>
+
+          <div class="modal fade" id="modal-default">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button
+                    type="button"
+                    class="close"
+                    data-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                  <h4 class="modal-title">
+                    <i class="fa fa-tasks"></i> ADD NEW ASSIGNMENT
+                  </h4>
+                </div>
+                <form method="post" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <div class="modal-body">
+                    <div class="form-group mb-0">
+                      <label class="col-form-label">Assignment Title</label>
+                      <input
+                        type="text"
+                        class="form-control form-control-uppercase"
+                        name="title"
+                        placeholder="Title"
+                        required
+                      />
+                    </div>
+                    <div class="form-group mb-0">
+                      <label class="col-form-label">Description</label>
+                      <textarea
+                        class="form-control"
+                        rows="5"
+                        placeholder="Description ..."
+                        name="description"
+                        required
+                      ></textarea>
+                    </div>
+                    <div class="form-group mb-0">
+                      <label class="col-form-label"
+                        >Upload Document</label
+                      >
+                      <input
+                        class="form-control form-control-lg"
+                        name="documentFiles"
+                        type="file"
+                        accept=".pdf, .doc, .docx"
+                      />
+                    </div>
+                    <div class="form-group mb-0">
+                      <label class="col-form-label">Start Date</label>
+                      <input
+                        type="datetime-local"
+                        class="form-control form-control-uppercase"
+                        name="start_date"
+                        required
+                      />
+                    </div>
+                    <div class="form-group mb-0">
+                      <label class="col-form-label">Due Date</label>
+                      <input
+                        type="datetime-local"
+                        class="form-control form-control-uppercase"
+                        name="due_date"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button
+                      type="button"
+                      class="btn btn-flat btn-default pull-left"
+                      data-dismiss="modal"
+                    >
+                      Close
+                    </button>
+                    <button
+                      type="submit"
+                      name="submit"
+                      class="btn btn-flat btn-primary"
+                    >
+                      <i class="fa fa-save"></i>
+                      Submit
+                    </button>
+                  </div>
+                </form>
+              </div>
+              <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+          </div>
+          <!-- /.modal -->
+        </section>
+        <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+
+      {% include 'main/trainee/footer.html' %}
+    </div>
+    {% endblock %}
+  </body>
+</html>

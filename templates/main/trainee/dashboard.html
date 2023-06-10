@@ -37,109 +37,114 @@
 
         <!-- Main content -->
         <section class="content">
-          <!-- Small boxes (Stat box) -->
           <div class="row">
-            <div class="col-lg-6 col-xs-6">
-              <!-- small box -->
-              <div class="small-box bg-green">
-                <div class="inner">
-                  <h3>{{ module_total }}</h3>
-
-                  <p>Modules</p>
-                </div>
-                <div class="icon">
-                  <i class="fa fa-book"></i>
-                </div>
-                <a href="{% url 'trainee_modules' %}" class="small-box-footer"
-                  >More info <i class="fa fa-arrow-circle-right"></i
-                ></a>
-              </div>
-            </div>
-            <!-- ./col -->
-            <div class="col-lg-6 col-xs-6">
-              <!-- small box -->
-              <div class="small-box bg-blue">
-                <div class="inner">
-                  <h3>{{ trainee_total }}</h3>
-
-                  <p>Current Trainees</p>
-                </div>
-                <div class="icon">
-                  <i class="fa fa-group"></i>
-                </div>
-                <a href="{% url 'trainee_traineeList' current_cohort.id %}" class="small-box-footer"
-                  >More info <i class="fa fa-arrow-circle-right"></i
-                ></a>
-              </div>
-            </div>
-            <!-- ./col -->
-          </div>
-          <!-- /.row -->
-          {% if team %}
-          <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-8">
               <div class="box box-info">
-                <div class="box-header with-border">
-                  <h3 class="box-title">
-                    <i class="fa fa-group"></i> OUR TEAM
-                  </h3>
-                  <div class="box-tools pull-right">
-                    <button
-                      type="button"
-                      class="btn btn-box-tool"
-                      data-widget="collapse"
-                    >
-                      <i class="fa fa-minus"></i>
-                    </button>
-                    <button
-                      type="button"
-                      class="btn btn-box-tool"
-                      data-widget="remove"
-                    >
-                      <i class="fa fa-times"></i>
-                    </button>
-                  </div>
+                <div class="box-header">
+                  <h3 class="box-title">Modules ({{module_total}})</h3>
                 </div>
                 <!-- /.box-header -->
-                <div class="box-body no-padding">
-                  <ul class="users-list clearfix">
-                    {% for trainee in team %}
-                    <li>
-                      <img
-                        class=""
-                        src="{{trainee.profilePicture.url}}"
-                        style="
-                          height: 100px !important;
-                          width: 100px !important;
-                        "
-                        alt="{{trainee.user.first_name}} image"
-                      />
-                      <a
-                        class="users-list-name"
-                        href="{% url 'manager_traineeEdit' trainee.id %}"
-                      >
-                        {{trainee.user}}
-                      </a>
-                      <span class="users-list-date"
-                        >{{trainee.specialization}}</span
-                      >
+                <div class="box-body">
+                  {% if modules %}
+                  <ul class="list-group">
+                    {% for module in modules %}
+                    <li class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between">
+                        <h4 class="text-primary">{{module.name}}</h4>
+                      </div>
+                      <p class="mb-1">{{module.description}}</p>
+                      <span class="text-md"> <i class="fa fa-file"></i> {{module.documentFiles}}</span>
                     </li>
                     {% endfor %}
                   </ul>
+                  {% endif %}
+                  
                 </div>
-                <!-- /.box-body -->
-                <div class="box-footer text-center">
-                  <a href="{% url 'manager_team' %}" class="uppercase">
-                    View More info
-                  </a>
-                </div>
-                <!-- /.box-footer -->
               </div>
               <!--/.box -->
             </div>
             <!-- /.col -->
+            <div class="col-lg-4">
+              <div class="box box-info">
+                <div class="box-header">
+                  <h3 class="box-title">Assignment</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  {% if assignment %}
+                  <div class="list-group">
+                    {% for report in assignment %}
+                    <a
+                      href=""
+                      class="list-group-item list-group-item-action {% if not report.status %}list-group-item-info{% endif %}"
+                    >
+                      <div class="d-flex w-100 justify-content-between">
+                        <h4 class="mb-1"> 
+                          {{report.group.group_name}} 
+                          {% if not report.status %}
+                          <span class="label label-warning pull-right">pending</span>
+                          {% else %}
+                          <span class="label label-default pull-right">Marked</span>
+                          {% endif %}
+                        </h4>
+                        <span>Submitted date: {{report.createdDate}}</span>
+                      </div>
+                    </a>
+                    {% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="box box-info">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Trainees</h3>
+    
+                  <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"> <i class="fa fa-minus"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  {% if groups %}
+                  <ul class="list-group list-group-flush">
+                    {% for group in groups %}
+                    <li class="list-group-item">
+                      <div class="card-header">
+                        <h5 class="mb-2">
+                          <a class="collapsed text-bold" data-toggle="collapse" data-target="#data{{group.id}}" aria-expanded="true">
+                            {{group.group_name}}
+                            <span class="badge bg-blue pull-right badge-pill"> Members {{group.trainee_count}}</span>
+                          </a>
+                        </h5>
+                      </div>
+                      <div id="data{{group.id}}" class="collapse">
+                        <ul class="list-group list-group-flush">
+                          {% for member in group.trainees.all %}
+                          <li class="list-group-item d-flex justify-content-between align-items-center">
+                              {% if member.profilePicture %}
+                              <img src="{{member.profilePicture}}" width="30px" alt="{{member.user.first_name}}" />
+                              {% else %}
+                              <img src="{% static 'images/anonymous.png' %}" width="30px" alt="{{member.user.first_name}}" />
+                              {% endif %}
+                              <a href="{% url 'trainee_traineeProfile' current_cohort.id member.id %}" class="product-titles">
+                                {{member.user}}
+                              </a>
+                          </li>
+                          {% endfor%}
+                        </ul>
+                      </div>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+                </div>
+                <!-- /.box-body -->
+              </div>
+              <!-- /.box -->
+            </div>
           </div>
-          {% endif %}
 
           <!-- Main row -->
           <div class="row"></div>
