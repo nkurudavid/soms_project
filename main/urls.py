@@ -34,4 +34,18 @@ urlpatterns = [
     path('staff/trainer/dashboard/cohorts/<int:pk>/assignments/<int:n>/assignment', TrainerDashboard_assignmentEdit, name='trainer_assignmentDetails'),
     path('staff/trainer/dashboard/cohorts/<int:pk>/assignments/<int:n>/assignment/<int:k>/report', TrainerDashboard_reportCollection, name='trainer_assignmentReport'),
 
+
+    # Trainee urls
+    path('staff/trainee/login', TraineeLogin, name='trainee_login'),
+    path('staff/trainee/logout', TraineeLogout, name='trainee_logout'),
+    path('staff/trainee/dashboard', TraineeDashboard, name='trainee_dashboard'),
+    path('staff/trainee/dashboard/my_profile', Trainee_profile, name='trainee_profile'),
+    path('staff/trainee/dashboard/modules', TraineeDashboard_module, name='trainee_modules'),
+    path('staff/trainee/dashboard/modules/<int:pk>/module_info', TraineeDashboard_moduleEdit, name='trainee_moduleEdit'),
+    path('staff/trainee/dashboard/cohorts/<int:pk>/trainees', TraineeDashboard_traineeList, name='trainee_traineeList'),
+    path('staff/trainee/dashboard/cohorts/<int:pk>/trainees_list/<int:n>/trainee_profile', TraineeDashboard_traineeProfile, name='trainee_traineeProfile'),
+    path('staff/trainee/dashboard/cohorts/<int:pk>/assignments', TraineeDashboard_assignmentList, name='trainee_assignmentList'),
+    path('staff/trainee/dashboard/cohorts/<int:pk>/assignments/<int:n>/assignment', TraineeDashboard_assignmentEdit, name='trainee_assignmentDetails'),
+    path('staff/trainee/dashboard/cohorts/<int:pk>/assignments/<int:n>/assignment/<int:k>/report', TraineeDashboard_reportCollection, name='trainee_assignmentReport'),
+
 ]
