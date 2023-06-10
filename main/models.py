@@ -73,6 +73,7 @@ class Assignment(models.Model):
         blank=True, null=True
     )
     status = models.BooleanField(verbose_name="Is Marked", default=False)
+    startDate = models.DateTimeField(blank=True, null=True)
     dueDate = models.DateTimeField(blank=True, null=True)
     createdDate = models.DateTimeField(auto_now=True)
     def __str__(self):
@@ -96,7 +97,7 @@ class AssignmentReport(models.Model):
 
 
 class Feedback(models.Model):
-    assignment = models.ForeignKey(Assignment, verbose_name="Assignment", related_name="feedbacks", on_delete=models.CASCADE)
+    report = models.OneToOneField(AssignmentReport, verbose_name="Assignment Report", related_name="feedbacks", on_delete=models.CASCADE)
     grade = models.CharField(verbose_name="Assignment Grade", max_length=100, unique=True)
     comment = models.TextField(verbose_name="Comment", blank=True)
     createdDate = models.DateTimeField(auto_now_add=True)
