@@ -1,4 +1,4 @@
-
+from django.db.models import Count
 from datetime import date
 from django.shortcuts import redirect, render
 from django.contrib import messages
@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model, authenticate, login, logout, update_session_auth_hash
 
 from account.models import Trainer, Trainee, ProgramManager, Company
-from .models import Stack, Cohort, Module
+from .models import Assignment, AssignmentReport, Group, Stack, Cohort, Module
 from recruitment.models import Application
 
 # Create your views here.
@@ -1016,76 +1016,99 @@ def TrainerDashboard_moduleEdit(request, pk):
 @login_required(login_url='trainer_login')
 def TrainerDashboard_assignmentList(request, pk):
     if request.user.is_authenticated and request.user.is_trainer==True:
-        if 'submit' in request.POST:
-            # Retrieve the form data from the request
-            first_name = request.POST.get('first_name')
-            last_name = request.POST.get('last_name')
-            email = request.POST.get('email')
-            gender = request.POST.get('gender')
-            phone1 = request.POST.get('phone1')
-            phone2 = request.POST.get('phone2')
-            specialization = request.POST.get('specialization')
-            ssn = request.POST.get('ssn')
-            locationAddress = request.POST.get('locationAddress')
-            profilePicture = request.FILES.get('profilePicture')
+        cohort_id = pk
+        # getting cohort
+        if Cohort.objects.filter(id=cohort_id).exists():
+            # if exists
+            current_cohort = Cohort.objects.get(id=cohort_id)
+            # getting all trainees from cohort
+            traineesData=Trainee.objects.filter(cohort=pk, stack=request.user.trainers.stack)
+            # getting current assignment
+            currentAssignment = Assignment.objects.filter(cohort=pk, stack=request.user.trainers.stack).order_by('-createdDate').first()
+            if 'submit' in request.POST:
+                # Retrieve the form data from the request
+                first_name = request.POST.get('first_name')
+                last_name = request.POST.get('last_name')
+                email = request.POST.get('email')
+                gender = request.POST.get('gender')
+                phone1 = request.POST.get('phone1')
+                phone2 = request.POST.get('phone2')
+                specialization = request.POST.get('specialization')
+                ssn = request.POST.get('ssn')
+                locationAddress = request.POST.get('locationAddress')
+                profilePicture = request.FILES.get('profilePicture')
 
-            if first_name and last_name and email and gender and phone1 and phone2 and specialization and ssn and locationAddress and profilePicture:
-                if get_user_model().objects.filter(email=email):
-                    messages.warning(request, "Email already exist.")
-                    return redirect(ManagerDashboard_team)
-                elif Trainer.objects.filter(ssn=ssn):
-                    messages.warning(request, "SSN already exist.")
-                    return redirect(ManagerDashboard_team)
-                elif Trainer.objects.filter(phone1=phone1):
-                    messages.warning(request, "Phone 1 already exist.")
-                    return redirect(ManagerDashboard_team)
-                else:
-                    current_year = date.today().year
-                    trainerPassword = "trainer"+str(current_year)
-                    # Create new User as Trainer
-                    user =  get_user_model().objects.create_user(
-                        first_name=first_name,
-                        last_name=last_name,
-                        email=email,
-                        gender=gender,
-                        is_trainer=True,
-                        password=trainerPassword
-                    )
-                    if user:
-                        trainerUser = get_user_model().objects.get(email=email)
-                        # Create trainer profile
-                        trainerProfile = Trainer(
-                            user=trainerUser,
-                            ssn=ssn,
-                            profilePicture=profilePicture,
-                            phone1=phone1,
-                            phone2=phone2,
-                            specialization=specialization,
-                            locationAddress=locationAddress,
-                        )
-                        trainerProfile.save()
-                        messages.success(request, "Trainer "+first_name+", created successfully.")
-                        return redirect(TrainerDashboard_assignmentList)
+                if first_name and last_name and email and gender and phone1 and phone2 and specialization and ssn and locationAddress and profilePicture:
+                    if get_user_model().objects.filter(email=email):
+                        messages.warning(request, "Email already exist.")
+                        return redirect(ManagerDashboard_team)
+                    elif Trainer.objects.filter(ssn=ssn):
+                        messages.warning(request, "SSN already exist.")
+                        return redirect(ManagerDashboard_team)
+                    elif Trainer.objects.filter(phone1=phone1):
+                        messages.warning(request, "Phone 1 already exist.")
+                        return redirect(ManagerDashboard_team)
                     else:
-                        messages.error(request, ('Process Failed.'))
-                        return redirect(TrainerDashboard_assignmentList)
+                        current_year = date.today().year
+                        trainerPassword = "trainer"+str(current_year)
+                        # Create new User as Trainer
+                        user =  get_user_model().objects.create_user(
+                            first_name=first_name,
+                            last_name=last_name,
+                            email=email,
+                            gender=gender,
+                            is_trainer=True,
+                            password=trainerPassword
+                        )
+                        if user:
+                            trainerUser = get_user_model().objects.get(email=email)
+                            # Create trainer profile
+                            trainerProfile = Trainer(
+                                user=trainerUser,
+                                ssn=ssn,
+                                profilePicture=profilePicture,
+                                phone1=phone1,
+                                phone2=phone2,
+                                specialization=specialization,
+                                locationAddress=locationAddress,
+                            )
+                            trainerProfile.save()
+                            messages.success(request, "Trainer "+first_name+", created successfully.")
+                            return redirect(TrainerDashboard_assignmentList)
+                        else:
+                            messages.error(request, ('Process Failed.'))
+                            return redirect(TrainerDashboard_assignmentList)
+                else:
+                    messages.error(request, ('All fields are required.'))
+                    return redirect(TrainerDashboard_assignmentList)
             else:
-                messages.error(request, ('All fields are required.'))
-                return redirect(TrainerDashboard_assignmentList)
-        else:
-            # getting team
-            teamData = Trainer.objects.filter()
-            # getting cohort
-            CohortData = Cohort.objects.filter()
+                # getting group
+                groupData = Group.objects.filter(cohort=pk, stack=request.user.trainers.stack).annotate(trainee_count=Count('trainees'))
+                # getting assignments
+                assignmentData = Assignment.objects.filter(cohort=pk, stack=request.user.trainers.stack)
+                # getting assignment reports
+                reportData = AssignmentReport.objects.filter(assignment=currentAssignment)
+                # getting modules
+                moduleData = Module.objects.filter()
+                # getting cohorts
+                CohortData = Cohort.objects.filter()
 
-            context = {
-                'title': 'Manager - Team',
-                'team': teamData,
-                'team_total': teamData.count,
-                'team_active': 'active',
-                'cohorts': CohortData,
-            }
-            return render(request, 'main/trainer/assignmentList.html', context)
+                context = {
+                    'title': 'Trainer - Assignment',
+                    'assignment_active': 'active',
+                    'trainees': traineesData,
+                    'groups': groupData,
+                    'assignments': assignmentData,
+                    'reports': reportData,
+                    'assignments_total': assignmentData.count,
+                    'modules': moduleData,
+                    'cohorts': CohortData,
+                    'current_cohort': current_cohort
+                }
+                return render(request, 'main/trainer/assignmentList.html', context)
+        else:
+            messages.error(request, ('Cohort not found'))
+            return redirect(TrainerDashboard)
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(TrainerLogin)

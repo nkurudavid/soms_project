@@ -56,15 +56,15 @@ class Module(models.Model):
 class Group(models.Model):
     cohort = models.ForeignKey(Cohort, verbose_name="Cohort belonging", related_name="groups", on_delete=models.CASCADE)
     stack = models.ForeignKey(Stack, verbose_name="Stack belonging", related_name="groups", on_delete=models.CASCADE)
-    group_name = models.CharField(verbose_name="Group Name", max_length=100, unique=True)
+    group_name = models.CharField(verbose_name="Group Name", max_length=100)
     def __str__(self):
-        return self.group_name
+        return "{} {}".format(self.group_name, self.stack)
 
 
 class Assignment(models.Model):
     cohort = models.ForeignKey(Cohort, verbose_name="Cohort belonging", related_name="assignments", on_delete=models.CASCADE)
     stack = models.ForeignKey(Stack, verbose_name="Stack belonging", related_name="assignments", on_delete=models.CASCADE)
-    title = models.CharField(verbose_name="Assignment Title", max_length=100, unique=True)
+    title = models.CharField(verbose_name="Assignment Title", max_length=100)
     description = models.TextField(verbose_name="Description", blank=True)
     documentFiles = models.FileField(
         verbose_name="Document", 
@@ -72,6 +72,9 @@ class Assignment(models.Model):
         validators=[FileExtensionValidator(['pdf','doc','ppt'])],
         blank=True, null=True
     )
+    status = models.BooleanField(verbose_name="Is Marked", default=False)
+    dueDate = models.DateTimeField(blank=True, null=True)
+    createdDate = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.title
 
