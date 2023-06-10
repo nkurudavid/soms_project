@@ -31,5 +31,7 @@ urlpatterns = [
     path('staff/trainer/dashboard/cohorts/<int:pk>/trainees', TrainerDashboard_traineeList, name='trainer_traineeList'),
     path('staff/trainer/dashboard/cohorts/<int:pk>/trainees_list/<int:n>/trainee_profile', TrainerDashboard_traineeProfile, name='trainer_traineeProfile'),
     path('staff/trainer/dashboard/cohorts/<int:pk>/assignments', TrainerDashboard_assignmentList, name='trainer_assignmentList'),
+    path('staff/trainer/dashboard/cohorts/<int:pk>/assignments/<int:n>/assignment', TrainerDashboard_assignmentEdit, name='trainer_assignmentDetails'),
+    path('staff/trainer/dashboard/cohorts/<int:pk>/assignments/<int:n>/assignment/<int:k>/report', TrainerDashboard_reportCollection, name='trainer_assignmentReport'),
 
 ]
