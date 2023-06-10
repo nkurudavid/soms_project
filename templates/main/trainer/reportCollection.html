@@ -23,19 +23,21 @@
         <!-- Content Header (Page header) -->
         <section class="content-header">
           <h1>
-            <i class="fa fa-book"></i>
-            Module Info
+            <i class="fa fa-file"></i>
+            Assigment Report
           </h1>
           <ol class="breadcrumb">
             <li>
-              <a href="#"><i class="fa fa-dashboard"></i> Home</a>
+              <a href="{% url 'trainer_dashboard' %}"><i class="fa fa-dashboard"></i> Home</a>
+            </li>
+            <li> <i class="fa fa-sitemap"></i> {{current_cohort.cohort_name}}</li>
+            <li>
+              <a href="{% url 'trainer_assignmentList' current_cohort.id %}"><i class="fa fa-tasks"></i> Assignments</a>
             </li>
             <li>
-              <a href="{% url 'trainer_modules' %}">
-                <i class="fa fa-book"></i> modules
-              </a>
+              <a href="{% url 'trainer_assignmentDetails' current_cohort.id assignment.id %}"> Assignment</a>
             </li>
-            <li class="active">Edit</li>
+            <li class="active">Report</li>
           </ol>
         </section>
 
@@ -43,141 +45,173 @@
         <section class="content">
           <div class="row">
             <div class="col-lg-8">
-              <div class="nav-tabs-custom">
-                <ul class="nav nav-tabs">
-                  <li class="active">
-                    <a
-                      href="#module_info"
-                      class="text-uppercase"
-                      data-toggle="tab"
-                    >
-                      {{module.name}} MODULE
-                    </a>
-                  </li>
-                </ul>
-                <div class="tab-content">
-                  <div class="active tab-pane" id="module_info">
-                    <!-- /.box-header -->
-                    <div class="box-body">
-                      <div class="row mb-5">
-                        <div class="col-lg-12">
-                          <strong> <i class="fa fa-book"></i> Title: </strong>
-                          <p class="text-muted">{{module.name}}</p>
-                          <hr />
-
-                          <strong> Descriptions: </strong>
-                          <p class="text-muted">{{module.description}}</p>
-                          <hr />
-
-                          <strong>
-                            <i class="fa fa-file"></i> Document Notes:
-                          </strong>
-                          <p class="text-muted">
-                            {% if module.documentFiles %}
-                            {{module.documentFiles}}
-                            <br />
-                            <br />
-                            <a
-                              href="{{module.documentFiles.url}}"
-                              target="_blank"
-                              class="btn btn-primary btn-sm btn-flat"
-                            >
-                              <i class="fa fa-download"></i>
-                              Download
-                            </a>
-                            {% else %} No Document Files {% endif %}
-                          </p>
-                          <hr />
-                        </div>
-                      </div>
-                      <a
-                        href="{% url 'trainer_modules' %}"
-                        class="btn btn-default btn-flat pull-left"
-                        ><i class="fa fa-arrow-left"></i> Back
-                      </a>
-                    </div>
-                    <!-- /.box-body -->
-                  </div>
-                </div>
-                <!-- /.tab-content -->
-              </div>
-              <!-- /.nav-tabs-custom -->
-            </div>
-            <div class="col-lg-4">
-              <div class="box">
+              <div class="box box-info">
                 <div class="box-header">
-                  <h3 class="box-title">
-                    <i class="fa fa-edit"></i> Edit Module
-                  </h3>
+                  <h3 class="box-title">{{report.group.group_name}}: Assignment Report</h3>
+                  {% if not current_cohort.status %}
+                  {% if not report.status %}
+                  <button
+                    type="button"
+                    class="btn btn-flat btn-default pull-right"
+                    data-toggle="modal"
+                    data-target="#modal-default"
+                  >
+                    <i class="fa fa-square-o"></i>
+                    Mark report
+                  </button>
+                  {% else %}
+                  <button
+                    type="button"
+                    class="btn btn-flat btn-default pull-right"
+                    data-toggle="modal"
+                    data-target="#modal-default"
+                  >
+                    <i class="fa fa-check-square-o text-primary"></i>
+                    Marked
+                  </button>
+                  {% endif %}
+                  {% endif %}
                 </div>
                 <!-- /.box-header -->
                 <div class="box-body">
-                  <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="modal-body">
-                      <div class="form-group mb-0">
-                        <label class="col-form-label">Module name</label>
-                        <input
-                          type="text"
-                          class="form-control form-control-uppercase"
-                          name="module_name"
-                          placeholder="Module Name"
-                          value="{{ module.name }}"
-                          required
-                        />
-                      </div>
-                      <div class="form-group mb-0">
-                        <label class="col-form-label">Description</label>
-                        <textarea
-                          class="form-control"
-                          rows="5"
-                          placeholder="Description ..."
-                          name="description"
-                        >
-{{ module.description }}</textarea
-                        >
-                      </div>
-                      <div class="form-group mb-0">
-                        <label class="col-form-label"
-                          >Upload Document Notes</label
-                        >
-                        <input
-                          class="form-control form-control-lg"
-                          name="notes_document"
-                          type="file"
-                          accept=".pdf, .doc, .docx"
-                        />
+                  {% if report %}
+                  <div class="list-group">
+                    <div
+                      class="list-group-item list-group-item-action"
+                    >
+                      <div class="d-flex w-100 justify-content-between">
+                        <p>
+                          <span class="text-bold">
+                            Description:
+                          </span>
+                          <br />{{report.description}}
+                        </p>
+                        {% if report.documentFiles %}
+                        <p>
+                          <span class="text-bold">
+                            File:
+                          </span>
+                          <br />
+                          <a href="{{report.documentFiles.url}}" target="_blank" download>{{report.documentFiles}}</a>
+                        </p>
+                        {% else %}
+                        <p>
+                          <span class="text-bold">
+                            File:
+                          </span> 
+                          <span class="badge badge-primary badge-pill">No File Submitted</span>
+                        </p>
+                        {% endif %}
+                        <span>Submitted date: {{report.createdDate}}</span>
                       </div>
                     </div>
-                    <div class="modal-footer">
-                      <button
-                        type="button"
-                        class="btn btn-danger btn-flat"
-                        data-toggle="modal"
-                        data-target="#delete_modal"
-                      >
-                        <i class="fa fa-trash"></i> Delete
-                      </button>
-                      <button
-                        type="submit"
-                        name="submit"
-                        class="btn btn-primary btn-flat float-right"
-                      >
-                        <i class="fa fa-save"></i> Save Changes
-                      </button>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="box box-info">
+                <div class="box-header">
+                  <h3 class="box-title">Comment</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  {% if report.feedbacks %}
+                  <div class="list-group">
+                    <br/>
+                    <div class="list-group-item">
+                      <div class="d-flex w-100 justify-content-between">
+                        <h4 class="mb-1">
+                          <span class="text-bold">
+                            Grade: 
+                          </span>
+                          {{report.feedbacks.grade}}
+                        </h4>
+                      </div>
+                      <p class="mb-1">
+                        <span class="text-bold">
+                          Comment: 
+                        </span>
+                        <br/>{{report.feedbacks.comment}}
+                      </p>
+                      <span class="label label-default">Marked on: {{report.feedbacks.createdDate}}</span> 
                     </div>
-                  </form>
+                    <br/>
+                  </div>
+                  {% else %}
+                  <p class="mb-1">
+                    <span class="text-warning">
+                      Waiting for feedback ...
+                    </span>
+                  </p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-4">
+              <div class="box box-info">
+                <div class="box-header">
+                  <h3 class="box-title">Assignment</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  {% if assignment %}
+                  <div class="list-group">
+                    <br/>
+                    <div
+                      class="list-group-item list-group-item-action"
+                    >
+                      <div class="d-flex w-100 justify-content-between">
+                        <h4 class="mb-1">
+                          Title: {{assignment.title}}
+                        </h4>
+                      </div>
+                      <p class="mb-1"><i class="fa fa-bullhorn"></i> {{assignment.description}}</p>
+                      {% if assignment.documentFiles %}
+                      <span class="text-md"> <i class="fa fa-file"></i> {{assignment.documentFiles}}</span>
+                      {% endif %}
+                      <span class="label label-primary">Due date: {{assignment.dueDate}}</span> 
+                    </div>
+                    <br/>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="box box-info">
+                <div class="box-header with-border">
+                  <h3 class="box-title">{{report.group.group_name}}</h3>
+    
+                  <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"> <i class="fa fa-minus"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  <ul class="list-group list-group-flush">
+                    <h5>Group members</h5>
+                    {% for member in report.group.trainees.all %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      {% if member.profilePicture %}
+                        <img src="{{member.profilePicture}}" width="30px" alt="{{member.user.first_name}}" />
+                        {% else %}
+                        <img src="{% static 'images/anonymous.png' %}" width="30px" alt="{{member.user.first_name}}" />
+                        {% endif %}
+                        <a href="{% url 'trainer_traineeProfile' current_cohort.id member.id %}" class="product-titles">
+                          {{member.user}}
+                        </a>
+                    </li>
+                    {% endfor%}
+                  </ul>
                 </div>
                 <!-- /.box-body -->
               </div>
               <!-- /.box -->
             </div>
-            <!-- /.col -->
+
           </div>
 
-          <!-- Modal -->
-          <div class="modal fade" id="delete_modal">
-            <div class="modal-dialog modal-dialog-centered">
+          <div class="modal fade" id="modal-default">
+            <div class="modal-dialog">
               <div class="modal-content">
                 <div class="modal-header">
                   <button
@@ -189,16 +223,33 @@
                     <span aria-hidden="true">&times;</span>
                   </button>
                   <h4 class="modal-title">
-                    <i class="fa fa-trash"></i> DELETE MODULE
+                    <i class="fa fa-tasks"></i> MARKING OF ASSIGNMENT REPORT
                   </h4>
                 </div>
-                <form action="" method="post">
+                <form method="post">
                   {% csrf_token %}
                   <div class="modal-body">
-                    <p class="text-center h4">
-                      Are you sure want to delete <br />
-                      module: "{{module.name}}" ?
-                    </p>
+                    <div class="form-group mb-0">
+                      <label class="col-form-label">Grade</label>
+                      <input
+                        type="text"
+                        class="form-control form-control-uppercase"
+                        name="grade"
+                        placeholder="Grade"
+                        value="{{ report.feedbacks.grade }}"
+                        required
+                      />
+                    </div>
+                    <div class="form-group mb-0">
+                      <label class="col-form-label">Comment on Report</label>
+                      <textarea
+                        class="form-control"
+                        rows="5"
+                        placeholder="Comment ..."
+                        name="comment"
+                        required
+                      >{{ report.feedbacks.comment }}</textarea>
+                    </div>
                   </div>
                   <div class="modal-footer">
                     <button
@@ -208,18 +259,32 @@
                     >
                       Close
                     </button>
+                    {% if not report.status %}
                     <button
                       type="submit"
-                      name="delete"
-                      class="btn btn-flat btn-danger"
+                      name="submit"
+                      class="btn btn-flat btn-primary"
                     >
-                      Yes, Delete
+                      <i class="fa fa-check-square-o"></i>
+                      Mark Report
                     </button>
+                    {% else %}
+                    <button
+                      type="submit"
+                      name="update_comment"
+                      class="btn btn-flat btn-primary"
+                    >
+                      Save Changes
+                    </button>
+                    {% endif %}
                   </div>
                 </form>
               </div>
+              <!-- /.modal-content -->
             </div>
+            <!-- /.modal-dialog -->
           </div>
+          <!-- /.modal -->
         </section>
         <!-- /.content -->
       </div>

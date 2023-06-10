@@ -2,7 +2,7 @@
 
 <header class="main-header">
   <!-- Logo -->
-  <a href="" class="logo" style="padding: 0">
+  <a href="{% url 'trainer_dashboard' %}" class="logo" style="padding: 0">
     <img
       class=""
       src="{% static 'dist/img/logo.jpg' %}"
@@ -22,7 +22,7 @@
       <ul class="nav navbar-nav">
         <!-- Tasks: style can be found in dropdown.less -->
         <li class="tasks-menu">
-          <a href="#">
+          <a href="{% url 'trainer_dashboard' %}">
             <h4 style="margin: 0; padding: 0">SOMS</h4>
           </a>
         </li>

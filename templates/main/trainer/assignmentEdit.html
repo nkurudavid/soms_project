@@ -23,19 +23,18 @@
         <!-- Content Header (Page header) -->
         <section class="content-header">
           <h1>
-            <i class="fa fa-book"></i>
-            Module Info
+            <i class="fa fa-tasks"></i>
+            Assigment Details
           </h1>
           <ol class="breadcrumb">
             <li>
-              <a href="#"><i class="fa fa-dashboard"></i> Home</a>
+              <a href="{% url 'trainer_dashboard' %}"><i class="fa fa-dashboard"></i> Home</a>
             </li>
+            <li> <i class="fa fa-sitemap"></i> {{current_cohort.cohort_name}}</li>
             <li>
-              <a href="{% url 'trainer_modules' %}">
-                <i class="fa fa-book"></i> modules
-              </a>
+              <a href="{% url 'trainer_assignmentList' current_cohort.id %}"><i class="fa fa-tasks"></i> Assignments</a>
             </li>
-            <li class="active">Edit</li>
+            <li class="active">Assignment Details</li>
           </ol>
         </section>
 
@@ -43,139 +42,255 @@
         <section class="content">
           <div class="row">
             <div class="col-lg-8">
-              <div class="nav-tabs-custom">
-                <ul class="nav nav-tabs">
-                  <li class="active">
-                    <a
-                      href="#module_info"
-                      class="text-uppercase"
-                      data-toggle="tab"
-                    >
-                      {{module.name}} MODULE
-                    </a>
-                  </li>
-                </ul>
-                <div class="tab-content">
-                  <div class="active tab-pane" id="module_info">
-                    <!-- /.box-header -->
-                    <div class="box-body">
-                      <div class="row mb-5">
-                        <div class="col-lg-12">
-                          <strong> <i class="fa fa-book"></i> Title: </strong>
-                          <p class="text-muted">{{module.name}}</p>
-                          <hr />
-
-                          <strong> Descriptions: </strong>
-                          <p class="text-muted">{{module.description}}</p>
-                          <hr />
-
-                          <strong>
-                            <i class="fa fa-file"></i> Document Notes:
-                          </strong>
-                          <p class="text-muted">
-                            {% if module.documentFiles %}
-                            {{module.documentFiles}}
-                            <br />
-                            <br />
-                            <a
-                              href="{{module.documentFiles.url}}"
-                              target="_blank"
-                              class="btn btn-primary btn-sm btn-flat"
-                            >
-                              <i class="fa fa-download"></i>
-                              Download
-                            </a>
-                            {% else %} No Document Files {% endif %}
-                          </p>
-                          <hr />
-                        </div>
-                      </div>
-                      <a
-                        href="{% url 'trainer_modules' %}"
-                        class="btn btn-default btn-flat pull-left"
-                        ><i class="fa fa-arrow-left"></i> Back
-                      </a>
-                    </div>
-                    <!-- /.box-body -->
-                  </div>
-                </div>
-                <!-- /.tab-content -->
-              </div>
-              <!-- /.nav-tabs-custom -->
-            </div>
-            <div class="col-lg-4">
-              <div class="box">
+              <div class="box box-info">
                 <div class="box-header">
-                  <h3 class="box-title">
-                    <i class="fa fa-edit"></i> Edit Module
-                  </h3>
+                  <h3 class="box-title">Assignment</h3>
+                  {% if not current_cohort.status %}
+                  <div class="ml-2">
+                    <form action="" method="post">
+                      {% csrf_token %}
+                      {% if not assignment.status %}
+                      <button
+                        type="submit"
+                        class="btn btn-flat btn-default pull-right"
+                        name="is_marked"
+                      >
+                        <i class="fa fa-check-square-o"></i> Mark as Done
+                      </button>
+                      {% else %}
+                      <button
+                        type="submit"
+                        class="btn btn-flat btn-default pull-right"
+                        name="ongoing"
+                      >
+                        <i class="fa fa-square-o"></i> Mark as Ongoing
+                      </button>
+                      {% endif %}
+                    </form>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-flat btn-primary pull-right"
+                    data-toggle="modal"
+                    data-target="#modal-default"
+                  >
+                    <i class="fa fa-edit"></i>
+                    Edit
+                  </button>
+                  {% endif %}
                 </div>
                 <!-- /.box-header -->
                 <div class="box-body">
-                  <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="modal-body">
-                      <div class="form-group mb-0">
-                        <label class="col-form-label">Module name</label>
-                        <input
-                          type="text"
-                          class="form-control form-control-uppercase"
-                          name="module_name"
-                          placeholder="Module Name"
-                          value="{{ module.name }}"
-                          required
-                        />
+                  {% if assignment %}
+                  <div class="list-group">
+                    <br/>
+                    <div
+                      class="list-group-item list-group-item-action {% if not assignment.status %}list-group-item-primary active{% endif %}"
+                    >
+                      <div class="d-flex w-100 justify-content-between">
+                        <h4 class="mb-1">
+                          Title: {{assignment.title}}
+                        </h4>
                       </div>
-                      <div class="form-group mb-0">
-                        <label class="col-form-label">Description</label>
-                        <textarea
-                          class="form-control"
-                          rows="5"
-                          placeholder="Description ..."
-                          name="description"
-                        >
-{{ module.description }}</textarea
-                        >
-                      </div>
-                      <div class="form-group mb-0">
-                        <label class="col-form-label"
-                          >Upload Document Notes</label
-                        >
-                        <input
-                          class="form-control form-control-lg"
-                          name="notes_document"
-                          type="file"
-                          accept=".pdf, .doc, .docx"
-                        />
-                      </div>
+                      <p class="mb-1"><i class="fa fa-bullhorn"></i> {{assignment.description}}</p>
+                      {% if assignment.documentFiles %}
+                      <span class="text-md"> <i class="fa fa-file"></i> {{assignment.documentFiles}}</span>
+                      {% endif %}
+                      <span class="label {% if assignment.status %} label-default {% endif %}">From: {{assignment.startDate}}</span> -
+                      <span class="label {% if assignment.status %} label-default {% endif %}">Due date: {{assignment.dueDate}}</span>
                     </div>
-                    <div class="modal-footer">
-                      <button
-                        type="button"
-                        class="btn btn-danger btn-flat"
-                        data-toggle="modal"
-                        data-target="#delete_modal"
-                      >
-                        <i class="fa fa-trash"></i> Delete
-                      </button>
-                      <button
-                        type="submit"
-                        name="submit"
-                        class="btn btn-primary btn-flat float-right"
-                      >
-                        <i class="fa fa-save"></i> Save Changes
-                      </button>
-                    </div>
-                  </form>
+                    <br/>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="box box-info">
+                <div class="box-header">
+                  <h3 class="box-title">Assigment Report</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  {% if reports %}
+                  <div class="list-group">
+                    {% for report in reports %}
+                    <a
+                      href="{% url 'trainer_assignmentReport' current_cohort.id assignment.id report.id  %}"
+                      class="list-group-item list-group-item-action {% if not report.status %}list-group-item-info{% endif %}"
+                    >
+                      <div class="d-flex w-100 justify-content-between">
+                        <h4 class="mb-1"> 
+                          {{report.group.group_name}} 
+                          {% if not report.status %}
+                          <span class="label label-warning pull-right">pending</span>
+                          {% else %}
+                          <span class="label label-default pull-right">Marked</span>
+                          {% endif %}
+                        </h4>
+                        <span>Submitted date: {{report.createdDate}}</span>
+                      </div>
+                    </a>
+                    {% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-4">
+              <div class="box box-info">
+                <div class="box-header with-border">
+                  <h3 class="box-title">All Groups</h3>
+    
+                  <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"> <i class="fa fa-minus"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  {% if groups %}
+                  <ul class="list-group list-group-flush">
+                    {% for group in groups %}
+                    <li class="list-group-item">
+                      <div class="card-header">
+                        <h5 class="mb-2">
+                          <a class="collapsed text-bold" data-toggle="collapse" data-target="#data{{group.id}}" aria-expanded="true">
+                            {{group.group_name}}
+                            <span class="badge bg-blue pull-right badge-pill"> Members {{group.trainee_count}}</span>
+                          </a>
+                        </h5>
+                      </div>
+                      <div id="data{{group.id}}" class="collapse">
+                        <ul class="list-group list-group-flush">
+                          {% for member in group.trainees.all %}
+                          <li class="list-group-item d-flex justify-content-between align-items-center">
+                              {% if member.profilePicture %}
+                              <img src="{{member.profilePicture}}" width="30px" alt="{{member.user.first_name}}" />
+                              {% else %}
+                              <img src="{% static 'images/anonymous.png' %}" width="30px" alt="{{member.user.first_name}}" />
+                              {% endif %}
+                              <a href="{% url 'trainer_traineeProfile' current_cohort.id member.id %}" class="product-titles">
+                                {{member.user}}
+                              </a>
+                          </li>
+                          {% endfor%}
+                        </ul>
+                      </div>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
                 </div>
                 <!-- /.box-body -->
               </div>
               <!-- /.box -->
             </div>
-            <!-- /.col -->
+
           </div>
 
-          <!-- Modal -->
+          <div class="modal fade" id="modal-default">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button
+                    type="button"
+                    class="close"
+                    data-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                  <h4 class="modal-title">
+                    <i class="fa fa-tasks"></i> ADD NEW ASSIGNMENT
+                  </h4>
+                </div>
+                <form method="post" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <div class="modal-body">
+                    <div class="form-group mb-0">
+                      <label class="col-form-label">Assignment Title</label>
+                      <input
+                        type="text"
+                        class="form-control form-control-uppercase"
+                        name="title"
+                        placeholder="Title"
+                        value="{{ assignment.title }}"
+                        required
+                      />
+                    </div>
+                    <div class="form-group mb-0">
+                      <label class="col-form-label">Description</label>
+                      <textarea
+                        class="form-control"
+                        rows="5"
+                        placeholder="Description ..."
+                        name="description"
+                        required
+                      >{{ assignment.description }}</textarea>
+                    </div>
+                    <div class="form-group mb-0">
+                      <label class="col-form-label"
+                        >Upload Document</label
+                      >
+                      <input
+                        class="form-control form-control-lg"
+                        name="documentFiles"
+                        type="file"
+                        accept=".pdf, .doc, .docx"
+                      />
+                    </div>
+                    <div class="form-group mb-0">
+                      <label class="col-form-label">Start Date</label>
+                      <input
+                        type="datetime-local"
+                        class="form-control form-control-uppercase"
+                        name="start_date"
+                        value="{{ assignment.startDate|date:'Y-m-d H:i:s' }}"
+                        required
+                      />
+                    </div>
+                    <div class="form-group mb-0">
+                      <label class="col-form-label">Due Date</label>
+                      <input
+                        type="datetime-local"
+                        class="form-control form-control-uppercase"
+                        name="due_date"
+                        value="{{ assignment.dueDate|date:'Y-m-d H:i:s' }}"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button
+                      type="button"
+                      class="btn btn-flat btn-default pull-left"
+                      data-dismiss="modal"
+                    >
+                      Close
+                    </button>
+                    <button
+                    type="button"
+                    class="btn btn-danger btn-flat"
+                    data-toggle="modal"
+                    data-target="#delete_modal"
+                  >
+                    <i class="fa fa-trash"></i> Delete
+                  </button>
+                    <button
+                      type="submit"
+                      name="submit"
+                      class="btn btn-flat btn-primary"
+                    >
+                      <i class="fa fa-save"></i>
+                      Submit
+                    </button>
+                  </div>
+                </form>
+              </div>
+              <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+          </div>
+          <!-- /.modal -->
           <div class="modal fade" id="delete_modal">
             <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content">
@@ -189,7 +304,7 @@
                     <span aria-hidden="true">&times;</span>
                   </button>
                   <h4 class="modal-title">
-                    <i class="fa fa-trash"></i> DELETE MODULE
+                    <i class="fa fa-trash"></i> DELETE ASSIGNMENT
                   </h4>
                 </div>
                 <form action="" method="post">
@@ -197,7 +312,7 @@
                   <div class="modal-body">
                     <p class="text-center h4">
                       Are you sure want to delete <br />
-                      module: "{{module.name}}" ?
+                      Assignment: "{{assignment.title}}" ?
                     </p>
                   </div>
                   <div class="modal-footer">

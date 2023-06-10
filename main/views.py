@@ -801,6 +801,7 @@ def TrainerDashboard(request):
             'title': 'Trainer Dashboard', 
             'dash_active': 'active', 
             'cohorts': CohortData,
+            'current_cohort': currCohort,
             'module_total': ModulesData.count(),
             'trainee_total': TraineesData.count(),
         }
@@ -1156,15 +1157,33 @@ def TrainerDashboard_assignmentEdit(request, pk, n):
                         messages.error(request, ('All fields are required.'))
                         return redirect(TrainerDashboard_assignmentEdit, pk, n)
 
+                elif 'is_marked' in request.POST:
+                    # Update assignment status
+                    updateAssignment = Assignment.objects.filter(cohort=pk, stack=request.user.trainers.stack, id=assignment_id).update(
+                        status=True
+                    )
+                    return redirect(TrainerDashboard_assignmentEdit, pk, n)
+
+                elif 'ongoing' in request.POST:
+                    # Update assignment status
+                    updateAssignment = Assignment.objects.filter(cohort=pk, stack=request.user.trainers.stack, id=assignment_id).update(
+                        status=False
+                    )
+                    return redirect(TrainerDashboard_assignmentEdit, pk, n)
+
                 elif 'delete' in request.POST:
-                    # Delete Module and it's files
-                    if len(selectedAssignment.documentFiles) > 0:
-                        selectedAssignment.documentFiles.delete()
+                    # Delete Assignment file
+                    if selectedAssignment.documentFiles:
+                        if len(selectedAssignment.documentFiles) > 0:
+                            selectedAssignment.documentFiles.delete()
+                    # Delete Assignment
                     selectedAssignment.delete()
                     messages.success(request, "Assignment deleted successfully.")
                     return redirect(TrainerDashboard_assignmentList, pk)
 
                 else:
+                    # getting group
+                    groupData = Group.objects.filter(cohort=pk, stack=request.user.trainers.stack).annotate(trainee_count=Count('trainees'))
                     # getting assignment reports
                     reportData = AssignmentReport.objects.filter(assignment=selectedAssignment).order_by('-createdDate')
                     # getting cohorts
@@ -1177,6 +1196,7 @@ def TrainerDashboard_assignmentEdit(request, pk, n):
                         'cohorts': CohortData,
                         'assignment': selectedAssignment,
                         'reports': reportData,
+                        'groups': groupData,
                     }
                     return render(request, 'main/trainer/assignmentEdit.html', context)
             else:
@@ -1203,7 +1223,7 @@ def TrainerDashboard_reportCollection(request, pk, n, k):
             current_cohort = Cohort.objects.get(id=cohort_id)
             if Assignment.objects.filter(cohort=pk, stack=request.user.trainers.stack, id=assignment_id).exists():
                 # if exists
-                selectedAssignment = Assignment.objects.filter(cohort=pk, stack=request.user.trainers.stack, id=assignment_id)
+                selectedAssignment = Assignment.objects.get(cohort=pk, stack=request.user.trainers.stack, id=assignment_id)
                 if AssignmentReport.objects.filter(id=report_id, assignment=assignment_id).exists():
                     # if exists
                     reportData = AssignmentReport.objects.get(id=report_id, assignment=assignment_id)
@@ -1217,9 +1237,30 @@ def TrainerDashboard_reportCollection(request, pk, n, k):
                             reportFeedback = Feedback(
                                 report =reportData,
                                 grade =grade,
-                                comment =comment,
+                                comment =comment
                             )
                             reportFeedback.save()
+                            # update assignment report status to true for marked
+                            AssignmentReport.objects.filter(id=report_id, assignment=assignment_id).update(
+                                status=True,
+                            )
+                            messages.success(request, "Report graded successfully.")
+                            return redirect(TrainerDashboard_reportCollection, pk, n, k)
+                        else:
+                            messages.error(request, ('All fields are required.'))
+                            return redirect(TrainerDashboard_reportCollection, pk, n, k)
+
+                    if 'update_comment' in request.POST:
+                        # Retrieve the form data from the request
+                        grade = request.POST.get('grade')
+                        comment = request.POST.get('comment')
+
+                        if grade and comment:
+                            # update feedback
+                            Feedback.objects.filter(report=report_id).update(
+                                grade =grade,
+                                comment =comment
+                            )
                             messages.success(request, "Report graded successfully.")
                             return redirect(TrainerDashboard_reportCollection, pk, n, k)
                         else:
@@ -1227,11 +1268,8 @@ def TrainerDashboard_reportCollection(request, pk, n, k):
                             return redirect(TrainerDashboard_reportCollection, pk, n, k)
 
                     else:
-                        # getting feedback
-                        feedbackData = Feedback.objects.filter(report=selectedAssignment.id)
                         # getting cohorts
                         CohortData = Cohort.objects.filter()
-
                         context = {
                             'title': 'Trainer - Assignment Report Info',
                             'assignment_active': 'active',
@@ -1239,7 +1277,6 @@ def TrainerDashboard_reportCollection(request, pk, n, k):
                             'current_cohort': current_cohort,
                             'assignment': selectedAssignment,
                             'report': reportData,
-                            'feedback': feedbackData
                         }
                         return render(request, 'main/trainer/reportCollection.html', context)
                 else:

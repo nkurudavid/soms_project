@@ -3,15 +3,10 @@ from django.core.validators import FileExtensionValidator
 
 
 class Cohort(models.Model):
-    class Status(models.TextChoices):
-        WAITING = "Waiting", "Waiting"
-        ONGOING = "Ongoing", "Ongoing"
-        COMPLETED = "Completed", "Completed"
-
     cohort_name = models.CharField(verbose_name="Cohort Name", max_length=100, unique=True)
     starting_date = models.DateField(verbose_name="When Start")
     ending_date = models.DateField(verbose_name="When End")
-    status = models.CharField(verbose_name="Status", choices=Status.choices, default=Status.WAITING, max_length=10)
+    status = models.BooleanField(verbose_name="Is Completed", default=False)
     def __str__(self):
         return self.cohort_name
 
