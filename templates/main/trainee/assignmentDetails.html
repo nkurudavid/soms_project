@@ -1,0 +1,303 @@
+{% extends "main/dash_main_layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
+  {% load static %}
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+  </head>
+
+  <body>
+    {% block account_content%}
+
+    <div class="wrapper">
+      {% include 'main/trainee/navbar.html' %}
+      <!-- Left side column. contains the logo and sidebar -->
+      {% include 'main/trainee/sidebar.html' %}
+
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            <i class="fa fa-tasks"></i>
+            Assigment Details
+          </h1>
+          <ol class="breadcrumb">
+            <li>
+              <a href="{% url 'trainer_dashboard' %}"><i class="fa fa-dashboard"></i> Home</a>
+            </li>
+            <li>
+              <a href="{% url 'trainee_assignmentList' %}"><i class="fa fa-tasks"></i> Assignments</a>
+            </li>
+            <li class="active">Assignment Details</li>
+          </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+          <div class="row">
+            <div class="col-lg-8">
+              <div class="box box-info">
+                <div class="box-header">
+                  <h3 class="box-title">Assignment</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  {% if assignment %}
+                  <div class="list-group">
+                    <br/>
+                    <div
+                      class="list-group-item list-group-item-action {% if not assignment.status %}list-group-item-info{% endif %}"
+                    >
+                      <div class="d-flex w-100 justify-content-between">
+                        <h4 class="mb-1">
+                          Title: {{assignment.title}}
+                        </h4>
+                      </div>
+                      <p class="mb-1"><i class="fa fa-bullhorn"></i> {{assignment.description}}</p>
+                      {% if assignment.documentFiles %}
+                      <span class="text-md">
+                         <i class="fa fa-file"></i> <a href="{{assignment.documentFiles.url}}" target="_blank" download> {{assignment.documentFiles}}</a>
+                      </span>
+                      <br />
+                      <br />
+                      {% endif %}
+                      <span class="label label-default">From: {{assignment.startDate}}</span> -
+                      <span class="label label-default">Due date: {{assignment.dueDate}}</span>
+                    </div>
+                    <br/>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              
+              {% if not assignment.status %}
+              <div class="box box-info">
+                <div class="box-header">
+                  <h3 class="box-title">Report Submission</h3>
+                  {% if canSubmit %}
+                  <button
+                    type="button"
+                    class="btn btn-flat btn-sm btn-primary pull-right"
+                    data-toggle="modal"
+                    data-target="#modal-default"
+                  >
+                    <i class="fa fa-paper-plane"></i>
+                    Click to submit
+                  </button>
+                  {% endif %}
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  <p>Remaining time: <span class="text-primary text-bold" id="countdown"></span></p>
+                </div>
+              </div>
+              {% endif %}
+
+              <div class="box box-info">
+                <div class="box-header">
+                  <h3 class="box-title">{{user.trainees.group.group_name}}: Assignment Report</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  {% if report %}
+                  <div class="list-group">
+                    <div class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between">
+                        <p>
+                          <span class="text-bold">
+                            Description:
+                          </span>
+                          <br />{{report.description}}
+                        </p>
+                        {% if report.documentFiles %}
+                        <p>
+                          <span class="text-bold">
+                            File:
+                          </span>
+                          <br />
+                          <a href="{{report.documentFiles.url}}" target="_blank" download>{{report.documentFiles}}</a>
+                        </p>
+                        {% else %}
+                        <p>
+                          <span class="text-bold">
+                            File:
+                          </span> 
+                          <span class="badge badge-primary badge-pill">No File Submitted</span>
+                        </p>
+                        {% endif %}
+                        <span>Submitted date: {{report.createdDate}}</span>
+                      </div>
+                    </div>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+              
+              {% if assignment.status %}
+              <div class="box box-info">
+                <div class="box-header">
+                  <h3 class="box-title">Comment</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  {% if report.feedbacks %}
+                  <div class="list-group">
+                    <br/>
+                    <div class="list-group-item">
+                      <div class="d-flex w-100 justify-content-between">
+                        <h4 class="mb-1">
+                          <span class="text-bold">
+                            Grade: 
+                          </span>
+                          {{report.feedbacks.grade}}
+                        </h4>
+                      </div>
+                      <p class="mb-1">
+                        <span class="text-bold">
+                          Comment: 
+                        </span>
+                        <br/>{{report.feedbacks.comment}}
+                      </p>
+                      <span class="label label-default">Marked on: {{report.feedbacks.createdDate}}</span> 
+                    </div>
+                    <br/>
+                  </div>
+                  {% else %}
+                  <p class="mb-1">
+                    <span class="text-warning">
+                      Waiting for feedback ...
+                    </span>
+                  </p>
+                  {% endif %}
+                </div>
+              </div>
+              {% endif %}
+
+            </div>
+
+            <div class="col-lg-4">
+              {% if groupData %}
+              <div class="box box-info">
+                {% for group in groupData %}
+                <div class="box-header with-border">
+                  <h3 class="box-title">
+                    {{group.group_name}}
+                  </h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  <ul class="list-group list-group-flush">
+                    {% for member in group.trainees.all %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {% if member.profilePicture %}
+                        <img src="{{member.profilePicture}}" width="30px" alt="{{member.user.first_name}}" />
+                        {% else %}
+                        <img src="{% static 'images/anonymous.png' %}" width="30px" alt="{{member.user.first_name}}" />
+                        {% endif %}
+                        <a href="{% url 'trainee_memberProfile' member.id %}" class="product-titles">
+                          {{member.user}}
+                        </a>
+                    </li>
+                    {% endfor%}
+                  </ul>
+                </div>
+                {% endfor %}
+                <!-- /.box-body -->
+              </div>
+              {% endif %}
+            </div>
+
+          </div>
+
+          <div class="modal fade" id="modal-default">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button
+                    type="button"
+                    class="close"
+                    data-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                  <h4 class="modal-title">
+                    <i class="fa fa-paper-plane"></i> SUBMIT ASSIGNMENT REPORT
+                  </h4>
+                </div>
+                <form method="post" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <div class="modal-body">
+                    <div class="form-group mb-0">
+                      <label class="col-form-label">Description</label>
+                      <textarea
+                        class="form-control"
+                        rows="5"
+                        placeholder="Description ..."
+                        name="description"
+                        required
+                      >{{ report.description }}</textarea>
+                    </div>
+                    <div class="form-group mb-0">
+                      <label class="col-form-label"
+                        >Upload Document</label
+                      >
+                      <input
+                        class="form-control form-control-lg"
+                        name="documentFiles"
+                        type="file"
+                        accept=".pdf, .doc, .docx, .ppt"
+                      />
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button
+                      type="button"
+                      class="btn btn-flat btn-default pull-left"
+                      data-dismiss="modal"
+                    >
+                      Close
+                    </button>
+                    {% if report %}
+                    <button
+                      type="submit"
+                      name="update_report"
+                      class="btn btn-flat btn-primary"
+                    >
+                      <i class="fa fa-paper-plane"></i>
+                      update report
+                    </button>
+                    {% else %}
+                    <button
+                      type="submit"
+                      name="submit"
+                      class="btn btn-flat btn-primary"
+                    >
+                      <i class="fa fa-paper-plane"></i>
+                      Submit
+                    </button>
+                    {% endif %}
+                  </div>
+                </form>
+              </div>
+              <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+          </div>
+          <!-- /.modal -->
+        </section>
+        <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+
+      {% include 'main/trainee/footer.html' %}
+    </div>
+    {% endblock %}
+  </body>
+</html>

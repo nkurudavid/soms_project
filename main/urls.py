@@ -40,12 +40,8 @@ urlpatterns = [
     path('trainee/logout', TraineeLogout, name='trainee_logout'),
     path('trainee/dashboard', TraineeDashboard, name='trainee_dashboard'),
     path('trainee/dashboard/my_profile', Trainee_profile, name='trainee_profile'),
-    path('trainee/dashboard/modules', TraineeDashboard_module, name='trainee_modules'),
-    path('trainee/dashboard/modules/<int:pk>/module_info', TraineeDashboard_moduleEdit, name='trainee_moduleEdit'),
-    path('trainee/dashboard/cohorts/<int:pk>/trainees', TraineeDashboard_traineeList, name='trainee_traineeList'),
-    path('trainee/dashboard/cohorts/<int:pk>/trainees_list/<int:n>/trainee_profile', TraineeDashboard_traineeProfile, name='trainee_traineeProfile'),
-    path('trainee/dashboard/cohorts/<int:pk>/assignments', TraineeDashboard_assignmentList, name='trainee_assignmentList'),
-    path('trainee/dashboard/cohorts/<int:pk>/assignments/<int:n>/assignment', TraineeDashboard_assignmentEdit, name='trainee_assignmentDetails'),
-    path('trainee/dashboard/cohorts/<int:pk>/assignments/<int:n>/assignment/<int:k>/report', TraineeDashboard_reportCollection, name='trainee_assignmentReport'),
-
+    path('trainee/dashboard/module/<int:pk>/module_info', TraineeDashboard_moduleInfo, name='trainee_moduleInfo'),
+    path('trainee/dashboard/group_member/<int:pk>/profile', TraineeDashboard_traineeProfile, name='trainee_memberProfile'),
+    path('trainee/dashboard/assignments', TraineeDashboard_assignmentList, name='trainee_assignmentList'),
+    path('trainee/dashboard/assignments/<int:pk>/assignment', TraineeDashboard_assignmentDetails, name='trainee_assignmentDetails'),
 ]

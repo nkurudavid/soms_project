@@ -1,4 +1,5 @@
 from django.db.models import Count
+from django.utils import timezone
 from datetime import date
 from django.shortcuts import redirect, render
 from django.contrib import messages
@@ -292,9 +293,9 @@ def ManagerDashboard_teamEdit(request, pk):
                         )
                         if user:
                             if profilePicture:
-                                if len(profilePicture) > 0:
+                                if len(profilePicture) != 0:
                                     data = Trainer.objects.get(id=trainer_id)
-                                    if len(data.profilePicture) > 0:
+                                    if len(data.profilePicture) != 0:
                                         data.profilePicture.delete()
 
                                 # Update trainer profile
@@ -958,9 +959,9 @@ def TrainerDashboard_moduleEdit(request, pk):
                         return redirect(TrainerDashboard_moduleEdit, pk)
                     else:
                         if notes_document:
-                            if len(notes_document) > 0:
+                            if len(notes_document) != 0:
                                 # check if existing module have document
-                                if len(moduleData.documentFiles) > 0:
+                                if len(moduleData.documentFiles) != 0:
                                     moduleData.documentFiles.delete()
 
                             # Update module with document file
@@ -989,7 +990,7 @@ def TrainerDashboard_moduleEdit(request, pk):
 
             elif 'delete' in request.POST:
                 # Delete Module and it's files
-                if len(moduleData.documentFiles) > 0:
+                if len(moduleData.documentFiles) != 0:
                     moduleData.documentFiles.delete()
                 moduleData.delete()
                 messages.success(request, "Module deleted successfully.")
@@ -1124,20 +1125,19 @@ def TrainerDashboard_assignmentEdit(request, pk, n):
                             return redirect(TrainerDashboard_assignmentList, pk)
                         else:
                             if documentFiles:
-                                if len(documentFiles) > 0:
+                                if selectedAssignment.documentFiles:
                                     # check if existing assignment have document
-                                    if len(selectedAssignment.documentFiles) > 0:
+                                    if len(selectedAssignment.documentFiles) != 0:
                                         selectedAssignment.documentFiles.delete()
 
                                 # Update assignment with document file
-                                selectedAssignment.title=title, 
-                                selectedAssignment.description=description,
-                                selectedAssignment.documentFiles=documentFiles,
-                                selectedAssignment.startDate=start_date,
-                                selectedAssignment.dueDate=due_date,
-                                # save changes
-                                selectedAssignment.save()
-                                updateAssignment = selectedAssignment
+                                updateAssignment = Assignment.objects.filter(cohort=pk, stack=request.user.trainers.stack, id=assignment_id).update(
+                                    title=title, 
+                                    description=description,
+                                    documentFiles=documentFiles,
+                                    startDate=start_date,
+                                    dueDate=due_date,
+                                )
                             else:
                                 # Update assignment
                                 updateAssignment = Assignment.objects.filter(cohort=pk, stack=request.user.trainers.stack, id=assignment_id).update(
@@ -1174,7 +1174,7 @@ def TrainerDashboard_assignmentEdit(request, pk, n):
                 elif 'delete' in request.POST:
                     # Delete Assignment file
                     if selectedAssignment.documentFiles:
-                        if len(selectedAssignment.documentFiles) > 0:
+                        if len(selectedAssignment.documentFiles) != 0:
                             selectedAssignment.documentFiles.delete()
                     # Delete Assignment
                     selectedAssignment.delete()
@@ -1250,7 +1250,7 @@ def TrainerDashboard_reportCollection(request, pk, n, k):
                             messages.error(request, ('All fields are required.'))
                             return redirect(TrainerDashboard_reportCollection, pk, n, k)
 
-                    if 'update_comment' in request.POST:
+                    elif 'update_comment' in request.POST:
                         # Retrieve the form data from the request
                         grade = request.POST.get('grade')
                         comment = request.POST.get('comment')
@@ -1333,13 +1333,16 @@ def TraineeDashboard(request):
         # getting modules
         modulesData = Module.objects.filter(stack=request.user.trainees.stack)
         # getting assignments
-        assignmentData = Assignment.objects.filter(stack=request.user.trainees.stack).order_by('-createdDate')
+        assignmentData = Assignment.objects.filter(stack=request.user.trainees.stack, status=False).order_by('-createdDate')
+        # getting trainees
+        traineesData = Trainee.objects.filter(stack=request.user.trainees.stack)
         context = {
             'title': 'Trainee Dashboard', 
             'dash_active': 'active',
             'modules': modulesData,
-            'assignment': assignmentData,
             'module_total': modulesData.count(),
+            'assignments': assignmentData,
+            'trainees': traineesData,
         }
         return render(request, 'main/trainee/dashboard.html', context)
     else:
@@ -1364,467 +1367,162 @@ def Trainee_profile(request):
 
 
 @login_required(login_url='trainee_login')
-def TraineeDashboard_traineeList(request, pk):
-    if request.user.is_authenticated and request.user.is_trainee==True:
-        cohort_id = pk
-        # getting cohort
-        if Cohort.objects.filter(id=cohort_id).exists():
-            # if exists
-            current_cohort = Cohort.objects.get(id=cohort_id)
-            # getting all trainees from cohort
-            traineesData=Trainee.objects.filter(cohort=pk, stack=request.user.trainees.stack)
-            # getting cohort
-            CohortData = Cohort.objects.filter()
-            context = {
-                'title': 'Trainee - Trainees List',
-                'trainees_active': 'active',
-                'current_cohort': current_cohort,
-                'cohorts': CohortData,
-                'trainees': traineesData,
-                'trainees_total': traineesData.count
-            }
-            return render(request, 'main/trainee/trainees_list.html', context)
-        else:
-            messages.error(request, ('Cohort not found'))
-            return redirect(TraineeDashboard)
-    else:
-        messages.warning(request, ('You have to login to view the page!'))
-        return redirect(TraineeLogin)
-
-
-
-@login_required(login_url='manager_login')
-def TraineeDashboard_traineeProfile(request, pk, n):
-    if request.user.is_authenticated and request.user.is_trainee==True:
-        cohort_id = pk
-        trainee_id = n
-        # getting cohort
-        if Cohort.objects.filter(id=cohort_id).exists():
-            # if exists
-            current_cohort = Cohort.objects.get(id=cohort_id)
-            if Trainee.objects.filter(id=trainee_id, stack=request.user.trainees.stack).exists():
-                # get trainee
-                trainee = Trainee.objects.get(id=trainee_id)
-                # getting cohort
-                CohortData = Cohort.objects.filter()
-                context = {
-                    'title': 'Trainee - Trainee Profile',
-                    'trainees_active': 'active',
-                    'current_cohort': current_cohort,
-                    'cohorts': CohortData,
-                    'trainee': trainee,
-                }
-                return render(request, 'main/trainee/trainees_profile.html', context)
-            else:
-                messages.error(request, ('Trainee Profile not found'))
-                return redirect(TraineeDashboard_traineeList, pk)
-        else:
-            messages.error(request, ('Cohort not found'))
-            return redirect(TraineeDashboard)
-    else:
-        messages.warning(request, ('You have to login to view the page!'))
-        return redirect(TraineeLogin)
-
-
-
-@login_required(login_url='trainee_login')
-def TraineeDashboard_module(request):
-    if request.user.is_authenticated and request.user.is_trainee==True:
-        if 'new_module' in request.POST:
-            module_name = request.POST.get("module_name")
-            description = request.POST.get("description")
-            notes_document = request.FILES.get('notes_document')
-
-            if module_name:
-                # check existing module
-                if Module.objects.filter(name=module_name, stack=request.user.trainees.stack):
-                    messages.warning(request, "Module "+module_name+", Already exist.")
-                    return redirect(TraineeDashboard_module)
-                else:
-                    # add new stack
-                    new_module = Module(
-                        stack=request.user.trainees.stack,
-                        name=module_name, 
-                        description=description,
-                        documentFiles=notes_document
-                    )
-                    new_module.save()
-
-                    messages.success(request, "New Module registered successfully.")
-                    return redirect(TraineeDashboard_module)
-            else:
-                messages.error(request, "Error , Module required!")
-                return redirect(TraineeDashboard_module)
-        else:
-            # getting modules
-            ModuleData = Module.objects.filter(stack=request.user.trainees.stack)
-            # getting cohort
-            CohortData = Cohort.objects.filter()
-            context = {
-                'title': 'Trainee - Modules',
-                'modules_active': 'active', 
-                'cohorts': CohortData,
-                'modules': ModuleData,
-                'module_total': ModuleData.count(),
-            }
-            return render(request, 'main/trainee/modules.html', context)
-    else:
-        messages.warning(request, ('You have to login to view the page!'))
-        return redirect(TraineeLogin)
-
-
-
-@login_required(login_url='trainee_login')
-def TraineeDashboard_moduleEdit(request, pk):
+def TraineeDashboard_moduleInfo(request, pk):
     if request.user.is_authenticated and request.user.is_trainee==True:
         module_id = pk
         if Module.objects.filter(id=module_id, stack=request.user.trainees.stack).exists():
             # getting module
             moduleData = Module.objects.get(id=module_id, stack=request.user.trainees.stack)
-
-            if 'submit' in request.POST:
-                module_name = request.POST.get("module_name")
-                description = request.POST.get("description")
-                notes_document = request.FILES.get('notes_document')
-
-                if module_name:
-                    # check existing module
-                    if Module.objects.filter(name=module_name, stack=request.user.trainees.stack).exclude(id=module_id):
-                        messages.warning(request, "Module "+module_name+", Already exist.")
-                        return redirect(TraineeDashboard_moduleEdit, pk)
-                    else:
-                        if notes_document:
-                            if len(notes_document) > 0:
-                                # check if existing module have document
-                                if len(moduleData.documentFiles) > 0:
-                                    moduleData.documentFiles.delete()
-
-                            # Update module with document file
-                            moduleData.name=module_name, 
-                            moduleData.description=description,
-                            moduleData.documentFiles=notes_document
-                            # save changes
-                            moduleData.save()
-                            updateModule = moduleData
-                        else:
-                            # Update Module
-                            updateModule = Module.objects.filter(id=module_id, stack=request.user.trainees.stack).update(
-                                name=module_name, 
-                                description=description,
-                            )
-
-                        if updateModule:
-                            messages.success(request, "Module "+module_name+", Updated successfully.")
-                            return redirect(TraineeDashboard_moduleEdit, pk)
-                        else:
-                            messages.error(request, ('Process Failed.'))
-                            return redirect(TraineeDashboard_moduleEdit, pk)
-                else:
-                    messages.error(request, ('All fields are required.'))
-                    return redirect(TraineeDashboard_moduleEdit, pk)
-
-            elif 'delete' in request.POST:
-                # Delete Module and it's files
-                if len(moduleData.documentFiles) > 0:
-                    moduleData.documentFiles.delete()
-                moduleData.delete()
-                messages.success(request, "Module deleted successfully.")
-                return redirect(TraineeDashboard_module)
-
-            else:
-                # getting cohorts
-                CohortData = Cohort.objects.filter()
-                context = {
-                    'title': 'Trainee - Module Info',
-                    'modules_active': 'active',
-                    'cohorts': CohortData,
-                    'module': moduleData,
-                }
-                return render(request, 'main/trainee/moduleEdit.html', context)
+            context = {
+                'title': 'Trainee - Module Info',
+                'modules_active': 'active',
+                'module': moduleData,
+            }
+            return render(request, 'main/trainee/moduleInfo.html', context)
         else:
             messages.error(request, ('Module not found'))
-            return redirect(TraineeDashboard_module)
+            return redirect(TraineeDashboard)
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(TraineeLogin)
 
 
+@login_required(login_url='trainee_login')
+def TraineeDashboard_assignmentList(request):
+    if request.user.is_authenticated and request.user.is_trainee==True:
+        # getting current assignment
+        assignmentData = Assignment.objects.filter(stack=request.user.trainees.stack).order_by('-createdDate')
+        groupData = Group.objects.filter(id=request.user.trainees.group.id)
+
+        context = {
+            'title': 'Trainee - Assignment',
+            'assignment_active': 'active',
+            'assignments': assignmentData,
+            'groupData': groupData,
+            'assignments_total': assignmentData.count,
+        }
+        return render(request, 'main/trainee/assignmentList.html', context)
+
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(TraineeLogin)
+
 
 @login_required(login_url='trainee_login')
-def TraineeDashboard_assignmentList(request, pk):
+def TraineeDashboard_traineeProfile(request, pk):
     if request.user.is_authenticated and request.user.is_trainee==True:
-        cohort_id = pk
+        group_member = pk
         # getting cohort
-        if Cohort.objects.filter(id=cohort_id).exists():
+        if Trainee.objects.filter(id=group_member, stack=request.user.trainees.stack).exists():
+            # get trainee as group member
+            trainee = Trainee.objects.get(id=group_member, stack=request.user.trainees.stack)
+            context = {
+                'title': 'Trainer - Group member Profile',
+                'trainees_active': 'active',
+                'trainee': trainee,
+            }
+            return render(request, 'main/trainee/groupMember_profile.html', context)
+        else:
+            messages.error(request, ('Group member not found'))
+            return redirect(TraineeDashboard_assignmentList)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(TraineeLogin)
+
+
+@login_required(login_url='trainee_login')
+def TraineeDashboard_assignmentDetails(request, pk):
+    if request.user.is_authenticated and request.user.is_trainee==True:
+        assignment_id = pk
+        if Assignment.objects.filter(stack=request.user.trainees.stack, id=assignment_id).exists():
             # if exists
-            current_cohort = Cohort.objects.get(id=cohort_id)
-            # getting current assignment
-            currentAssignment = Assignment.objects.filter(cohort=pk, stack=request.user.trainees.stack).order_by('-createdDate').first()
+            selectedAssignment = Assignment.objects.get(stack=request.user.trainees.stack, id=assignment_id)
+            # getting group
+            groupData = Group.objects.filter(id=request.user.trainees.group.id)
+            # getting assignment reports
+            if AssignmentReport.objects.filter(assignment=selectedAssignment, group=request.user.trainees.group.id).exists():
+                reportData = AssignmentReport.objects.get(assignment=selectedAssignment, group=request.user.trainees.group.id)
+            else:
+                reportData=None
+
             if 'submit' in request.POST:
                 # Retrieve the form data from the request
-                title = request.POST.get('title')
+                description = request.POST.get('description')
+                documentFiles =request.FILES.get('documentFiles')
+
+                if description:
+                    # create feedback
+                    myGroup = Group.objects.get(id=request.user.trainees.group.id)
+                    if documentFiles:
+                        report = AssignmentReport(
+                            assignment=selectedAssignment,
+                            group =myGroup,
+                            description =description,
+                            documentFiles =documentFiles
+                        )
+                        report.save()
+                    else:
+                        report = AssignmentReport(
+                            assignment=selectedAssignment,
+                            group =myGroup,
+                            description =description,
+                        )
+                        report.save()
+                    messages.success(request, "Report submitted successfully.")
+                    return redirect(TraineeDashboard_assignmentDetails, pk)
+                else:
+                    messages.error(request, "All fields are required.")
+                    return redirect(TraineeDashboard_assignmentDetails, pk)
+
+            elif 'update_report' in request.POST:
+                # Retrieve the form data from the request
                 description = request.POST.get('description')
                 documentFiles = request.FILES.get('documentFiles')
-                startDate = request.POST.get('start_date')
-                due_date = request.POST.get('due_date')
 
-                if title and description and startDate and due_date:
-                    if Assignment.objects.filter(cohort=pk, stack=request.user.trainees.stack,title=title):
-                        messages.warning(request, "Assignment title exist.")
-                        return redirect(TraineeDashboard_assignmentList, pk)
+                if description:
+                    report = AssignmentReport.objects.get(assignment=selectedAssignment, group=request.user.trainees.group.id)
+                    if documentFiles:
+                        if report.documentFiles:
+                            # check if existing module have document
+                            if len(report.documentFiles) != 0:
+                                report.documentFiles.delete()
+
+                        # Update module with document file
+                        updateReport = AssignmentReport.objects.filter(assignment=selectedAssignment, group=request.user.trainees.group.id).update(
+                            description =description,
+                            documentFiles=documentFiles
+                        )
                     else:
-                        if documentFiles:
-                            # create assignment
-                            newAssignment = Assignment(
-                                cohort=current_cohort,
-                                stack=request.user.trainees.stack,
-                                title=title,
-                                description=description,
-                                documentFiles=documentFiles,
-                                startDate=startDate,
-                                dueDate=due_date,
-                            )
-                            newAssignment.save()
-                        else:
-                            # create assignment
-                            newAssignment = Assignment(
-                                cohort=current_cohort,
-                                stack=request.user.trainees.stack,
-                                title=title,
-                                description=description,
-                                startDate=startDate,
-                                dueDate=due_date,
-                            )
-                            newAssignment.save()
-                        messages.success(request, "Assignment created successfully.")
-                        return redirect(TraineeDashboard_assignmentList, pk)
-                else:
-                    messages.error(request, ('All fields are required.'))
-                    return redirect(TraineeDashboard_assignmentList, pk)
-            else:
-                # getting group
-                groupData = Group.objects.filter(cohort=pk, stack=request.user.trainees.stack).annotate(trainee_count=Count('trainees'))
-                # getting assignments
-                assignmentData = Assignment.objects.filter(cohort=pk, stack=request.user.trainees.stack).order_by('-createdDate')
-                # getting assignment reports
-                reportData = AssignmentReport.objects.filter(assignment=currentAssignment).order_by('-createdDate')
-                # getting modules
-                moduleData = Module.objects.filter(stack=request.user.trainees.stack)
-                # getting cohorts
-                CohortData = Cohort.objects.filter()
+                        # Update Report
+                        updateReport = AssignmentReport.objects.filter(assignment=selectedAssignment, group=request.user.trainees.group.id).update(
+                            description =description,
+                        )
 
+                    if updateReport:
+                        messages.success(request, "Report submitted successfully.")
+                        return redirect(TraineeDashboard_assignmentDetails, pk)
+                else:
+                    messages.error(request, "All fields are required.")
+                    return redirect(TraineeDashboard_assignmentDetails, pk)
+
+            else:
+                canSubmit=False
+                if selectedAssignment.startDate < timezone.now() and selectedAssignment.dueDate > timezone.now():
+                    canSubmit=True
+                else:
+                    canSubmit=False
                 context = {
-                    'title': 'Trainee - Assignment',
+                    'title': 'Trainee - Assignment Info',
                     'assignment_active': 'active',
-                    'groups': groupData,
-                    'assignments': assignmentData,
-                    'reports': reportData,
-                    'assignments_total': assignmentData.count,
-                    'modules': moduleData,
-                    'cohorts': CohortData,
-                    'current_cohort': current_cohort
+                    'assignment': selectedAssignment,
+                    'groupData': groupData,
+                    'report': reportData,
+                    'canSubmit': canSubmit
                 }
-                return render(request, 'main/trainee/assignmentList.html', context)
+                return render(request, 'main/trainee/assignmentDetails.html', context)
         else:
-            messages.error(request, ('Cohort not found'))
-            return redirect(TraineeDashboard)
+            messages.error(request, ('Assignment not found'))
+            return redirect(TraineeDashboard_assignmentList)
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(TraineeLogin)
-
-
-
-@login_required(login_url='trainee_login')
-def TraineeDashboard_assignmentEdit(request, pk, n):
-    if request.user.is_authenticated and request.user.is_trainee==True:
-        cohort_id = pk
-        assignment_id = n
-        # getting cohort
-        if Cohort.objects.filter(id=cohort_id).exists():
-            # if exists
-            current_cohort = Cohort.objects.get(id=cohort_id)
-            if Assignment.objects.filter(cohort=pk, stack=request.user.trainees.stack, id=assignment_id).exists():
-                # if exists
-                selectedAssignment = Assignment.objects.get(cohort=pk, stack=request.user.trainees.stack, id=assignment_id)
-                if 'submit' in request.POST:
-                    # Retrieve the form data from the request
-                    title = request.POST.get('title')
-                    description = request.POST.get('description')
-                    documentFiles = request.FILES.get('documentFiles')
-                    start_date = request.POST.get('start_date')
-                    due_date = request.POST.get('due_date')
-
-                    if title and description and start_date and due_date:
-                        if Assignment.objects.filter(cohort=pk, stack=request.user.trainees.stack,title=title).exclude(id=assignment_id):
-                            messages.warning(request, "Assignment title exist.")
-                            return redirect(TraineeDashboard_assignmentList, pk)
-                        else:
-                            if documentFiles:
-                                if len(documentFiles) > 0:
-                                    # check if existing assignment have document
-                                    if len(selectedAssignment.documentFiles) > 0:
-                                        selectedAssignment.documentFiles.delete()
-
-                                # Update assignment with document file
-                                selectedAssignment.title=title, 
-                                selectedAssignment.description=description,
-                                selectedAssignment.documentFiles=documentFiles,
-                                selectedAssignment.startDate=start_date,
-                                selectedAssignment.dueDate=due_date,
-                                # save changes
-                                selectedAssignment.save()
-                                updateAssignment = selectedAssignment
-                            else:
-                                # Update assignment
-                                updateAssignment = Assignment.objects.filter(cohort=pk, stack=request.user.trainees.stack, id=assignment_id).update(
-                                    title=title, 
-                                    description=description,
-                                    startDate=start_date,
-                                    dueDate=due_date,
-                                )
-
-                            if updateAssignment:
-                                messages.success(request, "Assignment updated successfully.")
-                                return redirect(TraineeDashboard_assignmentEdit, pk, n)
-                            else:
-                                messages.error(request, ('Process Failed.'))
-                                return redirect(TraineeDashboard_assignmentEdit, pk, n)
-                    else:
-                        messages.error(request, ('All fields are required.'))
-                        return redirect(TraineeDashboard_assignmentEdit, pk, n)
-
-                elif 'is_marked' in request.POST:
-                    # Update assignment status
-                    updateAssignment = Assignment.objects.filter(cohort=pk, stack=request.user.trainees.stack, id=assignment_id).update(
-                        status=True
-                    )
-                    return redirect(TraineeDashboard_assignmentEdit, pk, n)
-
-                elif 'ongoing' in request.POST:
-                    # Update assignment status
-                    updateAssignment = Assignment.objects.filter(cohort=pk, stack=request.user.trainees.stack, id=assignment_id).update(
-                        status=False
-                    )
-                    return redirect(TraineeDashboard_assignmentEdit, pk, n)
-
-                elif 'delete' in request.POST:
-                    # Delete Assignment file
-                    if selectedAssignment.documentFiles:
-                        if len(selectedAssignment.documentFiles) > 0:
-                            selectedAssignment.documentFiles.delete()
-                    # Delete Assignment
-                    selectedAssignment.delete()
-                    messages.success(request, "Assignment deleted successfully.")
-                    return redirect(TraineeDashboard_assignmentList, pk)
-
-                else:
-                    # getting group
-                    groupData = Group.objects.filter(cohort=pk, stack=request.user.trainees.stack).annotate(trainee_count=Count('trainees'))
-                    # getting assignment reports
-                    reportData = AssignmentReport.objects.filter(assignment=selectedAssignment).order_by('-createdDate')
-                    # getting cohorts
-                    CohortData = Cohort.objects.filter()
-
-                    context = {
-                        'title': 'Trainee - Assignment Info',
-                        'assignment_active': 'active',
-                        'current_cohort': current_cohort,
-                        'cohorts': CohortData,
-                        'assignment': selectedAssignment,
-                        'reports': reportData,
-                        'groups': groupData,
-                    }
-                    return render(request, 'main/trainee/assignmentEdit.html', context)
-            else:
-                messages.error(request, ('Assignment not found'))
-                return redirect(TraineeDashboard_assignmentList, pk)
-        else:
-            messages.error(request, ('Cohort not found'))
-            return redirect(TraineeDashboard)
-    else:
-        messages.warning(request, ('You have to login to view the page!'))
-        return redirect(TraineeLogin)
-
-
-
-@login_required(login_url='trainee_login')
-def TraineeDashboard_reportCollection(request, pk, n, k):
-    if request.user.is_authenticated and request.user.is_trainee==True:
-        cohort_id = pk
-        assignment_id = n
-        report_id = k
-        # getting cohort
-        if Cohort.objects.filter(id=cohort_id).exists():
-            # if exists
-            current_cohort = Cohort.objects.get(id=cohort_id)
-            if Assignment.objects.filter(cohort=pk, stack=request.user.trainees.stack, id=assignment_id).exists():
-                # if exists
-                selectedAssignment = Assignment.objects.get(cohort=pk, stack=request.user.trainees.stack, id=assignment_id)
-                if AssignmentReport.objects.filter(id=report_id, assignment=assignment_id).exists():
-                    # if exists
-                    reportData = AssignmentReport.objects.get(id=report_id, assignment=assignment_id)
-                    if 'submit' in request.POST:
-                        # Retrieve the form data from the request
-                        grade = request.POST.get('grade')
-                        comment = request.POST.get('comment')
-
-                        if grade and comment:
-                            # create feedback
-                            reportFeedback = Feedback(
-                                report =reportData,
-                                grade =grade,
-                                comment =comment
-                            )
-                            reportFeedback.save()
-                            # update assignment report status to true for marked
-                            AssignmentReport.objects.filter(id=report_id, assignment=assignment_id).update(
-                                status=True,
-                            )
-                            messages.success(request, "Report graded successfully.")
-                            return redirect(TraineeDashboard_reportCollection, pk, n, k)
-                        else:
-                            messages.error(request, ('All fields are required.'))
-                            return redirect(TraineeDashboard_reportCollection, pk, n, k)
-
-                    if 'update_comment' in request.POST:
-                        # Retrieve the form data from the request
-                        grade = request.POST.get('grade')
-                        comment = request.POST.get('comment')
-
-                        if grade and comment:
-                            # update feedback
-                            Feedback.objects.filter(report=report_id).update(
-                                grade =grade,
-                                comment =comment
-                            )
-                            messages.success(request, "Report graded successfully.")
-                            return redirect(TraineeDashboard_reportCollection, pk, n, k)
-                        else:
-                            messages.error(request, ('All fields are required.'))
-                            return redirect(TraineeDashboard_reportCollection, pk, n, k)
-
-                    else:
-                        # getting cohorts
-                        CohortData = Cohort.objects.filter()
-                        context = {
-                            'title': 'Trainee - Assignment Report Info',
-                            'assignment_active': 'active',
-                            'cohorts': CohortData,
-                            'current_cohort': current_cohort,
-                            'assignment': selectedAssignment,
-                            'report': reportData,
-                        }
-                        return render(request, 'main/trainee/reportCollection.html', context)
-                else:
-                    messages.error(request, ('report not found'))
-                    return redirect(TraineeDashboard_assignmentEdit, pk, n)
-            else:
-                messages.error(request, ('Assignment not found'))
-                return redirect(TraineeDashboard_assignmentList, pk)
-        else:
-            messages.error(request, ('Cohort not found'))
-            return redirect(TraineeDashboard)
-    else:
-        messages.warning(request, ('You have to login to view the page!'))
-        return redirect(TraineeLogin)
-

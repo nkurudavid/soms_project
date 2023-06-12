@@ -40,8 +40,8 @@ class Module(models.Model):
     description = models.TextField(verbose_name="Description", blank=True)
     documentFiles = models.FileField(
         verbose_name="Document", 
-        upload_to="document/course/", 
-        validators=[FileExtensionValidator(['pdf','doc'])],
+        upload_to="document/course", 
+        validators=[FileExtensionValidator(['pdf','doc','docx','ppt'])],
         blank=True, null=True
     )
     def __str__(self):
@@ -63,8 +63,8 @@ class Assignment(models.Model):
     description = models.TextField(verbose_name="Description", blank=True)
     documentFiles = models.FileField(
         verbose_name="Document", 
-        upload_to="document/course/assignment/", 
-        validators=[FileExtensionValidator(['pdf','doc','ppt'])],
+        upload_to="document/course/assignment", 
+        validators=[FileExtensionValidator(['pdf','doc','docx','ppt'])],
         blank=True, null=True
     )
     status = models.BooleanField(verbose_name="Is Marked", default=False)
@@ -81,8 +81,8 @@ class AssignmentReport(models.Model):
     description = models.TextField(verbose_name="Description", blank=True)
     documentFiles = models.FileField(
         verbose_name="Document", 
-        upload_to="document/course/assignment/", 
-        validators=[FileExtensionValidator(['pdf','doc','ppt'])],
+        upload_to="document/course/assignment/report", 
+        validators=[FileExtensionValidator(['pdf','doc','docx','ppt'])],
         blank=True, null=True
     )
     status = models.BooleanField(verbose_name="Is Received", default=False)

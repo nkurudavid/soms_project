@@ -14,9 +14,9 @@
     {% block account_content%}
 
     <div class="wrapper">
-      {% include 'main/trainer/navbar.html' %}
+      {% include 'main/trainee/navbar.html' %}
       <!-- Left side column. contains the logo and sidebar -->
-      {% include 'main/trainer/sidebar.html' %}
+      {% include 'main/trainee/sidebar.html' %}
 
       <!-- Content Wrapper. Contains page content -->
       <div class="content-wrapper">
@@ -24,15 +24,15 @@
         <section class="content-header">
           <h1>
             <i class="fa fa-user"></i>
-            Trainee Profile
+            Group member Profile
           </h1>
           <ol class="breadcrumb">
             <li>
               <a href="#"><i class="fa fa-dashboard"></i> Home</a>
             </li>
             <li>
-              <a href="{% url 'trainer_traineeList' current_cohort.id %}"
-                ><i class="fa fa-group"></i> Trainees List</a
+              <a href="{% url 'trainee_assignmentList' %}"
+                ><i class="fa fa-tasks"></i> Assignments</a
               >
             </li>
             <li class="active">Trainee Profile</li>
@@ -137,6 +137,12 @@
                             </a>
                           </p>
                           <hr />
+
+                          <strong>
+                            <i class="fa fa-group"></i> Group:
+                          </strong>
+                          <p class="text-muted">{{trainee.group.group_name}}</p>
+                          <hr />
                         </div>
                         <hr />
                       </div>
@@ -155,7 +161,7 @@
       </div>
       <!-- /.content-wrapper -->
 
-      {% include 'main/trainer/footer.html' %}
+      {% include 'main/trainee/footer.html' %}
     </div>
     {% endblock %}
   </body>

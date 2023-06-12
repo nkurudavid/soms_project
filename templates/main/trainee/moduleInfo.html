@@ -1,0 +1,113 @@
+{% extends "main/dash_main_layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
+  {% load static %}
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+  </head>
+
+  <body>
+    {% block account_content%}
+
+    <div class="wrapper">
+      {% include 'main/trainee/navbar.html' %}
+      <!-- Left side column. contains the logo and sidebar -->
+      {% include 'main/trainee/sidebar.html' %}
+
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            <i class="fa fa-book"></i>
+            Module Info
+          </h1>
+          <ol class="breadcrumb">
+            <li>
+              <a href="{% url 'trainee_dashboard' %}"><i class="fa fa-dashboard"></i> Home</a>
+            </li>
+            <li class="active">
+              <i class="fa fa-book"></i> Module
+            </li>
+          </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                  <li class="active">
+                    <a
+                      href="#module_info"
+                      class="text-uppercase"
+                      data-toggle="tab"
+                    >
+                      {{module.name}} MODULE
+                    </a>
+                  </li>
+                </ul>
+                <div class="tab-content">
+                  <div class="active tab-pane" id="module_info">
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                      <div class="row mb-5">
+                        <div class="col-lg-12">
+                          <strong> <i class="fa fa-book"></i> Title: </strong>
+                          <p class="text-muted">{{module.name}}</p>
+                          <hr />
+
+                          <strong> Descriptions: </strong>
+                          <p class="text-muted">{{module.description}}</p>
+                          <hr />
+
+                          <strong>
+                            <i class="fa fa-file"></i> Document Notes:
+                          </strong>
+                          <p class="text-muted">
+                            {% if module.documentFiles %}
+                            {{module.documentFiles}}
+                            <br />
+                            <br />
+                            <a
+                              href="{{module.documentFiles.url}}"
+                              target="_blank"
+                              class="btn btn-primary btn-sm btn-flat"
+                            >
+                              <i class="fa fa-download"></i>
+                              Download
+                            </a>
+                            {% else %} No Document Files {% endif %}
+                          </p>
+                          <hr />
+                        </div>
+                      </div>
+                      <a
+                        href="{% url 'trainee_dashboard' %}"
+                        class="btn btn-default btn-flat pull-left"
+                        ><i class="fa fa-arrow-left"></i> Back
+                      </a>
+                    </div>
+                    <!-- /.box-body -->
+                  </div>
+                </div>
+                <!-- /.tab-content -->
+              </div>
+              <!-- /.nav-tabs-custom -->
+            </div>
+          </div>
+        </section>
+        <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+
+      {% include 'main/manager/footer.html' %}
+    </div>
+    {% endblock %}
+  </body>
+</html>

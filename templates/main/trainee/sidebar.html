@@ -32,50 +32,12 @@
       <li class="{{dash_active}}">
         <a href="{% url 'trainee_dashboard' %}">
           <i class="fa fa-dashboard"></i> <span>Dashboard</span>
-          <span class="pull-right-container"> </span>
         </a>
       </li>
-      <li class="{{modules_active}}">
-        <a href="{% url 'trainee_modules' %}">
-          <i class="fa fa-book"></i>
-          <span>Modules</span>
-        </a>
-      </li>
-      <li class="header">TRAINING</li>
-      <li class="treeview {{trainees_active}}">
-        <a href="#">
-          <i class="fa fa-group"></i> <span>Trainees</span>
-          <span class="pull-right-container">
-            <i class="fa fa-angle-left pull-right"></i>
-          </span>
-        </a>
-        <ul class="treeview-menu">
-          {% if cohorts %} {% for cohort in cohorts %}
-          <li>
-            <a href="{% url 'trainee_traineeList' cohort.id %}">
-              <i class="fa fa-circle-o text-aqua"></i>
-              {{cohort.cohort_name}}
-            </a>
-          </li>
-          {% endfor %} {% endif %}
-        </ul>
-      </li>
-      <li class="treeview {{assignment_active}}">
-        <a href="#">
+      <li class="{{assignment_active}}">
+        <a href="{% url 'trainee_assignmentList' %}">
           <i class="fa fa-tasks"></i> <span>Assignments</span>
-          <span class="pull-right-container">
-            <i class="fa fa-angle-left pull-right"></i>
-          </span>
         </a>
-        <ul class="treeview-menu">
-          {% if cohorts %} {% for cohort in cohorts %}
-          <li>
-            <a href="{% url 'trainee_assignmentList' cohort.id %}">
-              <i class="fa fa-circle-o text-aqua"></i>
-              {{cohort.cohort_name}}
-            </a>
-          </li>
-          {% endfor %} {% endif %}
         </ul>
       </li>
     </ul>
