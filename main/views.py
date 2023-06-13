@@ -10,6 +10,10 @@ from account.models import Trainer, Trainee, ProgramManager, Company
 from .models import Assignment, AssignmentReport, Group, Feedback, Stack, Cohort, Module
 from recruitment.models import Application
 
+import matplotlib.pyplot as plt
+import numpy as np
+
+
 # Create your views here.
 def HomePage(request):
     # getting stacks
