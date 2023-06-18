@@ -1,8 +1,10 @@
+from django.conf import settings
 from django.db.models import Count
 from django.utils import timezone
 from datetime import date
 from django.shortcuts import redirect, render
 from django.contrib import messages
+from django.core.mail import send_mail
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model, authenticate, login, logout, update_session_auth_hash
 
@@ -696,6 +698,13 @@ def ManagerDashboard_applicationDetails(request, pk, n):
                         applicant.status=True
                         applicant.save()
 
+                        # SENDING NOTIFICATION TO APPLICANT THROUGH AN EMAIL
+                        subject = 'Congratulations! Your Application Accepted'
+                        message = 'Dear '+applicant.first_name+' '+applicant.last_name+',\n\n Great news! We are pleased to inform you that your application for '+current_cohort.cohort_name+', in stack '+applicant.stack.name+' has been accepted. You stood out among the applicants with your exceptional qualifications and potential.\n\n Please find attached important details and next steps. Feel free to reach out if you have any questions.\n\n Your login credential account are email: '+applicant.email+', password: '+traineePassword+'. Congratulations once again on your acceptance!\n\n Best regards,\n\n SOMS'
+                        email_from = settings.EMAIL_HOST_USER
+                        recipient_list =[applicant.email,]
+                        send_mail( subject, message, email_from, recipient_list )
+
                         messages.success(request, "Application approved successfully.")
                         return redirect(ManagerDashboard_applicationList, pk)
                     else:
@@ -707,6 +716,14 @@ def ManagerDashboard_applicationDetails(request, pk, n):
                         applicant.cv_file.delete()
                     # Delete Application
                     applicant.delete()
+
+                    # SENDING NOTIFICATION TO APPLICANT THROUGH AN EMAIL
+                    subject = 'Application Status Update - Regretful Decision'
+                    message = 'Dear '+applicant.first_name+' '+applicant.last_name+',\n\n We regret to inform you that your application for '+current_cohort.cohort_name+', in '+applicant.stack.name+' has been unsuccessful. The selection process was highly competitive, and although your application showed promise, we had to make difficult decisions based on our specific criteria and available opportunities.\n\n While we are unable to provide detailed feedback, we encourage you to explore other options and continue pursuing your goals. Keep an eye out for future opportunities with our organization, as your qualifications may align with upcoming openings.\n\n Thank you for your interest in SOMS. We wish you all the best in your future endeavors.\n\n Sincerely,\n\n SOMS'
+                    email_from = settings.EMAIL_HOST_USER
+                    recipient_list =[applicant.email,]
+                    send_mail( subject, message, email_from, recipient_list )
+
                     messages.success(request, "Application rejected successfully.")
                     return redirect(ManagerDashboard_applicationList, pk)
 
