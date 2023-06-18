@@ -12,7 +12,8 @@ from recruitment.models import Application
 
 import matplotlib.pyplot as plt
 import numpy as np
-
+import io
+import base64
 
 # Create your views here.
 def HomePage(request):
@@ -117,6 +118,24 @@ def ManagerLogout(request):
 @login_required(login_url='manager_login')
 def ManagerDashboard(request):
     if request.user.is_authenticated and request.user.is_manager==True:
+        cohorts = Cohort.objects.all()
+        stacks = Stack.objects.all()
+        data = []
+
+        for cohort in cohorts:
+            cohort_trainees = Trainee.objects.filter(cohort=cohort.id)
+            stack_counts = {}
+            
+            for stack in stacks:
+                count = cohort_trainees.filter(stack=stack.id).count()
+                stack_counts[stack.name] = count
+
+            data.append({
+                'cohort_name': cohort.cohort_name,
+                'stack_counts': stack_counts
+            })
+
+
         # getting stacks
         StacksData = Stack.objects.filter()
         # getting trainers
@@ -134,6 +153,7 @@ def ManagerDashboard(request):
             'trainer_total': TrainersData.count(),
             'applicant_total': NewApplicantsData.count(),
             'team': TrainersData,
+            'data': data
         }
         return render(request, 'main/manager/dashboard.html', context)
     else:
@@ -144,14 +164,42 @@ def ManagerDashboard(request):
 @login_required(login_url='manager_login')
 def Manager_profile(request):
     if request.user.is_authenticated and request.user.is_manager==True:
-        # getting cohort
-        CohortData = Cohort.objects.filter()
-        context = {
-            'title': 'Manager - My Profile',
-            'profile_active': 'active',
-            'cohorts': CohortData,
-        }
-        return render(request, 'main/manager/profile.html', context)
+        if request.method == 'POST':
+            old_password = request.POST.get("old_pass")
+            new_password = request.POST.get("pass1")
+            confirmed_new_password = request.POST.get("pass2")
+
+            if old_password and new_password and confirmed_new_password:
+                user = get_user_model().objects.get(email=request.user.email)
+                if not user.check_password(old_password):
+                    messages.error(request, "Your old password is not correct!")
+                    return redirect(Manager_profile)
+                else:
+                    if len(new_password) < 5:
+                        messages.warning(request, "Your password is too weak!")
+                        return redirect(Manager_profile)
+                    elif new_password != confirmed_new_password:
+                        messages.error(request, "Your new password not match the confirm password !")
+                        return redirect(Manager_profile)
+                    else:
+                        user.set_password(new_password)
+                        user.save()
+                        update_session_auth_hash(request, user)
+
+                        messages.success(request, "Your password has been changed successfully.!")
+                        return redirect(Manager_profile)
+            else:
+                messages.error(request, "Error , All fields are required !")
+                return redirect(Manager_profile)
+        else:
+            # getting cohort
+            CohortData = Cohort.objects.filter()
+            context = {
+                'title': 'Manager - My Profile',
+                'profile_active': 'active',
+                'cohorts': CohortData,
+            }
+            return render(request, 'main/manager/profile.html', context)
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(ManagerLogin)
@@ -819,14 +867,42 @@ def TrainerDashboard(request):
 @login_required(login_url='trainer_login')
 def Trainer_profile(request):
     if request.user.is_authenticated and request.user.is_trainer==True:
-        # getting cohort
-        CohortData = Cohort.objects.filter()
-        context = {
-            'title': 'Trainer - My Profile',
-            'profile_active': 'active',
-            'cohorts': CohortData,
-        }
-        return render(request, 'main/trainer/profile.html', context)
+        if request.method == 'POST':
+            old_password = request.POST.get("old_pass")
+            new_password = request.POST.get("pass1")
+            confirmed_new_password = request.POST.get("pass2")
+
+            if old_password and new_password and confirmed_new_password:
+                user = get_user_model().objects.get(email=request.user.email)
+                if not user.check_password(old_password):
+                    messages.error(request, "Your old password is not correct!")
+                    return redirect(Trainer_profile)
+                else:
+                    if len(new_password) < 5:
+                        messages.warning(request, "Your password is too weak!")
+                        return redirect(Trainer_profile)
+                    elif new_password != confirmed_new_password:
+                        messages.error(request, "Your new password not match the confirm password !")
+                        return redirect(Trainer_profile)
+                    else:
+                        user.set_password(new_password)
+                        user.save()
+                        update_session_auth_hash(request, user)
+
+                        messages.success(request, "Your password has been changed successfully.!")
+                        return redirect(Trainer_profile)
+            else:
+                messages.error(request, "Error , All fields are required !")
+                return redirect(Trainer_profile)
+        else:
+            # getting cohort
+            CohortData = Cohort.objects.filter()
+            context = {
+                'title': 'Trainer - My Profile',
+                'profile_active': 'active',
+                'cohorts': CohortData,
+            }
+            return render(request, 'main/trainer/profile.html', context)
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(TrainerLogin)
@@ -1357,14 +1433,42 @@ def TraineeDashboard(request):
 @login_required(login_url='trainee_login')
 def Trainee_profile(request):
     if request.user.is_authenticated and request.user.is_trainee==True:
-        # getting cohort
-        CohortData = Cohort.objects.filter()
-        context = {
-            'title': 'Trainee - My Profile',
-            'profile_active': 'active',
-            'cohorts': CohortData,
-        }
-        return render(request, 'main/trainee/profile.html', context)
+        if request.method == 'POST':
+            old_password = request.POST.get("old_pass")
+            new_password = request.POST.get("pass1")
+            confirmed_new_password = request.POST.get("pass2")
+
+            if old_password and new_password and confirmed_new_password:
+                user = get_user_model().objects.get(email=request.user.email)
+                if not user.check_password(old_password):
+                    messages.error(request, "Your old password is not correct!")
+                    return redirect(Trainee_profile)
+                else:
+                    if len(new_password) < 5:
+                        messages.warning(request, "Your password is too weak!")
+                        return redirect(Trainee_profile)
+                    elif new_password != confirmed_new_password:
+                        messages.error(request, "Your new password not match the confirm password !")
+                        return redirect(Trainee_profile)
+                    else:
+                        user.set_password(new_password)
+                        user.save()
+                        update_session_auth_hash(request, user)
+
+                        messages.success(request, "Your password has been changed successfully.!")
+                        return redirect(Trainee_profile)
+            else:
+                messages.error(request, "Error , All fields are required !")
+                return redirect(Trainee_profile)
+        else:
+            # getting cohort
+            CohortData = Cohort.objects.filter()
+            context = {
+                'title': 'Trainee - My Profile',
+                'profile_active': 'active',
+                'cohorts': CohortData,
+            }
+            return render(request, 'main/trainee/profile.html', context)
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(TraineeLogin)

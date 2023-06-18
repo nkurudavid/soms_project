@@ -62,6 +62,9 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic"
     />
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   </head>
 
   <body class="hold-transition skin-blue sidebar-mini">
@@ -169,6 +172,46 @@
     </script>
 
     {% endif %}
+
+    <script>
+      // Retrieve the data passed from the view
+      var chartData = JSON.parse('{{ data | safe }}');
+
+      // Prepare the data for the chart
+      var datasets = [];
+      var cohortNames = [];
+
+      for (var i = 0; i < chartData.length; i++) {
+          var cohortData = chartData[i];
+          var stackCounts = Object.values(cohortData.stack_counts);
+          datasets.push({
+              data: stackCounts,
+              backgroundColor: getRandomColors(stackCounts.length)
+          });
+          cohortNames.push(cohortData.cohort_name);
+      }
+
+      // Generate random colors for the chart
+      function getRandomColors(count) {
+          var colors = [];
+
+          for (var i = 0; i < count; i++) {
+              colors.push('#' + Math.floor(Math.random() * 16777215).toString(16));
+          }
+
+          return colors;
+      }
+
+      // Create the pie chart
+      var ctx = document.getElementById('traineeChart').getContext('2d');
+      var chart = new Chart(ctx, {
+          type: 'pie',
+          data: {
+              labels: cohortNames,
+              datasets: datasets
+          }
+      });
+  </script>
 
   </body>
 </html>

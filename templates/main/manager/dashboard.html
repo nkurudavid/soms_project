@@ -109,9 +109,23 @@
             <!-- ./col -->
           </div>
           <!-- /.row -->
-          {% if team %}
           <div class="row">
+            <!-- /.col -->
             <div class="col-md-12">
+              <div class="box box-info">
+                <div class="box-header with-border">
+                  <h3 class="box-title">
+                    <i class="fa fa-group"></i> About Cohorts
+                  </h3>
+                </div>
+                <div class="box-body no-padding">
+                  <canvas id="traineeChart"></canvas>
+                </div>
+              </div>
+              <!--/.box -->
+            </div>
+          {% if team %}
+            <div class="col-md-6">
               <div class="box box-info">
                 <div class="box-header with-border">
                   <h3 class="box-title">
@@ -171,9 +185,8 @@
               </div>
               <!--/.box -->
             </div>
-            <!-- /.col -->
-          </div>
           {% endif %}
+          </div>
 
           <!-- Main row -->
           <div class="row"></div>
