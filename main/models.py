@@ -1,5 +1,26 @@
 from django.db import models
+from django.utils.safestring import mark_safe
 from django.core.validators import FileExtensionValidator
+
+
+
+class Company(models.Model):
+    name = models.CharField(verbose_name="Company Name", max_length=50, unique=True)
+    location = models.CharField(verbose_name="Location Address", max_length=200)
+    logoFile = models.ImageField(
+        verbose_name="Logo Image", 
+        upload_to="images/profile/", 
+        validators=[FileExtensionValidator(['png','jpg','jpeg'])],
+        blank=True, null=True
+    )
+    
+    def logo(self):
+        return mark_safe('<img src="/../../media/%s" width="70" />' % (self.logoFile))
+    
+    logo.allow_tags = True 
+
+    def __str__(self):
+        return self.name
 
 
 class Cohort(models.Model):

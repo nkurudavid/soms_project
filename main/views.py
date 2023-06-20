@@ -8,7 +8,7 @@ from django.core.mail import send_mail
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model, authenticate, login, logout, update_session_auth_hash
 
-from account.models import Trainer, Trainee, ProgramManager, Company
+from account.models import Trainer, Trainee
 from .models import Assignment, AssignmentReport, Group, Feedback, Stack, Cohort, Module
 from recruitment.models import Application
 

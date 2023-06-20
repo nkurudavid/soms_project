@@ -22,7 +22,6 @@ class User(AbstractUser):
     is_manager = models.BooleanField(verbose_name="Is Manager", default=False)
     is_trainer = models.BooleanField(verbose_name="Is Trainer", default=False)
     is_trainee = models.BooleanField(verbose_name="Is Trainee", default=False)
-    is_company = models.BooleanField(verbose_name="Is Compony", default=False)
 
     username = None
 
@@ -123,26 +122,3 @@ class ProgramManager(models.Model):
 
     def __str__(self):
         return "{} {}".format(self.user.first_name, self.user.last_name)
-
-
-
-class Company(models.Model):
-    user = models.OneToOneField(User, verbose_name="User", related_name="companies", on_delete=models.CASCADE)
-    name = models.CharField(verbose_name="Company Name", max_length=50, unique=True)
-    email = models.EmailField(verbose_name="Email", max_length=255, unique=True, blank=False)
-    fixed_phone = PhoneNumberField(verbose_name="Phone Number", blank=True)
-    location = models.CharField(verbose_name="Location Address", max_length=200)
-    logoFile = models.ImageField(
-        verbose_name="Logo Image", 
-        upload_to="images/profile/", 
-        validators=[FileExtensionValidator(['png','jpg','jpeg'])],
-        blank=True, null=True
-    )
-    
-    def logo(self):
-        return mark_safe('<img src="/../../media/%s" width="70" />' % (self.logoFile))
-    
-    logo.allow_tags = True 
-
-    def __str__(self):
-        return self.name
