@@ -26,19 +26,14 @@
           <span class="pull-right-container"> </span>
         </a>
       </li>
-      <li class="{{stacks_active}}">
-        <a href="{% url 'manager_stacks' %}">
-          <i class="fa fa-sitemap"></i>
-          <span>Stacks</span>
+      <li class="header">PARTNER</li>
+      <li class="{{partner_active}}">
+        <a href="{% url 'manager_partners' %}">
+          <i class="fa fa-building-o"></i>
+          <span>Companies</span>
         </a>
       </li>
-      <li class="{{team_active}}">
-        <a href="{% url 'manager_team' %}">
-          <i class="fa fa-group"></i>
-          <span>Our Team</span>
-          <span class="pull-right-container"> </span>
-        </a>
-      </li>
+      <li class="header">OUTSOURCED</li>
       <li class="treeview {{dash_active}}">
         <a href="#">
           <i class="fa fa-group"></i>
@@ -63,6 +58,19 @@
         <a href="{% url 'manager_cohorts' %}">
           <i class="fa fa-list"></i>
           <span>Cohorts</span>
+        </a>
+      </li>
+      <li class="{{stacks_active}}">
+        <a href="{% url 'manager_stacks' %}">
+          <i class="fa fa-sitemap"></i>
+          <span>Stacks</span>
+        </a>
+      </li>
+      <li class="{{team_active}}">
+        <a href="{% url 'manager_team' %}">
+          <i class="fa fa-group"></i>
+          <span>Team</span>
+          <span class="pull-right-container"> </span>
         </a>
       </li>
 

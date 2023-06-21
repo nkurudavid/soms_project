@@ -1,0 +1,165 @@
+{% extends "main/dash_main_layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
+  {% load static %}
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+  </head>
+
+  <body>
+    {% block account_content%}
+
+    <div class="wrapper">
+      {% include 'main/manager/navbar.html' %}
+      <!-- Left side column. contains the logo and sidebar -->
+      {% include 'main/manager/sidebar.html' %}
+
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            <i class="fa fa-building-o"></i>
+            {{partner.name}}
+          </h1>
+          <ol class="breadcrumb">
+            <li>
+              <a href="#"><i class="fa fa-dashboard"></i> Home</a>
+            </li>
+            <li>
+              <a href="{% url 'manager_partners' %}">
+                <i class="fa fa-building-o"></i> Partners
+              </a>
+            </li>
+            <li class="active">Info</li>
+          </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+          <div class="row">
+            <div class="col-lg-12">
+                <div class="box box-info">
+                    <div class="box-header">
+                        <h3 class="box-title">Partner Information</h3>
+                    </div>
+                    <form role="form" action="" method="post">
+                      {% csrf_token %}
+                        <div class="modal-body">
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-lg-5 col-md-4 col-sm-12">
+                                        <div class="form-group">
+                                            <img src="{{partner.logoFile.url}}" width="90%" alt="{{partner.name}} image">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-7 col-md-8 col-sm-12">
+                                        <div class="form-group">
+                                            <label for="company_name">COMPONY NAME</label>
+                                            <input type="text" class="form-control" id="company_name" placeholder="Company Name" name="company_name" value="{{partner.name}}" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="locationAddress">LOCATION</label>
+                                            <input type="text" class="form-control" id="locationAddress" placeholder="Location ..." name="locationAddress" value="{{partner.location}}" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.box-body -->
+                        </div>
+                        <div class="modal-footer">
+                            <a href="{% url 'manager_partners' %}" class="btn btn-flat btn-default pull-left"><i class="fa fa-arrow-left"></i> Back</a>
+                            <button type="button" data-toggle="modal" data-target="#upload-image" class="btn btn-flat btn-secondary">
+                                <i class="fa fa-camera"></i> Change Logo
+                            </button>
+                            <button type="button" data-toggle="modal" data-target="#confirm" class="btn btn-flat btn-danger">
+                                <i class="fa fa-trash"></i> Delete
+                            </button>
+                            <button type="submit" class="btn btn-flat btn-primary" name="update_product">
+                                <i class="fa fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+          </div>
+        </section>
+        <!-- /.content -->
+
+        <!-- Modal -->
+        <div class="modal fade" id="upload-image" tabindex="-1" role="dialog" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+              <div class="box box-default">
+                  <form action="" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h4 class="modal-title" id="exampleModalLabel">
+                                <i class="fa fa-building-o"></i> UPDATE PARTNER
+                              </h4>
+                          </div>
+                          <div class="modal-body">
+                              <div class="form-group">
+                                  <label for="logoFile">Logo</label>
+                                  <!-- select -->
+                                  <div class="input-group">
+                                      <div class="input-group-addon">
+                                          <i class="fa fa-image"></i>
+                                      </div>
+                                      <input type="file" class="form-control" id="logoFile" name="logoFile" accept=".PNG,.JPG,.JPEG" required>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-flat btn-default pull-left" data-dismiss="modal">Close</button>
+                              <button type="submit" name="update_logo" class="btn btn-primary"><i class="fa fa-save"></i> Save Changes</button>
+                          </div>
+                      </div>
+                  </form>
+              </div>
+          </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="confirm" tabindex="-1" role="dialog" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                  <div class="box box-info">
+                      <form action="" method="post">
+                        {% csrf_token %}
+                          <div class="modal-header">
+                              <h4 class="modal-title" id="exampleModalLabel">
+                                  <i class="fa fa-trash"></i> DELETE PARTNER
+                              </h4>
+                          </div>
+                          <div class="modal-body">
+                              <h4 align="center">
+                                Are you sure you want to delete <br> 
+                                Partner "{{partner.name}}"
+                              </h4>
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-flat btn-default pull-left" data-dismiss="modal">Close</button>
+                              <button type="submit" name="delete_partner" class="btn btn-danger">
+                                Yes, Delete
+                              </button>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+          </div>
+        </div>
+
+
+      </div>
+      <!-- /.content-wrapper -->
+
+      {% include 'main/manager/footer.html' %}
+    </div>
+    {% endblock %}
+  </body>
+</html>

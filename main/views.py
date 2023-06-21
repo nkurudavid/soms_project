@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model, authenticate, login, logout, update_session_auth_hash
 
 from account.models import Trainer, Trainee
-from .models import Assignment, AssignmentReport, Group, Feedback, Stack, Cohort, Module
+from .models import Assignment, AssignmentReport, Group, Feedback, Stack, Cohort, Module, Company
 from recruitment.models import Application
 
 import matplotlib.pyplot as plt
@@ -294,6 +294,128 @@ def ManagerDashboard_team(request):
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(ManagerLogin)
+
+
+
+@login_required(login_url='manager_login')
+def ManagerDashboard_partner(request):
+    if request.user.is_authenticated and request.user.is_manager==True:
+        if 'submit' in request.POST:
+            # Retrieve the form data from the request
+            company_name = request.POST.get('company_name')
+            locationAddress = request.POST.get('locationAddress')
+            logoFile = request.FILES.get('logoFile')
+
+            if company_name and locationAddress and logoFile:
+                if Company.objects.filter(name=company_name):
+                    messages.warning(request, "Company name already assigned.")
+                    return redirect(ManagerDashboard_partner)
+                else:
+                    # add new company
+                    newCompany = Company(
+                        name=company_name,
+                        location=locationAddress,
+                        logoFile=logoFile
+                    )
+                    newCompany.save()
+                    messages.success(request, "Partner "+company_name+", created successfully.")
+                    return redirect(ManagerDashboard_partner)
+            else:
+                messages.error(request, ('All fields are required.'))
+                return redirect(ManagerDashboard_partner)
+        else:
+            # getting cohorts
+            CohortData = Cohort.objects.filter()
+            # getting companies
+            PartnerData = Company.objects.filter()
+
+            context = {
+                'title': 'Manager - Partner',
+                'partners': PartnerData,
+                'partner_active': 'active',
+                'cohorts': CohortData,
+            }
+            return render(request, 'main/manager/partners.html', context)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(ManagerLogin)
+
+
+@login_required(login_url='manager_login')
+def ManagerDashboard_partnerEdit(request, pk):
+    if request.user.is_authenticated and request.user.is_manager==True:
+        partner_id = pk
+        if Company.objects.filter(id=partner_id).exists():
+            # getting partner
+            foundData = Company.objects.get(id=partner_id)
+            if 'update_product' in request.POST:
+                # Retrieve the form data from the request
+                company_name = request.POST.get('company_name')
+                locationAddress = request.POST.get('locationAddress')
+
+                if company_name and locationAddress:
+                    if Company.objects.filter(name=company_name).exclude(id=foundData.id):
+                        messages.warning(request, "Company name already assigned.")
+                        return redirect(ManagerDashboard_partnerEdit, pk)
+                    else:
+                        # Update partner
+                        updateCompany = Company.objects.filter(id=partner_id).update(
+                            name=company_name,
+                            location = locationAddress,
+                        )
+                        if updateCompany:
+                            messages.success(request, "Partner "+company_name+", Updated successfully.")
+                            return redirect(ManagerDashboard_partnerEdit, pk)
+                        else:
+                            messages.error(request, ('Process Failed.'))
+                            return redirect(ManagerDashboard_partnerEdit, pk)
+                else:
+                    messages.error(request, ('All fields are required.'))
+                    return redirect(ManagerDashboard_partnerEdit, pk)
+
+            if 'update_logo' in request.POST:
+                # Retrieve the form data from the request
+                logoFile = request.FILES.get('logoFile')
+
+                if logoFile:
+                    if len(foundData.logoFile) != 0:
+                        foundData.logoFile.delete()
+
+                    # Update partner
+                    foundData.logoFile = logoFile
+                    foundData.save()
+
+                    messages.success(request, "Partner Updated successfully.")
+                    return redirect(ManagerDashboard_partnerEdit, pk)
+                else:
+                    messages.error(request, ('Company Logo is required.'))
+                    return redirect(ManagerDashboard_partnerEdit, pk)
+
+            elif 'delete_partner' in request.POST:
+                # Delete Partner
+                if len(foundData.logoFile) != 0:
+                    foundData.logoFile.delete()
+                foundData.delete()
+                messages.success(request, "Partner deleted successfully.")
+                return redirect(ManagerDashboard_partner)
+
+            else:
+                # getting cohorts
+                CohortData = Cohort.objects.filter()
+                context = {
+                    'title': 'Manager - Partner',
+                    'partner': foundData,
+                    'partner_active': 'active',
+                    'cohorts': CohortData,
+                }
+                return render(request, 'main/manager/partnerEdit.html', context)
+        else:
+            messages.error(request, ('Partner not found'))
+            return redirect(ManagerDashboard_partner)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(ManagerLogin)
+
 
 
 @login_required(login_url='manager_login')
