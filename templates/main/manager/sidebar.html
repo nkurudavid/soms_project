@@ -33,8 +33,8 @@
           <span>Companies</span>
         </a>
       </li>
-      <li class="header">OUTSOURCED</li>
-      <li class="treeview {{dash_active}}">
+      <li class="header">TALENTS</li>
+      <li class="treeview {{talent_active}}">
         <a href="#">
           <i class="fa fa-group"></i>
           <span>Talents</span>
@@ -43,13 +43,15 @@
           </span>
         </a>
         <ul class="treeview-menu">
-          <li class="{{dash_active}}">
-            <a href="#"><i class="fa fa-circle-o text-aqua"></i> Outsourced</a>
+          <li class="{{talentA_active}}">
+            <a href="{% url 'manager_outsourcedList' %}">
+              <i class="fa fa-circle-o text-aqua"></i> Outsourced
+            </a>
           </li>
-          <li class="{{dash_active}}">
-            <a href="#"
-              ><i class="fa fa-circle-o text-aqua"></i> Reserved Talents</a
-            >
+          <li class="{{talentB_active}}">
+            <a href="{% url 'manager_reservedList' %}">
+              <i class="fa fa-circle-o text-aqua"></i> Reserved Talents
+            </a>
           </li>
         </ul>
       </li>

@@ -24,13 +24,13 @@
         <section class="content-header">
           <h1>
             <i class="fa fa-group"></i>
-            Our Team
+            Outsourced Talents
           </h1>
           <ol class="breadcrumb">
             <li>
               <a href="{% url 'manager_dashboard' %}"><i class="fa fa-dashboard"></i> Home</a>
             </li>
-            <li class="active">Team</li>
+            <li class="active">Outsourced</li>
           </ol>
         </section>
 
@@ -40,16 +40,7 @@
             <div class="col-xs-12">
               <div class="box box-info">
                 <div class="box-header">
-                  <h3 class="box-title">All Trainers ({{team_total}})</h3>
-                  <button
-                    type="button"
-                    class="btn btn-flat btn-primary pull-right"
-                    data-toggle="modal"
-                    data-target="#modal-default"
-                  >
-                    <i class="fa fa-plus"></i>
-                    New Trainer
-                  </button>
+                  <h3 class="box-title">All Talents ({{talents.count}})</h3>
                 </div>
                 <!-- /.box-header -->
                 <div class="box-body">
@@ -60,44 +51,68 @@
                     <thead>
                       <tr>
                         <th>No.</th>
-                        <th>IMAGE</th>
-                        <th>FULL NAMES</th>
-                        <th>SSN</th>
-                        <th>CONTACT</th>
+                        <th colspan="2">TALENT</th>
+                        <th>COHORT</th>
                         <th>STACK</th>
+                        <th>DEPLOYMENT</th>
                         <th></th>
                       </tr>
                     </thead>
                     <tbody>
-                      {% if team %} {% for trainer in team %}
+                      {% if talents %} {% for talent in talents %}
                       <tr>
                         <td>{{ forloop.counter }}.</td>
                         <td>
+                          {% if talent.profilePicture %}
                           <img
                             class="profile-user-img img-responsive img-circle"
-                            src="{{trainer.profilePicture.url}}"
+                            src="{{talent.profilePicture.url}}"
                             width="120px"
-                            alt="{{trainer.user.first_name}} image"
+                            alt="{{talent.user.first_name}} image"
                           />
+                          {% else %}
+                          <img
+                            class="profile-user-img img-responsive img-circle"
+                            src="{% static 'images/anonymous.png' %}"
+                            width="90px"
+                            alt="{{talent.user.first_name}} image"
+                          />
+                          {% endif %}
                         </td>
-                        <td>{{trainer.user}}</td>
-                        <td>{{trainer.ssn}}</td>
                         <td>
-                          Email: {{trainer.user.email}}<br />
-                          Phome: {{trainer.phone1}}, {{trainer.phone2}}<br />
+                          {{talent.user.first_name}} {{talent.user.last_name}}<br />
+                          Email: {{talent.user.email}}<br />
+                          Phome: {{talent.phone1}}
                         </td>
-                        <td>{{trainer.stack}}</td>
+                        <td>{{talent.cohort.cohort_name}}</td>
+                        <td>{{talent.stack.name}}</td>
+                        <td>
+                          <img
+                            class=""
+                            src="{{talent.companyDeployed.logoFile.url}}"
+                            width="120px"
+                            alt="{{talent.companyDeployed.name}} image"
+                          />
+                          {{talent.companyDeployed.name}}
+                        </td>
                         <td>
                           <div class="pull-right">
                             <a
-                              href="{% url 'manager_trainerEdit' trainer.id %}"
+                              href="{% url 'manager_talentsProfile' current_cohort.id talent.id %}"
                               class="btn btn-flat btn-info"
                               ><i class="fa fa-eye"></i> View</a
                             >
                           </div>
                         </td>
                       </tr>
-                      {% endfor %} {% endif %}
+                      {% endfor %}
+                      {% else %}
+                      <tr>
+                        <td colspan="7">
+                          <p>There are no data here.</p>
+                        </td>
+                      </tr>
+                      {% endif %}
                     </tbody>
                   </table>
                 </div>
@@ -107,28 +122,6 @@
             </div>
             <!-- /.col -->
           </div>
-
-          <div class="modal fade" id="modal-default">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <button
-                    type="button"
-                    class="close"
-                    data-dismiss="modal"
-                    aria-label="Close"
-                  >
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                  <h4 class="modal-title">
-                    <i class="fa fa-user-plus"></i> REGISTER NEW TRAINER
-                  </h4>
-                </div>
-                {% include 'main/manager/trainer_model_form.html' %}
-              </div>
-            </div>
-          </div>
-          <!-- /.modal -->
         </section>
         <!-- /.content -->
       </div>

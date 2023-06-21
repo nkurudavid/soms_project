@@ -137,13 +137,15 @@ def ManagerDashboard(request):
                 'stack_counts': stack_counts
             })
 
-
+        # getting all reserved talents
+        reservedTalentsData=Trainee.objects.filter(companyDeployed__isnull=True, status="Awarded").order_by('cohort','stack')
         # getting stacks
         StacksData = Stack.objects.filter()
         # getting trainers
         TrainersData = Trainer.objects.filter()
         # getting new applicants
         current_cohort = Cohort.objects.latest('starting_date')
+        # getting new applicants
         NewApplicantsData = Application.objects.filter(cohort=current_cohort.id, status=False)
         # getting cohort
         CohortData = Cohort.objects.filter()
@@ -155,6 +157,7 @@ def ManagerDashboard(request):
             'trainer_total': TrainersData.count(),
             'applicant_total': NewApplicantsData.count(),
             'team': TrainersData,
+            'reservedTalents': reservedTalentsData,
             'data': data
         }
         return render(request, 'main/manager/dashboard.html', context)
@@ -940,6 +943,83 @@ def ManagerDashboard_traineeProfile(request, pk, n):
         else:
             messages.error(request, ('Cohort not found'))
             return redirect(ManagerDashboard)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(ManagerLogin)
+
+
+
+@login_required(login_url='manager_login')
+def ManagerDashboard_outsourcedList(request):
+    if request.user.is_authenticated and request.user.is_manager==True:
+        # getting all trainees from cohort
+        traineesData=Trainee.objects.filter(companyDeployed__isnull=False).order_by('cohort','stack')
+        # getting cohort
+        CohortData = Cohort.objects.filter()
+        context = {
+            'title': 'Manager - Outsourced Talents',
+            'talent_active': 'active',
+            'talentA_active': 'active',
+            'cohorts': CohortData,
+            'talents': traineesData,
+        }
+        return render(request, 'main/manager/outsourced_list.html', context)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(ManagerLogin)
+
+
+
+@login_required(login_url='manager_login')
+def ManagerDashboard_reservedList(request):
+    if request.user.is_authenticated and request.user.is_manager==True:
+        # getting all trainees from cohort
+        traineesData=Trainee.objects.filter(companyDeployed__isnull=True, status="Awarded").order_by('cohort','stack')
+        # getting cohort
+        CohortData = Cohort.objects.filter()
+        context = {
+            'title': 'Manager - Reserved Talents',
+            'talent_active': 'active',
+            'talentB_active': 'active',
+            'cohorts': CohortData,
+            'talents': traineesData,
+        }
+        return render(request, 'main/manager/talents_list.html', context)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(ManagerLogin)
+
+
+
+@login_required(login_url='manager_login')
+def ManagerDashboard_talentProfile(request, pk):
+    if request.user.is_authenticated and request.user.is_manager==True:
+        talent_id = pk
+        if Trainee.objects.filter(id=talent_id, status="Awarded").exists():
+            # get trainee
+            trainee = Trainee.objects.get(id=talent_id, status="Awarded")
+            if 'dismiss' in request.POST:
+                if trainee.cv_document:
+                    if len(trainee.cv_document )  > 0:
+                        trainee.cv_document.delete()
+                # Delete Trainee
+                get_user_model().objects.filter(id=trainee.user.id).delete()
+                Application.objects.filter(email=trainee.user.email).delete()
+                messages.success(request, "Trainee dismissed successfully.")
+                return redirect(ManagerDashboard_talentProfile, pk)
+            else:
+                # getting cohort
+                CohortData = Cohort.objects.filter()
+                context = {
+                    'title': 'Manager - Talent Profile',
+                    'talent_active': 'active',
+                    'cohorts': CohortData,
+                    'talent': trainee,
+                }
+                return render(request, 'main/manager/trainees_profile.html', context)
+        else:
+            messages.error(request, ('Talent Profile not found'))
+            return redirect(ManagerDashboard_reservedList)
     else:
         messages.warning(request, ('You have to login to view the page!'))
         return redirect(ManagerLogin)

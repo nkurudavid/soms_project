@@ -66,7 +66,6 @@ class Trainer(models.Model):
 
 class Trainee(models.Model):
     class Status(models.TextChoices):
-        SELECT = "", "Select Status"
         PENDING = "Pending", "Pending"
         AWARDED = "Awarded", "Awarded"
 
@@ -90,7 +89,7 @@ class Trainee(models.Model):
         blank=True, null=True
     )
     locationAddress = models.CharField(verbose_name="Address", max_length=200)
-    status = models.CharField(verbose_name="Status", choices=Status.choices, default=Status.SELECT, max_length=10)
+    status = models.CharField(verbose_name="Status", choices=Status.choices, default=Status.PENDING, max_length=10)
     companyDeployed = models.ForeignKey(Company, verbose_name="Company Deployed", related_name="trainees", on_delete=models.SET_DEFAULT, default=None, blank=True, null=True)
     deployedDate = models.DateField(verbose_name="When Deployed", blank=True, null=True)
 

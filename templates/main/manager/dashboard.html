@@ -29,7 +29,7 @@
           </h1>
           <ol class="breadcrumb">
             <li>
-              <a href="#"><i class="fa fa-dashboard"></i> Home</a>
+              <a href="{% url 'manager_dashboard' %}"><i class="fa fa-dashboard"></i> Home</a>
             </li>
             <li class="active">Dashboard</li>
           </ol>
@@ -50,9 +50,9 @@
                 <div class="icon">
                   <i class="fa fa-users"></i>
                 </div>
-                <a href="#" class="small-box-footer"
-                  >More info <i class="fa fa-arrow-circle-right"></i
-                ></a>
+                <a href="#" class="small-box-footer">
+                  More info <i class="fa fa-arrow-circle-right"></i>
+                </a>
               </div>
             </div>
             <!-- ./col -->
@@ -62,14 +62,14 @@
                 <div class="inner">
                   <h3>{{ stack_total }}</h3>
 
-                  <p>Stacks</p>
+                  <p>All Stacks</p>
                 </div>
                 <div class="icon">
                   <i class="fa fa-sitemap"></i>
                 </div>
-                <a href="{% url 'manager_stacks' %}" class="small-box-footer"
-                  >More info <i class="fa fa-arrow-circle-right"></i
-                ></a>
+                <a href="{% url 'manager_stacks' %}" class="small-box-footer">
+                  More info <i class="fa fa-arrow-circle-right"></i>
+                </a>
               </div>
             </div>
             <!-- ./col -->
@@ -79,14 +79,14 @@
                 <div class="inner">
                   <h3>{{ trainer_total }}</h3>
 
-                  <p>Trainers</p>
+                  <p>All Trainers</p>
                 </div>
                 <div class="icon">
                   <i class="fa fa-group"></i>
                 </div>
-                <a href="{% url 'manager_team' %}" class="small-box-footer"
-                  >More info <i class="fa fa-arrow-circle-right"></i
-                ></a>
+                <a href="{% url 'manager_team' %}" class="small-box-footer">
+                  More info <i class="fa fa-arrow-circle-right"></i>
+                </a>
               </div>
             </div>
             <!-- ./col -->
@@ -94,16 +94,16 @@
               <!-- small box -->
               <div class="small-box bg-aqua">
                 <div class="inner">
-                  <h3>465</h3>
+                  <h3>{{reservedTalents.count}}</h3>
 
                   <p>Reserved Talents</p>
                 </div>
                 <div class="icon">
                   <i class="fa fa-group"></i>
                 </div>
-                <a href="#" class="small-box-footer"
-                  >More info <i class="fa fa-arrow-circle-right"></i
-                ></a>
+                <a href="{% url 'manager_reservedList' %}" class="small-box-footer">
+                  More info <i class="fa fa-arrow-circle-right"></i>
+                </a>
               </div>
             </div>
             <!-- ./col -->
@@ -125,7 +125,7 @@
               <!--/.box -->
             </div>
           {% if team %}
-            <div class="col-md-6">
+            <div class="col-md-12">
               <div class="box box-info">
                 <div class="box-header with-border">
                   <h3 class="box-title">

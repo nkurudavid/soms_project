@@ -23,19 +23,19 @@
         <!-- Content Header (Page header) -->
         <section class="content-header">
           <h1>
-            <i class="fa fa-file"></i>
-            Application Details
+            <i class="fa fa-user"></i>
+            Talent Profile
           </h1>
           <ol class="breadcrumb">
             <li>
               <a href="{% url 'manager_dashboard' %}"><i class="fa fa-dashboard"></i> Home</a>
             </li>
             <li>
-              <a href="{% url 'manager_applicantsList' current_cohort.id %}"
-                ><i class="fa fa-copy"></i> Applicants List</a
+              <a href="{% url 'manager_traineesList' %}"
+                ><i class="fa fa-group"></i> Talents List</a
               >
             </li>
-            <li class="active">Application Details</li>
+            <li class="active">Talent Profile</li>
           </ol>
         </section>
 
@@ -46,13 +46,12 @@
               <div class="nav-tabs-custom">
                 <ul class="nav nav-tabs">
                   <li class="active">
-                    <a href="#profile" class="text-uppercase" data-toggle="tab"
-                      >APPLICANT FOR
-                      <strong> {{applicant.cohort.cohort_name}} </strong>
+                    <a href="#profile" class="text-uppercase" data-toggle="tab">
+                      {{talent.user.first_name}} {{talent.user.last_name}}
+                      PROFILE
                     </a>
                   </li>
                   <li class="pull-right">
-                    {% if applicant.status == False %}
                     <button
                       type="button"
                       class="btn btn-flat btn-primary pull-right"
@@ -61,16 +60,39 @@
                     >
                       <i class="fa fa-cogs"></i> Action
                     </button>
-                    {% endif %}
                   </li>
                 </ul>
                 <div class="tab-content">
                   <div class="active tab-pane" id="profile">
-                    <div class="box-header with-border">
-                      <h5 class="box-title text-primary text-bold">
-                        {{applicant.first_name}} {{applicant.last_name}}
-                      </h5>
-                      <p>Date <span> {{applicant.createdDate}} </span></p>
+                    <div class="box-body box-profile">
+                      {% if talent.profilePicture %}
+                      <img
+                        class="profile-user-img img-responsive img-circle"
+                        src="{{talent.profilePicture.url}}"
+                        style="width: 200px !important"
+                        alt="{{talent.user.first_name}} image"
+                      />
+                      {% else %}
+                      <img
+                        class="profile-user-img img-responsive img-circle"
+                        src="{% static 'images/anonymous.png' %}"
+                        style="width: 200px !important"
+                        alt="{{talent.user.first_name}} image"
+                      />
+                      {% endif %}
+
+                      <h3 class="profile-username text-center">
+                        {{talent.user.first_name}} {{talent.user.last_name}}
+                      </h3>
+
+                      <h3 class="text-bold text-muted text-center">Trainer</h3>
+                      <p class="text-muted text-center">
+                        <sup><i class="fa fa-quote-left"></i></sup>
+                        <span class="h4 text-bold">
+                          {{talent.stack.name}}
+                        </span>
+                        <sup><i class="fa fa-quote-right"></i></sup>
+                      </p>
                     </div>
                     <!-- /.box-header -->
                     <div class="box-body">
@@ -78,20 +100,21 @@
                         <div class="col-lg-6">
                           <strong> <i class="fa fa-user"></i> Names: </strong>
                           <p class="text-muted">
-                            {{applicant.first_name}} {{applicant.last_name}}
+                            {{talent.user.first_name}}
+                            {{talent.user.last_name}}
                           </p>
                           <hr />
 
                           <strong>
                             <i class="fa fa-envelope"></i> Email:
                           </strong>
-                          <p class="text-muted">{{applicant.email}}</p>
+                          <p class="text-muted">{{talent.user.email}}</p>
                           <hr />
 
                           <strong>
                             <i class="fa fa-phone"></i> Contact Phone:
                           </strong>
-                          <p class="text-muted">{{applicant.phone1}}</p>
+                          <p class="text-muted">{{talent.phone1}}</p>
                           <hr />
 
                           <strong>
@@ -99,37 +122,28 @@
                             <i class="fa fa-female"></i>
                             Gender:
                           </strong>
-                          <p class="text-muted">{{applicant.gender}}</p>
+                          <p class="text-muted">{{talent.user.gender}}</p>
                           <hr />
 
                           <strong>
                             <i class="fa fa-map-marker"></i> Location:
                           </strong>
-                          <p class="text-muted">
-                            {{applicant.locationAddress}}
-                          </p>
+                          <p class="text-muted">{{talent.locationAddress}}</p>
                           <hr />
                         </div>
                         <div class="col-lg-6">
                           <strong>
                             <i class="fa fa-sitemap"></i> Stack:
                           </strong>
-                          <p class="text-muted">{{applicant.stack.name}}</p>
-                          <hr />
-
-                          <strong>
-                            <i class="fa fa-graduation-cap"></i> Education
-                            Level:
-                          </strong>
-                          <p class="text-muted">{{applicant.educationLevel}}</p>
+                          <p class="text-muted">{{talent.stack.name}}</p>
                           <hr />
 
                           <strong>
                             <i class="fa fa-github"></i> Git Account Link:
                           </strong>
                           <p class="text-muted">
-                            <a href="{{applicant.githubLink}}" target="_blank">
-                              {{applicant.githubLink}}
+                            <a href="{{talent.git_account}}" target="_blank">
+                              {{talent.git_account}}
                             </a>
                           </p>
                           <hr />
@@ -138,27 +152,21 @@
                             <i class="fa fa-file"></i> Attached CV Document:
                           </strong>
                           <p class="text-muted">
-                            {{applicant.cv_file}}
+                            {% if talent.cv_document %} {{talent.cv_document}}
                             <br />
                             <br />
                             <a
-                              href="{{applicant.cv_file.url}}"
+                              href="{{talent.cv_document.url}}"
                               target="_blank"
                               class="btn btn-primary btn-sm"
                             >
                               <i class="fa fa-download"></i>
                               Download
                             </a>
+                            {% else %} No CV {% endif %}
                           </p>
                         </div>
                         <hr />
-                        {% if applicant.more %}
-                        <div class="col-lg-12">
-                          <hr />
-                          <strong>More Information ...</strong>
-                          <p>{{applicant.more}}</p>
-                        </div>
-                        {% endif %}
                       </div>
                     </div>
                     <!-- /.box-body -->
@@ -186,19 +194,13 @@
                   <span aria-hidden="true">&times;</span>
                 </button>
                 <h4 class="modal-title">
-                  <i class="fa fa-cogs"></i> DECIDE ON ACTIONS FOR APPLICANT
+                  <i class="fa fa-cogs"></i> DEPLOYMENT FOR TALENT
                 </h4>
               </div>
               <form action="" method="post">
                 {% csrf_token %}
                 <div class="modal-body">
-                  <p class="text-center h4">
-                    To Approve the Applicant, click "
-                    <span class="text-green">Approved Button</span> " <br />
-                    <br />
-                    To Reject the Applicant, click "
-                    <span class="text-red">Reject Button</span> " <br />
-                  </p>
+                  <p class="text-center">Select the partner from a list to deploy.</p>
                 </div>
                 <div class="modal-footer">
                   <button
@@ -209,75 +211,19 @@
                     Close
                   </button>
                   <button
-                    type="button"
-                    class="btn btn-flat btn-danger"
-                    data-toggle="modal"
-                    data-target="#delete_modal"
-                  >
-                    <i class="fa fa-trash"></i>
-                    Rejected
-                  </button>
-                  <button
                     type="submit"
-                    name="approved"
-                    class="btn btn-flat btn-success"
+                    class="btn btn-flat btn-primary"
+                    name="deploy_talent"
                   >
-                    <i class="fa fa-check-circle"></i>
-                    Approved
+                    <i class="fa fa-check"></i>
+                    Deploy
                   </button>
                 </div>
               </form>
             </div>
           </div>
         </div>
-        <!-- /.modal -->
 
-        <!-- Modal -->
-        <div class="modal fade" id="delete_modal">
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-              <div class="modal-header">
-                <button
-                  type="button"
-                  class="close"
-                  data-dismiss="modal"
-                  aria-label="Close"
-                >
-                  <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title">
-                  <i class="fa fa-trash"></i> REJECT APPLICATION
-                </h4>
-              </div>
-              <form action="" method="post">
-                {% csrf_token %}
-                <div class="modal-body">
-                  <p class="text-center h4">
-                    Are you sure want to Reject <br />
-                    Application for: "{{applicant.first_name}}
-                    {{applicant.last_name}}" ?
-                  </p>
-                </div>
-                <div class="modal-footer">
-                  <button
-                    type="button"
-                    class="btn btn-flat btn-default pull-left"
-                    data-dismiss="modal"
-                  >
-                    Close
-                  </button>
-                  <button
-                    type="submit"
-                    name="rejected"
-                    class="btn btn-flat btn-danger"
-                  >
-                    Yes, Delete
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
       </div>
       <!-- /.content-wrapper -->
 
