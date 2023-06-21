@@ -38,7 +38,7 @@
         <!-- Main content -->
         <section class="content">
           <div class="row">
-            <div class="col-xs-12">
+            <div class="col-lg-8">
               <div class="box box-info">
                 <div class="box-header">
                   <h3 class="box-title">All Trainees ({{trainees_total}})</h3>
@@ -107,9 +107,124 @@
               <!-- /.box -->
             </div>
             <!-- /.col -->
+            <div class="col-lg-4">
+              <div class="box box-info">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Groups</h3>
+                  {% if not current_cohort.status %}
+                  <div class="box-tools pull-right">
+                    <button
+                      type="button"
+                      class="btn btn-flat btn-sm btn-primary pull-right"
+                      data-toggle="modal"
+                      data-target="#groupModel"
+                    >
+                      <i class="fa fa-plus"></i>
+                      New
+                    </button>
+                  </div>
+                  {% endif %}
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  {% if groups %}
+                  <ul class="list-group list-group-flush">
+                    {% for group in groups %}
+                    <li class="list-group-item">
+                      <div class="card-header">
+                        <h5 class="mb-2">
+                          <a class="text-bold" href="{% url 'trainer_traineeGroup' current_cohort.id group.id %}">
+                            {{group.group_name}}
+                          </a>
+                          <a class="collapsed text-bold" href="#" data-toggle="collapse" data-target="#data{{group.id}}" aria-expanded="true">
+                            <span class="badge bg-blue pull-right badge-pill"> Members {{group.trainee_count}}</span>
+                          </a>
+                        </h5>
+                      </div>
+                      <div id="data{{group.id}}" class="collapse">
+                        <ul class="list-group list-group-flush">
+                          {% for member in group.trainees.all %}
+                          <li class="list-group-item d-flex justify-content-between align-items-center">
+                              {% if member.profilePicture %}
+                              <img src="{{member.profilePicture}}" width="30px" alt="{{member.user.first_name}}" />
+                              {% else %}
+                              <img src="{% static 'images/anonymous.png' %}" width="30px" alt="{{member.user.first_name}}" />
+                              {% endif %}
+                              <a href="{% url 'trainer_traineeProfile' current_cohort.id member.id %}" class="product-titles">
+                                {{member.user}}
+                              </a>
+                          </li>
+                          {% endfor%}
+                        </ul>
+                      </div>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+                </div>
+                <!-- /.box-body -->
+              </div>
+              <!-- /.box -->
+            </div>
           </div>
         </section>
         <!-- /.content -->
+
+
+          <div class="modal fade" id="groupModel">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button
+                    type="button"
+                    class="close"
+                    data-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                  <h4 class="modal-title">
+                    <i class="fa fa-group"></i> ADD NEW GROUP
+                  </h4>
+                </div>
+                <form method="post">
+                  {% csrf_token %}
+                  <div class="modal-body">
+                    <div class="form-group mb-0">
+                      <label class="col-form-label">Name</label>
+                      <input
+                        type="text"
+                        class="form-control form-control-uppercase"
+                        name="name"
+                        placeholder="Group Name"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button
+                      type="button"
+                      class="btn btn-flat btn-default pull-left"
+                      data-dismiss="modal"
+                    >
+                      Close
+                    </button>
+                    <button
+                      type="submit"
+                      name="submit"
+                      class="btn btn-flat btn-primary"
+                    >
+                      <i class="fa fa-save"></i>
+                      Submit
+                    </button>
+                  </div>
+                </form>
+              </div>
+              <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+          </div>
+          <!-- /.modal -->
       </div>
       <!-- /.content-wrapper -->
 

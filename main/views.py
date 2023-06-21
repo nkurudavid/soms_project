@@ -933,19 +933,133 @@ def TrainerDashboard_traineeList(request, pk):
         if Cohort.objects.filter(id=cohort_id).exists():
             # if exists
             current_cohort = Cohort.objects.get(id=cohort_id)
-            # getting all trainees from cohort
-            traineesData=Trainee.objects.filter(cohort=pk, stack=request.user.trainers.stack)
-            # getting cohort
-            CohortData = Cohort.objects.filter()
-            context = {
-                'title': 'Trainer - Trainees List',
-                'trainees_active': 'active',
-                'current_cohort': current_cohort,
-                'cohorts': CohortData,
-                'trainees': traineesData,
-                'trainees_total': traineesData.count
-            }
-            return render(request, 'main/trainer/trainees_list.html', context)
+            if request.POST:
+                group_name = request.POST.get("name")
+                if group_name:
+                    # check existing module
+                    if Group.objects.filter(cohort=current_cohort, stack=request.user.trainers.stack, group_name=group_name):
+                        messages.warning(request, group_name+" already exist.")
+                        return redirect(TrainerDashboard_traineeList, pk)
+                    else:
+                        # add new stack
+                        newGroup = Group(
+                            cohort=current_cohort,
+                            stack=request.user.trainers.stack,
+                            group_name=group_name
+                        )
+                        newGroup.save()
+
+                        messages.success(request, "New Group created successfully.")
+                        return redirect(TrainerDashboard_traineeList, pk)
+                else:
+                    messages.error(request, "Error , Group required!")
+                    return redirect(TrainerDashboard_traineeList, pk)
+            else:
+                # getting all trainees from cohort
+                traineesData=Trainee.objects.filter(cohort=pk, stack=request.user.trainers.stack)
+                # getting group
+                groupData = Group.objects.filter(cohort=pk, stack=request.user.trainers.stack).annotate(trainee_count=Count('trainees'))
+                # getting cohort
+                CohortData = Cohort.objects.filter()
+                context = {
+                    'title': 'Trainer - Trainees List',
+                    'trainees_active': 'active',
+                    'current_cohort': current_cohort,
+                    'cohorts': CohortData,
+                    'groups': groupData,
+                    'trainees': traineesData,
+                    'trainees_total': traineesData.count
+                }
+                return render(request, 'main/trainer/trainees_list.html', context)
+        else:
+            messages.error(request, ('Cohort not found'))
+            return redirect(TrainerDashboard)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(TrainerLogin)
+
+
+
+
+@login_required(login_url='trainer_login')
+def TrainerDashboard_groupEdit(request, pk, g):
+    if request.user.is_authenticated and request.user.is_trainer==True:
+        cohort_id = pk
+        group_id = g
+        # getting cohort
+        if Cohort.objects.filter(id=cohort_id).exists():
+            # if exists
+            current_cohort = Cohort.objects.get(id=cohort_id)
+            # getting group
+            if Group.objects.filter(id=group_id).exists():
+                # if exists
+                selectedGroup = Group.objects.get(id=group_id, stack=request.user.trainers.stack)
+                if 'update_group' in request.POST:
+                    group_name = request.POST.get("name")
+                    if group_name:
+                        # check existing module
+                        if Group.objects.filter(cohort=current_cohort, stack=request.user.trainers.stack, group_name=group_name).exclude(id=group_id):
+                            messages.warning(request, group_name+" already exist.")
+                            return redirect(TrainerDashboard_groupEdit, pk, g)
+                        else:
+                            # Update Group
+                            updateModule = Group.objects.filter(id=group_id, cohort=current_cohort, stack=request.user.trainers.stack).update(
+                                group_name=group_name
+                            )
+                            if updateModule:
+                                messages.success(request, "Group updated successfully.")
+                                return redirect(TrainerDashboard_groupEdit, pk, g)
+                            else:
+                                messages.error(request, ('Process Failed.'))
+                                return redirect(TrainerDashboard_groupEdit, pk, g)
+                    else:
+                        messages.error(request, "Error , Group required!")
+                        return redirect(TrainerDashboard_groupEdit, pk, g)
+
+                elif 'delete' in request.POST:
+                    # Delete Group
+                    selectedGroup.delete()
+                    messages.success(request, "Group deleted successfully.")
+                    return redirect(TrainerDashboard_traineeList, pk)
+
+                elif 'submitMembers' in request.POST:
+                    trainee_ids = request.POST.getlist('trainees')
+
+                    for trainee_id in trainee_ids:
+                        trainee = Trainee.objects.get(id=trainee_id, cohort=pk, stack=request.user.trainers.stack)
+                        trainee.group = selectedGroup
+                        trainee.save()
+
+                    messages.success(request, "Group members added successfully.")
+                    return redirect(TrainerDashboard_groupEdit, pk, g)
+
+                elif 'remove_member' in request.POST:
+                    member_id = request.POST.get("member")
+                    trainee = Trainee.objects.get(id=member_id, cohort=pk, stack=request.user.trainers.stack)
+                    if trainee.group == selectedGroup:
+                        trainee.group = None
+                        trainee.save()
+                    messages.success(request, "Member removed successfully.")
+                    return redirect(TrainerDashboard_groupEdit, pk, g)
+
+                else:
+                    # getting all trainees from cohort whose group is null
+                    traineesData=Trainee.objects.filter(cohort=pk, stack=request.user.trainers.stack, group__isnull=True)
+                    # getting cohort
+                    CohortData = Cohort.objects.filter()
+                    context = {
+                        'title': 'Trainer - Groups',
+                        'trainees_active': 'active',
+                        'current_cohort': current_cohort,
+                        'cohorts': CohortData,
+                        'trainees': traineesData,
+                        'selectedGroup': selectedGroup,
+                        # 'groupMembers': selectedGroup.count
+                    }
+                    return render(request, 'main/trainer/groupEdit.html', context)
+            else:
+                messages.error(request, ('Group not found'))
+                return redirect(TrainerDashboard_traineeList, pk)
         else:
             messages.error(request, ('Cohort not found'))
             return redirect(TrainerDashboard)
