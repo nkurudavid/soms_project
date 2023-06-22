@@ -57,11 +57,12 @@
             </p>
             <p class="mb-3">
               To apply for our coding bootcamp and join the upcoming cohort,
-              click on the "Apply Now" button below. We can't wait to see you
+              fill the application form below. We can't wait to see you
               become a part of our vibrant community of aspiring coders.
             </p>
           </div>
 
+          {% if applicationSchedule and applicationOn %}
           <div class="col-lg-10 m-auto">
             <!-- Single Event -->
             <div class="single-event py-5">
@@ -276,10 +277,47 @@
             </div>
             <!-- End Single Event -->
           </div>
+          {% endif %}
         </div>
       </div>
     </section>
     <!--/ End Events -->
+    <section class="section">
+      <div class="container">
+          <div class="row">
+            <div class="col-lg-8 m-auto">
+              <div class="text-content content-center">
+                {% if applicationSchedule and applicationOn %}
+                <h4>
+                  <i class="fa fa-warning text-warning"></i> Application will close in: <b class="text-info" id="countdown"></b>
+                </h4>
+                <p>
+                  Join us today and embark on a transformative learning journey
+                  that will empower you to thrive in the world of software
+                  development.
+                </p>
+                {% elif applicationSchedule and not applicationOn %}
+                <h4>
+                  <i class="fa fa-warning text-warning"></i> Application will open in: <b class="text-info" id="countdown"></b>
+                </h4>
+                <p>
+                  Join us today and embark on a transformative learning journey
+                  that will empower you to thrive in the world of software
+                  development.
+                </p>
+                {% else %}
+                <h4 class="">
+                  <i class="fa fa-warning text-warning"></i> Application is closed
+                </h4>
+                <p>
+                  If you haven't applied any programming, please wait for the next upcoming cohort and try again.
+                </p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+      </div>
+    </section>
 
     {% if messages %} {% for message in messages %}
     <script>
@@ -289,6 +327,47 @@
     </script>
     {% endfor %} {% endif %}
     <br />
+
+
+    {% if applicationSchedule %}
+
+    <script>
+        // Set the date we're counting down to
+        {% if applicationSchedule and applicationOn %}
+        var countDownDate = new Date("{{applicationSchedule.end_period|date:'Y-m-d H:i:s'}}").getTime();
+        {% else %}
+        var countDownDate = new Date("{{applicationSchedule.start_period|date:'Y-m-d H:i:s'}}").getTime();
+        {% endif%}
+
+        // Update the count down every 1 second
+        var x = setInterval(function() {
+        
+            // Get start date and time
+            var start = new Date().getTime();
+        
+            // Find the distance between start and the count down date
+            var distance = countDownDate - start;
+        
+            // Time calculations for days, hours, minutes and seconds
+            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            // Display the result in the element with id="timer"
+            document.getElementById("countdown").innerHTML = days + "d " + hours + "h "
+            + minutes + "m " + seconds + "s ";
+
+            // If the count down is finished, write some text
+            if (distance < 0) {
+                clearInterval(x);
+                document.getElementById("countdown").innerHTML = "EXPIRED";
+                document.getElementById("countdown").classList.add("text-danger");
+            }
+        }, 1000);
+    </script>
+
+    {% endif %}
 
     {% endblock %}
   </body>

@@ -35,6 +35,8 @@ def HomePage(request):
 
 
 def ApplicationPage(request):
+    # GETTING CURRENT COHORT
+    current_cohort = Cohort.objects.latest('starting_date')
     if request.method == 'POST' :
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
@@ -60,8 +62,6 @@ def ApplicationPage(request):
             else:
                 # GETTING CURRENT STACK
                 selectedStack = Stack.objects.get(id=stack)
-                # GETTING CURRENT COHORT
-                current_cohort = Cohort.objects.latest('starting_date')
                 # SUBMITTING APPLICATION
                 applicationForm = Application(
                     cohort = current_cohort,
@@ -84,9 +84,26 @@ def ApplicationPage(request):
     else:
         # getting stacks
         StacksData = Stack.objects.filter()
+        # getting application schedule
+        if not Cohort_schedule.objects.get(schedule_name="Application", cohort=current_cohort.id):
+            applicationSchedule=None
+        else:
+            schedule = Cohort_schedule.objects.get(schedule_name="Application", cohort=current_cohort.id)
+            if schedule.start_period < timezone.now() and schedule.end_period > timezone.now():
+                applicationSchedule=schedule
+                application_on=True
+            elif schedule.start_period > timezone.now():
+                applicationSchedule=schedule
+                application_on=False
+            else:
+                applicationSchedule=None
+                application_on=False
+
         context = {
             'title': 'Join the BootCamp',
             'courses': StacksData,
+            'applicationSchedule': applicationSchedule,
+            'applicationOn': application_on
         }
         return render(request, 'application.html', context)
 
