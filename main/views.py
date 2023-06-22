@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model, authenticate, login, logout, update_session_auth_hash
 
 from account.models import Trainer, Trainee
-from .models import Assignment, AssignmentReport, Group, Feedback, Stack, Cohort, Module, Company
+from .models import Assignment, AssignmentReport, Group, Feedback, Stack, Cohort, Module, Company, Cohort_schedule
 from recruitment.models import Application
 
 import matplotlib.pyplot as plt
@@ -705,7 +705,7 @@ def ManagerDashboard_cohortEdit(request, pk):
                 if cohort_name and starting_date and ending_date:
                     if Cohort.objects.filter(cohort_name=cohort_name).exclude(id=cohort_id):
                         messages.warning(request, "Cohort name already exist.")
-                        return redirect(ManagerDashboard_cohorts)
+                        return redirect(ManagerDashboard_cohortEdit, pk)
                     else:
                         # Update Cohort
                         updated_cohort =  Cohort.objects.filter(id=cohort_id).update(
@@ -715,13 +715,27 @@ def ManagerDashboard_cohortEdit(request, pk):
                         )
                         if updated_cohort:
                             messages.success(request, "Cohort "+cohort_name+", Updated successfully.")
-                            return redirect(ManagerDashboard_cohorts)
+                            return redirect(ManagerDashboard_cohortEdit, pk)
                         else:
                             messages.error(request, ('Process Failed.'))
-                            return redirect(ManagerDashboard_cohorts)
+                            return redirect(ManagerDashboard_cohortEdit, pk)
                 else:
                     messages.error(request, ('All fields are required.'))
-                    return redirect(ManagerDashboard_cohorts)
+                    return redirect(ManagerDashboard_cohortEdit, pk)
+
+            elif 'is_completed' in request.POST:
+                # Update assignment status
+                updateCohort = Cohort.objects.filter(id=cohort_id).update(
+                    status=True
+                )
+                return redirect(ManagerDashboard_cohortEdit, pk)
+
+            elif 'ongoing' in request.POST:
+                # Update assignment status
+                updateCohort = Cohort.objects.filter(id=cohort_id).update(
+                    status=False
+                )
+                return redirect(ManagerDashboard_cohortEdit, pk)
 
             elif 'delete' in request.POST:
                 # Delete Cohort
@@ -740,6 +754,126 @@ def ManagerDashboard_cohortEdit(request, pk):
                     'cohorts': CohortData,
                 }
                 return render(request, 'main/manager/cohortEdit.html', context)
+        else:
+            messages.error(request, ('Cohort not found'))
+            return redirect(ManagerDashboard_cohorts)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(ManagerLogin)
+
+
+
+@login_required(login_url='manager_login')
+def ManagerDashboard_cohortSchedules(request, pk):
+    if request.user.is_authenticated and request.user.is_manager==True:
+        cohort_id= pk
+        if Cohort.objects.filter(id=cohort_id).exists():
+            # getting cohort
+            selected_cohort = Cohort.objects.get(id=cohort_id)
+            if 'new_schedule' in request.POST:
+                schedule_name = request.POST.get("schedule_name")
+                start_period = request.POST.get("start_period")
+                end_period = request.POST.get("end_period")
+
+                if schedule_name and start_period and end_period:
+                    if Cohort_schedule.objects.filter(cohort=cohort_id, schedule_name=schedule_name).exists():
+                        messages.warning(request, "Schedule "+schedule_name+", Already exist.")
+                        return redirect(ManagerDashboard_cohorts)
+                    else:
+                        # Create new Schedule
+                        newSchedule = Cohort_schedule(
+                            cohort=selected_cohort,
+                            schedule_name=schedule_name,
+                            start_period=start_period,
+                            end_period=end_period
+                        )
+                        newSchedule.save()
+
+                        messages.success(request, "Schedule created successfully.")
+                        return redirect(ManagerDashboard_cohorts)
+                else:
+                    messages.error(request, "Error , All fields are required!")
+                    return redirect(ManagerDashboard_cohorts)
+            else:
+                # getting schedules
+                ScheduleData = Cohort_schedule.objects.filter(cohort=selected_cohort.id)
+                # getting cohort
+                CohortData = Cohort.objects.filter()
+                context = {
+                    'title': 'Manager - Cohort Schedules',
+                    'cohort_active': 'active',
+                    'selected_cohort': selected_cohort,
+                    'schedules': ScheduleData,
+                }
+                return render(request, 'main/manager/cohortScheduleList.html', context)
+        else:
+            messages.error(request, ('Cohort not found'))
+            return redirect(ManagerDashboard_cohorts)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(ManagerLogin)
+
+
+
+@login_required(login_url='manager_login')
+def ManagerDashboard_cohortScheduleEdit(request, pk, n):
+    if request.user.is_authenticated and request.user.is_manager==True:
+        cohort_id = pk
+        schedule_id = n
+        if Cohort.objects.filter(id=cohort_id).exists():
+            # getting cohort
+            selected_cohort = Cohort.objects.get(id=cohort_id)
+            if Cohort_schedule.objects.filter(cohort=selected_cohort.id, id=schedule_id).exists():
+                # getting schedule
+                selected_schedule = Cohort_schedule.objects.get(id=schedule_id, cohort=selected_cohort.id)
+
+                if 'update_schedule' in request.POST:
+                    schedule_name = request.POST.get("schedule_name")
+                    start_period = request.POST.get("start_period")
+                    end_period = request.POST.get("end_period")
+
+                    if schedule_name and start_period and end_period:
+                        if Cohort_schedule.objects.filter(cohort=cohort_id, schedule_name=schedule_name).exclude(id=schedule_id).exists():
+                            messages.warning(request, "Schedule "+schedule_name+", Already exist.")
+                            return redirect(ManagerDashboard_cohortScheduleEdit, pk, n)
+                        else:
+                            # Update Schedule
+                            updatedSchedule =  Cohort_schedule.objects.filter(cohort=cohort_id, id=schedule_id).update(
+                                schedule_name=schedule_name,
+                                start_period=start_period,
+                                end_period=end_period
+                            )
+                            if updatedSchedule:
+                                messages.success(request, "Cohort schedule updated successfully.")
+                                return redirect(ManagerDashboard_cohortScheduleEdit, pk, n)
+                            else:
+                                messages.error(request, ('Process Failed.'))
+                                return redirect(ManagerDashboard_cohortScheduleEdit, pk, n)
+                    else:
+                        messages.error(request, ('All fields are required.'))
+                        return redirect(ManagerDashboard_cohortScheduleEdit, pk, n)
+
+                elif 'delete_schedule' in request.POST:
+                    # Delete Cohort
+                    delete_schedule = Cohort_schedule.objects.filter(id=schedule_id)
+                    delete_schedule.delete()
+                    messages.success(request, "Cohort schedule deleted successfully.")
+                    return redirect(ManagerDashboard_cohortSchedules, pk)
+
+                else:
+                    # getting cohort
+                    CohortData = Cohort.objects.filter()
+                    context = {
+                        'title': 'Manager - Cohort Schedule Details',
+                        'cohorts_active': 'active',
+                        'selected_cohort': selected_cohort,
+                        'selected_schedule': selected_schedule,
+                        'cohorts': CohortData,
+                    }
+                    return render(request, 'main/manager/cohortScheduleEdit.html', context)
+            else:
+                messages.error(request, ('Cohort schedule not found'))
+                return redirect(ManagerDashboard_cohortSchedules, pk)
         else:
             messages.error(request, ('Cohort not found'))
             return redirect(ManagerDashboard_cohorts)

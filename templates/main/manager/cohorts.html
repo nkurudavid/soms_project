@@ -70,16 +70,29 @@
                       {% if cohorts %} {% for cohort in cohorts %}
                       <tr>
                         <td>{{ forloop.counter }}.</td>
-                        <td>{{cohort.cohort_name}}</td>
+                        <td>{{cohort.cohort_name}} 
+                          <span class="pull-right">
+                            {% if cohort.status %}
+                            <span class="label label-primary">Completed</span>
+                            {% else %}
+                            <span class="label label-warning">Ongoing ...</span>
+                            {% endif %}
+                          </span>
+                        </td>
                         <td>{{cohort.starting_date}}</td>
                         <td>{{cohort.ending_date}}</td>
                         <td>
                           <div class="pull-right">
                             <a
+                              href="{% url 'manager_cohortSchedules' cohort.id %}"
+                              class="btn btn-flat btn-default"
+                            > <i class="fa fa-tasks"></i> Schedules
+                            </a>
+                            <a
                               href="{% url 'manager_cohortEdit' cohort.id %}"
                               class="btn btn-flat btn-info"
-                              ><i class="fa fa-edit"></i> Edit</a
-                            >
+                              > <i class="fa fa-cogs"></i>
+                            </a>
                           </div>
                         </td>
                       </tr>

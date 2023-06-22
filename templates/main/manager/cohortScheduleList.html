@@ -1,0 +1,151 @@
+{% extends "main/dash_main_layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
+  {% load static %}
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+  </head>
+
+  <body>
+    {% block account_content%}
+
+    <div class="wrapper">
+      {% include 'main/manager/navbar.html' %}
+      <!-- Left side column. contains the logo and sidebar -->
+      {% include 'main/manager/sidebar.html' %}
+
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            <i class="fa fa-tasks"></i>
+            Schedule for <strong>{{selected_cohort.cohort_name}}</strong>
+          </h1>
+          <ol class="breadcrumb">
+            <li>
+              <a href="{% url 'manager_dashboard' %}"> 
+                <i class="fa fa-dashboard"></i> Home 
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'manager_cohorts' %}"> 
+                <i class="fa fa-list"></i> Cohorts
+              </a>
+            </li>
+            <li class="active">Schedule</li>
+          </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="box box-info">
+                <div class="box-header">
+                  <h3 class="box-title">All Schedules</h3>
+                  {% if not current_cohort.status %}
+                  <button
+                    type="button"
+                    class="btn btn-flat btn-primary pull-right"
+                    data-toggle="modal"
+                    data-target="#scheduleModal"
+                  >
+                    <i class="fa fa-plus"></i>
+                    New Schedule
+                  </button>
+                  {% endif %}
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  {% if schedules %}
+                  <div class="list-group">
+                    <br/>
+                    {% for schedule in schedules %}
+                    <a
+                      href="{% url 'manager_cohortScheduleEdit' selected_cohort.id schedule.id %}"
+                      class="list-group-item list-group-item-action"
+                    >
+                      <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">
+                          Cohort Schedule: <br/><span class="h3 text-bold"> {{schedule.schedule_name}} </span>
+                          <span class="pull-right">
+                            <span class="label label-default">From: {{schedule.start_period}}</span> - 
+                            <span class="label label-default">Due date: {{schedule.end_period}}</span>
+                          </span>
+                        </h5>
+                      </div>
+                    </a>
+                    <br/>
+                    {% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="modal fade" id="scheduleModal">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button
+                    type="button"
+                    class="close"
+                    data-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                  <h4 class="modal-title">
+                    <i class="fa fa-tasks"></i> NEW SCHEDULE
+                  </h4>
+                </div>
+                <form action="" method="post">
+                  {% csrf_token %}
+                  <div class="modal-body">
+                      <div class="form-group mb-0">
+                          <label class="col-form-label">Schedule</label>
+                          <select class="form-control" name="schedule_name" required>
+                              <option value="">SELECT SCHEDULE</option>
+                              <option value="Application">Submiting Application</option>
+                              <option value="Interview">Call for Interview</option>
+                              <option value="Graduation">Cohort Graduation</option>
+                          </select>
+                      </div>
+                      <div class="form-group mb-0">
+                          <label class="col-form-label">Start:</label>
+                          <input type="datetime-local" class="form-control" name="start_period" required>
+                      </div>
+                      <div class="form-group mb-0">
+                          <label class="col-form-label">End:</label>
+                          <input type="datetime-local" class="form-control" name="end_period" required>
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-sm btn-secondary"
+                          data-dismiss="modal">Close</button>
+                      <button type="submit" name="new_schedule" class="btn btn-sm btn-primary">Submit</button>
+                  </div>
+              </form>
+              </div>
+              <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+          </div>
+          <!-- /.modal -->
+        </section>
+        <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+
+      {% include 'main/manager/footer.html' %}
+    </div>
+    {% endblock %}
+  </body>
+</html>

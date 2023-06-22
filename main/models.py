@@ -40,7 +40,7 @@ class Cohort_schedule(models.Model):
         GRADUATION = "Graduation", "Graduation"
 
     cohort = models.ForeignKey(Cohort, verbose_name="Cohort Scheduled", related_name="schedules", on_delete=models.CASCADE)
-    schedule_name = models.CharField(verbose_name="Status", choices=Schedule.choices, default=Schedule.SELECT, max_length=12)
+    schedule_name = models.CharField(verbose_name="Schedule Name", choices=Schedule.choices, default=Schedule.SELECT, max_length=12)
     start_period = models.DateTimeField()
     end_period = models.DateTimeField()
 
