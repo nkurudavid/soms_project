@@ -18,6 +18,10 @@ import io
 import base64
 
 # Create your views here.
+def handle_not_found(request, exception):
+    return render(request, 'page_404/404.html')
+
+
 def HomePage(request):
     # getting stacks
     StacksData = Stack.objects.filter()
@@ -695,6 +699,7 @@ def ManagerDashboard_cohortEdit(request, pk):
         if Cohort.objects.filter(id=cohort_id).exists():
             # if exists
             foundData = Cohort.objects.get(id=cohort_id)
+            traineesData=Trainee.objects.filter(cohort=cohort_id).order_by('stack')
 
             if 'submit' in request.POST:
                 # Retrieve the form data from the request
@@ -728,6 +733,11 @@ def ManagerDashboard_cohortEdit(request, pk):
                 updateCohort = Cohort.objects.filter(id=cohort_id).update(
                     status=True
                 )
+                if updateCohort:
+                    # update trainees status
+                    for trainee in traineesData:
+                        trainee.status="Awarded"
+                        trainee.save()
                 return redirect(ManagerDashboard_cohortEdit, pk)
 
             elif 'ongoing' in request.POST:
@@ -735,6 +745,11 @@ def ManagerDashboard_cohortEdit(request, pk):
                 updateCohort = Cohort.objects.filter(id=cohort_id).update(
                     status=False
                 )
+                if updateCohort:
+                    # update trainees status
+                    for trainee in traineesData:
+                        trainee.status="Pending"
+                        trainee.save()
                 return redirect(ManagerDashboard_cohortEdit, pk)
 
             elif 'delete' in request.POST:
@@ -778,7 +793,7 @@ def ManagerDashboard_cohortSchedules(request, pk):
                 if schedule_name and start_period and end_period:
                     if Cohort_schedule.objects.filter(cohort=cohort_id, schedule_name=schedule_name).exists():
                         messages.warning(request, "Schedule "+schedule_name+", Already exist.")
-                        return redirect(ManagerDashboard_cohorts)
+                        return redirect(ManagerDashboard_cohortSchedules, pk)
                     else:
                         # Create new Schedule
                         newSchedule = Cohort_schedule(
@@ -790,10 +805,10 @@ def ManagerDashboard_cohortSchedules(request, pk):
                         newSchedule.save()
 
                         messages.success(request, "Schedule created successfully.")
-                        return redirect(ManagerDashboard_cohorts)
+                        return redirect(ManagerDashboard_cohortSchedules, pk)
                 else:
                     messages.error(request, "Error , All fields are required!")
-                    return redirect(ManagerDashboard_cohorts)
+                    return redirect(ManagerDashboard_cohortSchedules, pk)
             else:
                 # getting schedules
                 ScheduleData = Cohort_schedule.objects.filter(cohort=selected_cohort.id)
@@ -1132,25 +1147,45 @@ def ManagerDashboard_talentProfile(request, pk):
         if Trainee.objects.filter(id=talent_id, status="Awarded").exists():
             # get trainee
             trainee = Trainee.objects.get(id=talent_id, status="Awarded")
-            if 'dismiss' in request.POST:
-                if trainee.cv_document:
-                    if len(trainee.cv_document )  > 0:
-                        trainee.cv_document.delete()
-                # Delete Trainee
-                get_user_model().objects.filter(id=trainee.user.id).delete()
-                Application.objects.filter(email=trainee.user.email).delete()
-                messages.success(request, "Trainee dismissed successfully.")
-                return redirect(ManagerDashboard_talentProfile, pk)
+            if 'deploy_talent' in request.POST:
+                companyDeployed = request.POST.get("companyDeployed")
+                deployedDate = request.POST.get("deployedDate")
+
+                if companyDeployed and deployedDate:
+                    if companyDeployed == "none":
+                        # Update Schedule
+                        updateDeployment =  Trainee.objects.filter(id=talent_id, status="Awarded").update(
+                            companyDeployed=None,
+                            deployedDate=None,
+                        )
+                    else:
+                        # Update Schedule
+                        updateDeployment =  Trainee.objects.filter(id=talent_id, status="Awarded").update(
+                            companyDeployed=companyDeployed,
+                            deployedDate=deployedDate,
+                        )
+                    if updateDeployment:
+                        messages.success(request, "Deployment updated successfully.")
+                        return redirect(ManagerDashboard_talentProfile, pk)
+                    else:
+                        messages.error(request, ('Process Failed.'))
+                        return redirect(ManagerDashboard_talentProfile, pk)
+                else:
+                    messages.error(request, ('All fields are required.'))
+                    return redirect(ManagerDashboard_talentProfile, pk)
             else:
                 # getting cohort
                 CohortData = Cohort.objects.filter()
+                # getting partners
+                CompanyData = Company.objects.filter()
                 context = {
                     'title': 'Manager - Talent Profile',
                     'talent_active': 'active',
                     'cohorts': CohortData,
+                    'partners': CompanyData,
                     'talent': trainee,
                 }
-                return render(request, 'main/manager/trainees_profile.html', context)
+                return render(request, 'main/manager/talent_profile.html', context)
         else:
             messages.error(request, ('Talent Profile not found'))
             return redirect(ManagerDashboard_reservedList)

@@ -31,7 +31,7 @@
               <a href="{% url 'manager_dashboard' %}"><i class="fa fa-dashboard"></i> Home</a>
             </li>
             <li>
-              <a href="{% url 'manager_traineesList' %}"
+              <a href="{% url 'manager_reservedList' %}"
                 ><i class="fa fa-group"></i> Talents List</a
               >
             </li>
@@ -84,14 +84,24 @@
                       <h3 class="profile-username text-center">
                         {{talent.user.first_name}} {{talent.user.last_name}}
                       </h3>
-
-                      <h3 class="text-bold text-muted text-center">Trainer</h3>
                       <p class="text-muted text-center">
+                        {% if talent.companyDeployed %}
+                        Deploy at 
                         <sup><i class="fa fa-quote-left"></i></sup>
                         <span class="h4 text-bold">
-                          {{talent.stack.name}}
+                          {{talent.companyDeployed.name}}
                         </span>
                         <sup><i class="fa fa-quote-right"></i></sup>
+                        <span class="">
+                          {{talent.deployedDate}}
+                        </span>
+                        {% else %}
+                        <sup><i class="fa fa-quote-left"></i></sup>
+                        <span class="h4 text-bold">
+                          Reserved Talent
+                        </span>
+                        <sup><i class="fa fa-quote-right"></i></sup>
+                        {% endif %}
                       </p>
                     </div>
                     <!-- /.box-header -->
@@ -132,6 +142,12 @@
                           <hr />
                         </div>
                         <div class="col-lg-6">
+                          <strong>
+                            <i class="fa fa-list"></i> Cohort:
+                          </strong>
+                          <p class="text-muted">{{talent.cohort.cohort_name}}</p>
+                          <hr />
+
                           <strong>
                             <i class="fa fa-sitemap"></i> Stack:
                           </strong>
@@ -201,6 +217,19 @@
                 {% csrf_token %}
                 <div class="modal-body">
                   <p class="text-center">Select the partner from a list to deploy.</p>
+                  <div class="form-group mb-0">
+                      <label class="col-form-label">Company</label>
+                      <select class="form-control" name="companyDeployed" required>
+                          <option value="none">SELECT</option>
+                          {% for partner in partners %}
+                          <option {% if talent.companyDeployed.name == partner.name %} selected {% endif %} value="{{partner.id}}">{{partner.name}}</option>
+                          {% endfor %}
+                      </select>
+                  </div>
+                  <div class="form-group mb-0">
+                      <label class="col-form-label">When Deployed:</label>
+                      <input type="date" class="form-control" name="deployedDate" required>
+                  </div>
                 </div>
                 <div class="modal-footer">
                   <button

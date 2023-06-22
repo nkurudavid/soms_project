@@ -48,7 +48,7 @@
               <div class="box box-info">
                 <div class="box-header">
                   <h3 class="box-title">All Schedules</h3>
-                  {% if not current_cohort.status %}
+                  {% if not selected_cohort.status %}
                   <button
                     type="button"
                     class="btn btn-flat btn-primary pull-right"
@@ -67,17 +67,22 @@
                     <br/>
                     {% for schedule in schedules %}
                     <a
+                      {% if not selected_cohort.status %}
                       href="{% url 'manager_cohortScheduleEdit' selected_cohort.id schedule.id %}"
+                      {% else %}
+                      href="#"
+                      {% endif %}
                       class="list-group-item list-group-item-action"
                     >
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">
-                          Cohort Schedule: <br/><span class="h3 text-bold"> {{schedule.schedule_name}} </span>
+                      <div class="d-flex w-100 justify-content-between py-2">
+                        <h4 class="mb-1">
                           <span class="pull-right">
                             <span class="label label-default">From: {{schedule.start_period}}</span> - 
                             <span class="label label-default">Due date: {{schedule.end_period}}</span>
+                            <br /> <br />
                           </span>
-                        </h5>
+                          Cohort Schedule: <br/><span class="h3 text-bold"> {{schedule.schedule_name}} </span>
+                        </h4>
                       </div>
                     </a>
                     <br/>

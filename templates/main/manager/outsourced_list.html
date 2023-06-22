@@ -52,8 +52,6 @@
                       <tr>
                         <th>No.</th>
                         <th colspan="2">TALENT</th>
-                        <th>COHORT</th>
-                        <th>STACK</th>
                         <th>DEPLOYMENT</th>
                         <th></th>
                       </tr>
@@ -82,10 +80,10 @@
                         <td>
                           {{talent.user.first_name}} {{talent.user.last_name}}<br />
                           Email: {{talent.user.email}}<br />
-                          Phome: {{talent.phone1}}
+                          Phome: {{talent.phone1}}<br />
+                          Cohort: {{talent.cohort.cohort_name}}<br />
+                          Stack: {{talent.stack.name}}
                         </td>
-                        <td>{{talent.cohort.cohort_name}}</td>
-                        <td>{{talent.stack.name}}</td>
                         <td>
                           <img
                             class=""
@@ -94,11 +92,13 @@
                             alt="{{talent.companyDeployed.name}} image"
                           />
                           {{talent.companyDeployed.name}}
+                          <br />
+                           Since {{talent.deployedDate}}
                         </td>
                         <td>
                           <div class="pull-right">
                             <a
-                              href="{% url 'manager_talentsProfile' current_cohort.id talent.id %}"
+                              href="{% url 'manager_talentProfile' talent.id %}"
                               class="btn btn-flat btn-info"
                               ><i class="fa fa-eye"></i> View</a
                             >
