@@ -110,7 +110,70 @@
           </div>
           <!-- /.row -->
           <div class="row">
-            <!-- /.col -->
+            <div class="col-md-6">
+              <div class="box box-info">
+                <div class="box-header with-border">
+                  <h3 class="box-title">
+                    <i class="fa fa-group"></i> About Cohorts
+                  </h3>
+                </div>
+                <div class="box-body no-padding">
+                  <h5 class="card-title">Pie Chart</h5>
+                  <!-- Pie Chart -->
+                  <div id="pieChart"></div>
+                  <script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                      new ApexCharts(document.querySelector("#pieChart"), {
+                        series: [44, 55, 13, 43, 22],
+                        chart: {
+                          height: 400,
+                          type: 'pie',
+                          toolbar: {
+                            show: true
+                          }
+                        },
+                        labels: ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
+                      }).render();
+                    });
+                  </script>
+                  <!-- End Pie Chart -->
+                </div>
+              </div>
+              <!--/.box -->
+            </div>
+
+            <div class="col-md-6">
+              <div class="box box-info">
+                <div class="box-header with-border">
+                  <h3 class="box-title">
+                    <i class="fa fa-group"></i> About Cohorts
+                  </h3>
+                </div>
+                <div class="box-body no-padding">
+                  <h5 class="card-title">Donut Chart</h5>
+                  <!-- Donut Chart -->
+                  <div id="donutChart"></div>
+                  <script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                      new ApexCharts(document.querySelector("#donutChart"), {
+                        series: [44, 55, 13, 43, 22],
+                        chart: {
+                          height: 400,
+                          type: 'donut',
+                          toolbar: {
+                            show: true
+                          }
+                        },
+                        labels: ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
+                      }).render();
+                    });
+                  </script>
+                  <!-- End Donut Chart -->
+                </div>
+              </div>
+              <!--/.box -->
+            </div>
+
             <div class="col-md-12">
               <div class="box box-info">
                 <div class="box-header with-border">
@@ -119,7 +182,68 @@
                   </h3>
                 </div>
                 <div class="box-body no-padding">
-                  <canvas id="traineeChart"></canvas>
+                 <h5 class="card-title">Column Chart</h5>
+                  <!-- Column Chart -->
+                  <div id="columnChart"></div>
+                  <script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                      new ApexCharts(document.querySelector("#columnChart"), {
+                        series: [
+                        {
+                          name: 'Net Profit',
+                          data: [44, 55, 57, 96]
+                        },{
+                          name: 'Net Profit',
+                          data: [44, 55, 57, 96]
+                        },{
+                          name: 'Net Profit',
+                          data: [44, 55, 57, 96]
+                        },{
+                          name: 'Net Profit',
+                          data: [44, 55, 57, 96]
+                        }
+                        ],
+                        chart: {
+                          type: 'bar',
+                          height: 300
+                        },
+                        plotOptions: {
+                          bar: {
+                            horizontal: false,
+                            columnWidth: '60%',
+                            endingShape: 'rounded'
+                          },
+                        },
+                        dataLabels: {
+                          enabled: false
+                        },
+                        stroke: {
+                          show: true,
+                          width: 2,
+                          colors: ['transparent']
+                        },
+                        xaxis: {
+                          categories: ['Feb', 'Mar', 'Apr', 'May'],
+                        },
+                        yaxis: {
+                          title: {
+                            text: '$ (thousands)'
+                          }
+                        },
+                        fill: {
+                          opacity: 1
+                        },
+                        tooltip: {
+                          y: {
+                            formatter: function(val) {
+                              return "$ " + val + " thousands"
+                            }
+                          }
+                        }
+                      }).render();
+                    });
+                  </script>
+                  <!-- End Column Chart -->
                 </div>
               </div>
               <!--/.box -->
