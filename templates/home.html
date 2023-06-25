@@ -349,46 +349,29 @@
     </section>
     <!--/ End Contact Us -->
 
-    
-		<!-- Clients CSS -->
+    {% if partners%}
 		<div class="clients">
 			<div class="container">
 				<div class="row">
-					<div class="col-lg-4 col-md-4 col-12">
+					<div class="col-lg-6 col-md-4 col-12">
 						<div class="text-content">
-							<h4>Our Awesome Clients!</h4>
+							<h4>Our Partners!</h4>
 							<p>Vivamus volutpat eros pulvinar velit laoreet, sit amet egestas erat dignissim. Et harum quidem</p>
 						</div>
 					</div>
-					<div class="col-lg-8 col-md-8 col-12">
+					<div class="col-lg-6 col-md-8 col-12">
 						<div class="client-slider">
+              {% for partner in partners %}
 							<div class="single-slider">
-								<a href="#"><img src="images/client1.png" alt="#"></a>
+								<a href="#"><img src="{{partner.logoFile.url}}" alt="{{partner.name}}"></a>
 							</div>
-							<div class="single-slider">
-								<a href="#"><img src="images/client2.png" alt="#"></a>
-							</div>
-							<div class="single-slider">
-								<a href="#"><img src="images/client3.png" alt="#"></a>
-							</div>
-							<div class="single-slider">
-								<a href="#"><img src="images/client4.png" alt="#"></a>
-							</div>
-							<div class="single-slider">
-								<a href="#"><img src="images/client5.png" alt="#"></a>
-							</div>
-							<div class="single-slider">
-								<a href="#"><img src="images/client1.png" alt="#"></a>
-							</div>
-							<div class="single-slider">
-								<a href="#"><img src="images/client2.png" alt="#"></a>
-							</div>
+              {% endfor %}
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<!--/ End Clients CSS -->
+		{% endif %}
 
     {% endblock %}
   </body>

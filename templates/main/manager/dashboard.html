@@ -60,7 +60,7 @@
               <!-- small box -->
               <div class="small-box bg-green">
                 <div class="inner">
-                  <h3>{{ stack_total }}</h3>
+                  <h3>{{ stacks.count }}</h3>
 
                   <p>All Stacks</p>
                 </div>
@@ -94,7 +94,7 @@
               <!-- small box -->
               <div class="small-box bg-aqua">
                 <div class="inner">
-                  <h3>{{reservedTalents.count}}</h3>
+                  <h3>{{reservedTalents}}</h3>
 
                   <p>Reserved Talents</p>
                 </div>
@@ -110,107 +110,44 @@
           </div>
           <!-- /.row -->
           <div class="row">
-            <div class="col-md-6">
-              <div class="box box-info">
-                <div class="box-header with-border">
-                  <h3 class="box-title">
-                    <i class="fa fa-group"></i> About Cohorts
-                  </h3>
-                </div>
-                <div class="box-body no-padding">
-                  <h5 class="card-title">Pie Chart</h5>
-                  <!-- Pie Chart -->
-                  <div id="pieChart"></div>
-                  <script>
-                    document.addEventListener("DOMContentLoaded", () => {
-                      new ApexCharts(document.querySelector("#pieChart"), {
-                        series: [44, 55, 13, 43, 22],
-                        chart: {
-                          height: 400,
-                          type: 'pie',
-                          toolbar: {
-                            show: true
-                          }
-                        },
-                        labels: ['Team A', 'Team B', 'Team C', 'Team D', 'Team E']
-                      }).render();
-                    });
-                  </script>
-                  <!-- End Pie Chart -->
-                </div>
-              </div>
-              <!--/.box -->
-            </div>
-
-            <div class="col-md-6">
-              <div class="box box-info">
-                <div class="box-header with-border">
-                  <h3 class="box-title">
-                    <i class="fa fa-group"></i> About Cohorts
-                  </h3>
-                </div>
-                <div class="box-body no-padding">
-                  <h5 class="card-title">Donut Chart</h5>
-                  <!-- Donut Chart -->
-                  <div id="donutChart"></div>
-                  <script>
-                    document.addEventListener("DOMContentLoaded", () => {
-                      new ApexCharts(document.querySelector("#donutChart"), {
-                        series: [44, 55, 13, 43, 22],
-                        chart: {
-                          height: 400,
-                          type: 'donut',
-                          toolbar: {
-                            show: true
-                          }
-                        },
-                        labels: ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
-                      }).render();
-                    });
-                  </script>
-                  <!-- End Donut Chart -->
-                </div>
-              </div>
-              <!--/.box -->
-            </div>
 
             <div class="col-md-12">
               <div class="box box-info">
                 <div class="box-header with-border">
                   <h3 class="box-title">
-                    <i class="fa fa-group"></i> About Cohorts
+                    <i class="fa fa-tasks"></i> About Cohorts
                   </h3>
                 </div>
                 <div class="box-body no-padding">
-                 <h5 class="card-title">Column Chart</h5>
                   <!-- Column Chart -->
                   <div id="columnChart"></div>
                   <script>
                     document.addEventListener("DOMContentLoaded", () => {
                       new ApexCharts(document.querySelector("#columnChart"), {
+                        title: {
+                          text: 'Referer of Cohorts',
+                          left: 'center'
+                        },
                         series: [
+                        {% for stack, cohort_trainee_count in stack_data.items %}
                         {
-                          name: 'Net Profit',
-                          data: [44, 55, 57, 96]
-                        },{
-                          name: 'Net Profit',
-                          data: [44, 55, 57, 96]
-                        },{
-                          name: 'Net Profit',
-                          data: [44, 55, 57, 96]
-                        },{
-                          name: 'Net Profit',
-                          data: [44, 55, 57, 96]
-                        }
+                          name: '{{ stack.name }}',
+                          data: [
+                          {% for count in cohort_trainee_count %}
+                          {{ count }},
+                          {% endfor %}
+                          ]
+                        },
+                        {% endfor %}
                         ],
                         chart: {
                           type: 'bar',
-                          height: 300
+                          height: 350
                         },
                         plotOptions: {
                           bar: {
                             horizontal: false,
-                            columnWidth: '60%',
+                            columnWidth: '50%',
                             endingShape: 'rounded'
                           },
                         },
@@ -223,20 +160,24 @@
                           colors: ['transparent']
                         },
                         xaxis: {
-                          categories: ['Feb', 'Mar', 'Apr', 'May'],
+                          categories: [
+                          {% for cohort in cohorts %}
+                          '{{cohort.cohort_name}}',
+                          {% endfor%}
+                          ],
                         },
                         yaxis: {
                           title: {
-                            text: '$ (thousands)'
+                            text: 'Trainee(s)'
                           }
                         },
                         fill: {
-                          opacity: 1
+                          opacity: 2
                         },
                         tooltip: {
                           y: {
                             formatter: function(val) {
-                              return "$ " + val + " thousands"
+                              return val + " Trainee(s)"
                             }
                           }
                         }
@@ -248,68 +189,48 @@
               </div>
               <!--/.box -->
             </div>
-          {% if team %}
+
             <div class="col-md-12">
               <div class="box box-info">
                 <div class="box-header with-border">
                   <h3 class="box-title">
-                    <i class="fa fa-group"></i> OUR TEAM
+                    <i class="fa fa-group"></i> About Talents
                   </h3>
-                  <div class="box-tools pull-right">
-                    <button
-                      type="button"
-                      class="btn btn-box-tool"
-                      data-widget="collapse"
-                    >
-                      <i class="fa fa-minus"></i>
-                    </button>
-                    <button
-                      type="button"
-                      class="btn btn-box-tool"
-                      data-widget="remove"
-                    >
-                      <i class="fa fa-times"></i>
-                    </button>
-                  </div>
                 </div>
-                <!-- /.box-header -->
                 <div class="box-body no-padding">
-                  <ul class="users-list clearfix">
-                    {% for trainer in team %}
-                    <li>
-                      <img
-                        class=""
-                        src="{{trainer.profilePicture.url}}"
-                        style="
-                          height: 100px !important;
-                          width: 100px !important;
-                        "
-                        alt="{{trainer.user.first_name}} image"
-                      />
-                      <a
-                        class="users-list-name"
-                        href="{% url 'manager_trainerEdit' trainer.id %}"
-                      >
-                        {{trainer.user}}
-                      </a>
-                      <span class="users-list-date"
-                        >{{trainer.specialization}}</span
-                      >
-                    </li>
-                    {% endfor %}
-                  </ul>
+                  <!-- Donut Chart -->
+                  <div id="donutChart"></div>
+                  <script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                      new ApexCharts(document.querySelector("#donutChart"), {
+                        title: {
+                          text: 'Referer of Outsourced',
+                          left: 'center'
+                        },
+                        series: [{{reservedTalents}}, {{deployedTalents}}],
+                        chart: {
+                          height: 350,
+                          type: 'donut',
+                          toolbar: {
+                            show: true
+                          }
+                        },
+                        tooltip: {
+                          y: {
+                            formatter: function(val) {
+                              return val + " Talent(s)"
+                            }
+                          }
+                        },
+                        labels: ['Reserved Talents', 'Deployed Talents',],
+                      }).render();
+                    });
+                  </script>
+                  <!-- End Donut Chart -->
                 </div>
-                <!-- /.box-body -->
-                <div class="box-footer text-center">
-                  <a href="{% url 'manager_team' %}" class="uppercase">
-                    View More info
-                  </a>
-                </div>
-                <!-- /.box-footer -->
               </div>
               <!--/.box -->
             </div>
-          {% endif %}
           </div>
 
           <!-- Main row -->

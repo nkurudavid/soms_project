@@ -38,10 +38,56 @@
         <!-- Main content -->
         <section class="content">
           <div class="row">
-            <div class="col-xs-12">
+            <div class="col-lg-12">
+              <div class="box box-info">
+                <div class="box-header with-border">
+                  <h3 class="box-title">
+                    <i class="fa fa-sitemap"></i> About Stacks
+                  </h3>
+                </div>
+                <div class="box-body no-padding">
+                  <!-- Pie Chart -->
+                  <div id="pieChart"></div>
+                  <script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                      new ApexCharts(document.querySelector("#pieChart"), {
+                        series: [
+                        {% for stack_name, trainee_count in trainee_numbers.items %}
+                        {{ trainee_count }},
+                        {% endfor %}
+                        ],
+                        chart: {
+                          height: 350,
+                          type: 'pie',
+                          toolbar: {
+                            show: true
+                          }
+                        },
+                        tooltip: {
+                          y: {
+                            formatter: function(val) {
+                              return val + " Trainee(s)"
+                            }
+                          }
+                        },
+                        labels: [
+                        {% for stack_name, trainee_count in trainee_numbers.items %}
+                        '{{ stack_name }}',
+                        {% endfor %}
+                        ]
+                      }).render();
+                    });
+                  </script>
+                  <!-- End Pie Chart -->
+                </div>
+              </div>
+              <!--/.box -->
+            </div>
+
+            <div class="col-lg-12">
               <div class="box box-info">
                 <div class="box-header">
-                  <h3 class="box-title">All Trainees ({{trainees_total}})</h3>
+                  <h3 class="box-title">All Trainees ({{trainees.count}})</h3>
                 </div>
                 <!-- /.box-header -->
                 <div class="box-body">
@@ -81,7 +127,8 @@
                           {% endif %}
                         </td>
                         <td>
-                          {{trainee.user.first_name}} {{trainee.user.last_name}}
+                          {{trainee.user.first_name}} {{trainee.user.last_name}} <br />
+                          Gender: {{trainee.user.gender}}
                         </td>
                         <td>{{trainee.stack.name}}</td>
                         <td>
