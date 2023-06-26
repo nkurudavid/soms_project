@@ -26,10 +26,12 @@ def HomePage(request):
     # getting stacks
     StacksData = Stack.objects.filter()
     TrainersData = Trainer.objects.filter()
+    partners = Company.objects.filter()
     context = {
         'title': 'Welcome to SOMS',
         'courses': StacksData,
         'instructors': TrainersData,
+        'partners': partners,
     }
     return render(request, 'home.html', context)
 
@@ -141,45 +143,38 @@ def ManagerLogout(request):
 @login_required(login_url='manager_login')
 def ManagerDashboard(request):
     if request.user.is_authenticated and request.user.is_manager==True:
-        cohorts = Cohort.objects.all()
-        stacks = Stack.objects.all()
-        data = []
-
-        for cohort in cohorts:
-            cohort_trainees = Trainee.objects.filter(cohort=cohort.id)
-            stack_counts = {}
-            
-            for stack in stacks:
-                count = cohort_trainees.filter(stack=stack.id).count()
-                stack_counts[stack.name] = count
-
-            data.append({
-                'cohort_name': cohort.cohort_name,
-                'stack_counts': stack_counts
-            })
-
         # getting all reserved talents
-        reservedTalentsData=Trainee.objects.filter(companyDeployed__isnull=True, status="Awarded").order_by('cohort','stack')
-        # getting stacks
-        StacksData = Stack.objects.filter()
+        reservedTalents = Trainee.objects.filter(companyDeployed__isnull=True, status=Trainee.Status.AWARDED).count()
+        deployedTalents = Trainee.objects.filter(companyDeployed__isnull=False, status=Trainee.Status.AWARDED).count()
         # getting trainers
         TrainersData = Trainer.objects.filter()
         # getting new applicants
         current_cohort = Cohort.objects.latest('starting_date')
         # getting new applicants
         NewApplicantsData = Application.objects.filter(cohort=current_cohort.id, status=False)
-        # getting cohort
-        CohortData = Cohort.objects.filter()
+
+        StacksData = Stack.objects.all()
+        CohortData = Cohort.objects.all()
+        stack_data = {}
+        for stack in StacksData:
+            cohort_trainee_count = []
+            for cohort in CohortData:
+                trainee_count = Trainee.objects.filter(cohort=cohort, stack=stack).count()
+                cohort_trainee_count.append(trainee_count)
+            stack_data[stack] = cohort_trainee_count
+
+
         context = {
             'title': 'Manager Dashboard', 
-            'dash_active': 'active', 
+            'dash_active': 'active',
+            'stacks': StacksData,
             'cohorts': CohortData,
-            'stack_total': StacksData.count(),
+            'stack_data': stack_data,
             'trainer_total': TrainersData.count(),
             'applicant_total': NewApplicantsData.count(),
             'team': TrainersData,
-            'reservedTalents': reservedTalentsData,
-            'data': data
+            'reservedTalents': reservedTalents,
+            'deployedTalents': deployedTalents,
         }
         return render(request, 'main/manager/dashboard.html', context)
     else:
@@ -1050,16 +1045,22 @@ def ManagerDashboard_traineesList(request, pk):
             # if exists
             current_cohort = Cohort.objects.get(id=cohort_id)
             # getting all trainees from cohort
-            traineesData=Trainee.objects.filter(cohort=pk).order_by('stack')
+            traineesData=Trainee.objects.filter(cohort=current_cohort).order_by('stack')
             # getting cohort
             CohortData = Cohort.objects.filter()
+
+            StacksData = Stack.objects.all()
+            trainee_numbers = {}
+            for stack in StacksData:
+                trainee_count = Trainee.objects.filter(cohort=current_cohort, stack=stack).count()
+                trainee_numbers[stack.name] = trainee_count
             context = {
                 'title': 'Manager - Trainees',
                 'trainees_active': 'active',
                 'current_cohort': current_cohort,
                 'cohorts': CohortData,
                 'trainees': traineesData,
-                'trainees_total': traineesData.count
+                'trainee_numbers': trainee_numbers
             }
             return render(request, 'main/manager/trainees_list.html', context)
         else:
