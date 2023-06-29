@@ -1,0 +1,233 @@
+{% extends "main/dash_main_layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
+  {% load static %}
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Talent Report</title>
+  </head>
+
+  <body>
+    {% block account_content%}
+
+    <div class="wrapper">
+      {% include 'main/manager/navbar.html' %}
+      <!-- Left side column. contains the logo and sidebar -->
+      {% include 'main/manager/sidebar.html' %}
+
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            <i class="fa fa-group"></i>
+            About Talents
+          </h1>
+          <ol class="breadcrumb">
+            <li>
+              <a href="{% url 'manager_dashboard' %}"><i class="fa fa-dashboard"></i> Home</a>
+            </li>
+            <li class="active">Talents</li>
+          </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+          <!-- Small boxes (Stat box) -->
+          <div class="row">
+            <div class="col-lg-6 col-xs-6">
+              <!-- small box -->
+              <div class="small-box bg-aqua">
+                <div class="inner">
+                  <h3>{{reservedTalents.count}}</h3>
+
+                  <p>Reserved Talents</p>
+                </div>
+                <div class="icon">
+                  <i class="fa fa-group"></i>
+                </div>
+                <a href="{% url 'manager_reservedList' %}" class="small-box-footer">
+                  More info <i class="fa fa-arrow-circle-right"></i>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-6 col-xs-6">
+              <!-- small box -->
+              <div class="small-box bg-green">
+                <div class="inner">
+                  <h3>{{deployedTalents.count}}</h3>
+
+                  <p>Outsourced Talents</p>
+                </div>
+                <div class="icon">
+                  <i class="fa fa-group"></i>
+                </div>
+                <a href="{% url 'manager_outsourcedList' %}" class="small-box-footer">
+                  More info <i class="fa fa-arrow-circle-right"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- /.row -->
+          <div class="row">
+            <div class="col-md-12">
+              <div class="box box-info">
+                <div class="box-header with-border">
+                  <h3 class="box-title">
+                    <i class="fa fa-group"></i> About Talents
+                  </h3>
+                </div>
+                <div class="box-body no-padding">
+                  <!-- Donut Chart -->
+                  <div id="donutChart"></div>
+                  <script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                      new ApexCharts(document.querySelector("#donutChart"), {
+                        title: {
+                          text: 'Referer of Outsourced',
+                          left: 'center'
+                        },
+                        series: [{{reservedTalents.count}}, {{deployedTalents.count}}],
+                        chart: {
+                          height: 350,
+                          type: 'donut',
+                          toolbar: {
+                            show: true
+                          }
+                        },
+                        tooltip: {
+                          y: {
+                            formatter: function(val) {
+                              return val + " Talent(s)"
+                            }
+                          }
+                        },
+                        labels: ['Reserved Talents', 'Deployed Talents',],
+                      }).render();
+                    });
+                  </script>
+                  <!-- End Donut Chart -->
+                </div>
+              </div>
+              <!--/.box -->
+            </div>
+            
+            <div class="col-lg-12">
+              <p>Click to generate report. <button class="btn btn-sm btn-primary" onclick="printReport()"> <i class="fa fa-save"></i>  Print Report</button></p>
+            </div>
+
+          </div>
+
+          <!-- Main row -->
+          <div class="row"></div>
+          <!-- /.row (main row) -->
+        </section>
+        <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+
+      {% include 'main/manager/footer.html' %}
+      <script>
+        function printReport() {
+          var myChart = document.getElementById('donutChart').innerHTML;
+          var additionalContent = '<h2>SOMS Report for Talents</h2>' +
+                                  '<p>This is additional content that is not displayed on the page.</p>';
+          var selectedSection1 = '<div class="card mb-3">'+
+                  '<div class="box-header">'+
+                    '<h3 class="box-title">List of Outsourced Talents</h3>'+
+                  '</div>'+
+                  '<div class="box-body reportContents">'+
+                  '<table class="table table-bordered table-striped">'+
+                    '<thead>'+
+                      '<tr>'+
+                        '<th>No.</th>'+
+                        '<th colspan="2">TALENT</th>'+
+                        '<th>DEPLOYMENT</th>'+
+                      '</tr>'+
+                    '</thead>'+
+                    '<tbody>'+
+                      '{% if deployedTalents %} {% for talent in deployedTalents %}'+
+                      '<tr>'+
+                        '<td>{{ forloop.counter }}.</td>'+
+                        '<td>'+
+                          '{% if talent.profilePicture %}'+
+                          '<img class="profile-user-img img-responsive img-circle" src="{{talent.profilePicture.url}}" width="120px" alt="{{talent.user.first_name}} image" />'+
+                          '{% else %}'+
+                          '<img class="profile-user-img img-responsive img-circle" src="{% static "images/anonymous.png" %}" width="50px" alt="{{talent.user.first_name}} image" />'+
+                          '{% endif %}'+
+                        '</td>'+
+                        '<td>'+
+                          'Name: {{talent.user.first_name}} {{talent.user.last_name}}<br />'+
+                          'Gender: {{talent.user.gender}}<br />'+
+                          'Email: {{talent.user.email}}<br />'+
+                          'Phome: {{talent.phone1}}<br />'+
+                          'Cohort: {{talent.cohort.cohort_name}}<br />'+
+                          'Stack: {{talent.stack.name}}'+
+                        '</td>'+
+                        '<td>'+
+                          '<img class="" src="{{talent.companyDeployed.logoFile.url}}" width="120px" height="60px" alt="{{talent.companyDeployed.name}} image" />'+
+                          '{{talent.companyDeployed.name}}'+
+                          '<br />'+
+                          ' Since {{talent.deployedDate}}'+
+                        '</td>'+
+                      '</tr>'+
+                      '{% endfor %} {% endif %}'+
+                    '</tbody>'+
+                  '</table>'+
+                '</div></div>';
+
+          var selectedSection2 = '<div class="card mb-3">'+
+                  '<div class="box-header">'+
+                    '<h3 class="box-title">List of Reserved Talents</h3>'+
+                  '</div>'+
+                  '<div class="box-body reportContents">'+
+                  '<table class="table table-bordered table-striped">'+
+                    '<thead>'+
+                      '<th>No.</th>'+
+                      '<th colspan="2">TALENT</th>'+
+                      '<th>COHORT</th>'+
+                      '<th>STACK</th>'+
+                    '</thead>'+
+                    '<tbody>'+
+                      '{% if reservedTalents %} {% for talent in reservedTalents %}'+
+                      '<tr>'+
+                        '<td>{{ forloop.counter }}.</td>'+
+                        '<td>'+
+                          '{% if talent.profilePicture %}'+
+                          '<img class="profile-user-img img-responsive img-circle" src="{{talent.profilePicture.url}}" width="120px" alt="{{talent.user.first_name}} image" />'+
+                          '{% else %}'+
+                          '<img class="profile-user-img img-responsive img-circle" src="{% static "images/anonymous.png" %}" width="50px" alt="{{talent.user.first_name}} image" />'+
+                          '{% endif %}'+
+                        '</td>'+
+                        '<td>'+
+                          'Name: {{talent.user.first_name}} {{talent.user.last_name}}<br />'+
+                          'Gender: {{talent.user.gender}}<br />'+
+                          'Email: {{talent.user.email}}<br />'+
+                          'Phome: {{talent.phone1}}<br />'+
+                        '</td>'+
+                        '<td>{{talent.cohort.cohort_name}}</td>'+
+                        '<td>{{talent.stack.name}}</td>'+
+                      '</tr>'+
+                      '{% endfor %} {% endif %}'+
+                    '</tbody>'+
+                  '</table>'+
+                '</div></div>';
+
+          // Create a new page content by combining the selected sections' content with additional content
+          var printContent = additionalContent + myChart + selectedSection1 + selectedSection2;
+
+          var originalContent = document.body.innerHTML;
+          document.body.innerHTML = printContent;
+          window.print();
+          document.body.innerHTML = originalContent;
+        }
+      </script>
+
+
+    </div>
+    {% endblock %}
+  </body>
+</html>

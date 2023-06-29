@@ -43,6 +43,12 @@
           </span>
         </a>
         <ul class="treeview-menu">
+          <li class="{{report_active}}">
+            <a href="{% url 'talent_report' %}">
+              <i class="fa fa-circle-o text-aqua"></i> <span>Report</span>
+              <span class="pull-right-container"> </span>
+            </a>
+          </li>
           <li class="{{talentA_active}}">
             <a href="{% url 'manager_outsourcedList' %}">
               <i class="fa fa-circle-o text-aqua"></i> Outsourced
