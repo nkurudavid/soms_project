@@ -182,6 +182,28 @@ def ManagerDashboard(request):
         return redirect(ManagerLogin)
 
 
+
+@login_required(login_url='manager_login')
+def ManagerDashboard_talentReport(request):
+    if request.user.is_authenticated and request.user.is_manager==True:
+        # getting all reserved talents
+        talents = Trainee.objects.filter(status=Trainee.Status.AWARDED)
+        CohortData = Cohort.objects.filter()
+        context = {
+            'title': 'Talents Report', 
+            'talent_active': 'active',
+            'report_active': 'active',
+            'cohorts': CohortData,
+            'reservedTalents': talents.filter(companyDeployed__isnull=True),
+            'deployedTalents':  talents.filter(companyDeployed__isnull=False),
+        }
+        return render(request, 'main/manager/talent_report.html', context)
+    else:
+        messages.warning(request, ('You have to login to view the page!'))
+        return redirect(ManagerLogin)
+
+
+
 @login_required(login_url='manager_login')
 def Manager_profile(request):
     if request.user.is_authenticated and request.user.is_manager==True:

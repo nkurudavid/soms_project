@@ -24,6 +24,7 @@ urlpatterns = [
     path('staff/manager/dashboard/cohorts/<int:pk>/application_list/<int:n>/application_details', ManagerDashboard_applicationDetails, name='manager_applicationDetails'),
     path('staff/manager/dashboard/cohorts/<int:pk>/trainees_list', ManagerDashboard_traineesList, name='manager_traineesList'),
     path('staff/manager/dashboard/cohorts/<int:pk>/trainees_list/<int:n>/trainee_profile', ManagerDashboard_traineeProfile, name='manager_traineesProfile'),
+    path('staff/manager/dashboard/talents/talent_report', ManagerDashboard_talentReport, name='talent_report'),
     path('staff/manager/dashboard/talents/outsourced_list', ManagerDashboard_outsourcedList, name='manager_outsourcedList'),
     path('staff/manager/dashboard/talents/reserved_list', ManagerDashboard_reservedList, name='manager_reservedList'),
     path('staff/manager/dashboard/talents/<int:pk>/talent_profile', ManagerDashboard_talentProfile, name='manager_talentProfile'),

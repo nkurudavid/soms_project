@@ -112,6 +112,9 @@
               <!-- /.box -->
             </div>
             <!-- /.col -->
+            <div class="col-lg-12">
+              <p>Click to generate report. <button class="btn btn-sm btn-primary" onclick="printReport()"> <i class="fa fa-save"></i>  Print Report</button></p>
+            </div>
           </div>
         </section>
         <!-- /.content -->
@@ -119,6 +122,56 @@
       <!-- /.content-wrapper -->
 
       {% include 'main/manager/footer.html' %}
+      <script>
+        function printReport() {
+          var additionalContent = '<h2>SOMS Report for Reserved Talents</h2>' +
+                                  '<p>This is additional content that is not displayed on the page.</p>';
+          var selectedSection = '<div class="card mb-3">'+
+                  '<div class="box-header">'+
+                    '<h3 class="box-title">List of Reserved Talents</h3>'+
+                  '</div>'+
+                  '<div class="box-body reportContents">'+
+                  '<table class="table table-bordered table-striped">'+
+                    '<thead>'+
+                      '<th>No.</th>'+
+                      '<th colspan="2">TALENT</th>'+
+                      '<th>COHORT</th>'+
+                      '<th>STACK</th>'+
+                    '</thead>'+
+                    '<tbody>'+
+                      '{% if talents %} {% for talent in talents %}'+
+                      '<tr>'+
+                        '<td>{{ forloop.counter }}.</td>'+
+                        '<td>'+
+                          '{% if talent.profilePicture %}'+
+                          '<img class="profile-user-img img-responsive img-circle" src="{{talent.profilePicture.url}}" width="120px" alt="{{talent.user.first_name}} image" />'+
+                          '{% else %}'+
+                          '<img class="profile-user-img img-responsive img-circle" src="{% static "images/anonymous.png" %}" width="50px" alt="{{talent.user.first_name}} image" />'+
+                          '{% endif %}'+
+                        '</td>'+
+                        '<td>'+
+                          'Name: {{talent.user.first_name}} {{talent.user.last_name}}<br />'+
+                          'Gender: {{talent.user.gender}}<br />'+
+                          'Email: {{talent.user.email}}<br />'+
+                          'Phome: {{talent.phone1}}<br />'+
+                        '</td>'+
+                        '<td>{{talent.cohort.cohort_name}}</td>'+
+                        '<td>{{talent.stack.name}}</td>'+
+                      '</tr>'+
+                      '{% endfor %} {% endif %}'+
+                    '</tbody>'+
+                  '</table>'+
+                '</div></div>';
+
+          // Create a new page content by combining the selected sections' content with additional content
+          var printContent = additionalContent + selectedSection;
+
+          var originalContent = document.body.innerHTML;
+          document.body.innerHTML = printContent;
+          window.print();
+          document.body.innerHTML = originalContent;
+        }
+      </script>
     </div>
     {% endblock %}
   </body>
